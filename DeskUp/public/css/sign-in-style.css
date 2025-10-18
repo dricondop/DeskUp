@@ -1,0 +1,150 @@
+@font-face {
+    font-family: 'Inter', sans-serif;
+    src: url(../assets/Inter-VariableFont_opsz,wght.ttf);
+    font-weight: 100 900;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body.signin-body {
+    background-color: #07325F;
+    background-image:
+      linear-gradient(125deg, #07325F 0%, #2A7B9B 40%, #57C785 100%);
+    background-repeat: no-repeat, repeat;
+    background-size: cover, 64px 64px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.sign-in-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    gap: 25px;
+}
+
+form.sign-in-form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+form.sign-in-form input {
+    margin-bottom: 15px;
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 15px;
+    height: 40px;
+    width: 300px;
+    background-color: transparent;
+    color: #fff;     
+    caret-color: #fff;
+    outline: none;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    border-radius: 4px;
+    padding: 0 18px 0 42px;
+}
+
+form.sign-in-form input::placeholder {
+    color: #fff;
+    opacity: 0.7;    
+}
+
+form.sign-in-form input.email,
+form.sign-in-form input.password {
+    background-repeat: no-repeat;
+    background-position: 14px center;
+    background-size: 18px 18px;
+}
+
+form.sign-in-form input.email {
+    background-image: url("../assets/user.png");
+}
+
+div.password-container {
+    position: relative;
+    display: flex;
+}
+
+div.password-container > input.password {
+    padding-left: 42px;
+}
+
+p.alert.error {
+    font-family: 'Inter';
+    font-weight: 500;
+    font-size: 15px;
+    color: #aa0101;
+}
+
+button.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 37.5%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 0;
+}
+
+button.toggle-password img {
+    height: 20px;
+    width: 20px;
+}
+
+button.submit {
+    justify-self: center;
+    margin-top: 25px;
+    height: 40px;
+    width: 80px;
+    font-family: 'Inter';
+    font-size: 14px;
+    font-weight: 400;
+    border-radius: 4px;
+    outline: none;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    color: white;
+    background-color: transparent;
+    align-self: center;
+}
+
+form.sign-in-form input.password {
+    background-image: url("../assets/lock.png");
+}
+
+a.forgot-password {
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 15px;
+    color: white;
+    text-decoration: underline;
+}
+
+a.back {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+}
+a.back img {
+    width: 25px;
+    height: 25px;
+}
+
+img.sign-in-logo {
+    height: 40%;
+    width: 40%;
+}
