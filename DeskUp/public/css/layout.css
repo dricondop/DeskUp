@@ -1,0 +1,144 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#canvas {
+    width: 100vw;
+    height: 100vh;
+    background: #f0f0f0;
+    background-image:
+        linear-gradient(rgba(0, 0, 0, .05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, .05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    position: relative;
+    cursor: grab;
+}
+
+#canvas.grabbing {
+    cursor: grabbing;
+}
+
+#canvas.selecting {
+    cursor: crosshair;
+}
+
+.desk {
+    position: absolute;
+    width: 80px;
+    height: 100px;
+    cursor: move;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.desk:hover {
+    transform: scale(1.05);
+}
+
+.desk.dragging {
+    opacity: 0.7;
+    z-index: 1000;
+}
+
+.desk.selected img {
+    outline: 3px solid #e74c3c;
+    outline-offset: 2px;
+}
+
+.desk-label {
+    color: black;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.selection-box {
+    position: absolute;
+    border: 2px dashed #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    pointer-events: none;
+    z-index: 999;
+}
+
+.toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.toolbar .toolbar-btn {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background: #4a90e2;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+}
+
+.toolbar .toolbar-btn:hover {
+    background: #357abd;
+}
+
+.toolbar .toolbar-btn.delete-btn {
+    background: #e74c3c;
+}
+
+.toolbar .toolbar-btn.delete-btn:hover {
+    background: #c0392b;
+}
+
+.toolbar .toolbar-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.toolbar .toolbar-btn.file-btn {
+    padding: 0;
+    background: transparent;
+}
+
+.toolbar .toolbar-btn.file-btn:hover {
+    background: transparent;
+}
+
+.toolbar .toolbar-btn.file-btn span {
+    padding: 10px 15px;
+    background: #4a90e2;
+    color: white;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.toolbar .toolbar-btn.file-btn:hover span {
+    background: #357abd;
+}
+
+.toolbar .toolbar-btn.file-btn input[type="file"] {
+    display: none;
+}
+
+.desk-count {
+    margin: 5px;
+    font-size: 14px;
+    color: #333;
+}
