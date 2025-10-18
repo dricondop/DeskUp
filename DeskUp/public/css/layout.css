@@ -72,39 +72,35 @@ body {
 
 .toolbar {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 20px;
     background: white;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.toolbar .toolbar-btn {
+.toolbar .toolbar-btn,
+.toolbar .file-btn {
     padding: 10px 15px;
-    margin: 5px;
     border: none;
     background: #4a90e2;
     color: white;
     border-radius: 5px;
     cursor: pointer;
-    display: inline-block;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: normal;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
 }
 
-.toolbar .toolbar-btn:hover {
+.toolbar .toolbar-btn:hover,
+.toolbar .file-btn:hover {
     background: #357abd;
-}
-
-.toolbar .toolbar-btn.delete-btn {
-    background: #e74c3c;
-}
-
-.toolbar .toolbar-btn.delete-btn:hover {
-    background: #c0392b;
 }
 
 .toolbar .toolbar-btn:disabled {
@@ -112,33 +108,84 @@ body {
     cursor: not-allowed;
 }
 
-.toolbar .toolbar-btn.file-btn {
-    padding: 0;
-    background: transparent;
+.toolbar .delete-btn {
+    background: #e74c3c;
 }
 
-.toolbar .toolbar-btn.file-btn:hover {
-    background: transparent;
+.toolbar .delete-btn:hover {
+    background: #c0392b;
 }
 
-.toolbar .toolbar-btn.file-btn span {
-    padding: 10px 15px;
-    background: #4a90e2;
-    color: white;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.toolbar .toolbar-btn.file-btn:hover span {
-    background: #357abd;
-}
-
-.toolbar .toolbar-btn.file-btn input[type="file"] {
+.toolbar .file-btn input[type="file"] {
     display: none;
 }
 
 .desk-count {
-    margin: 5px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
     font-size: 14px;
     color: #333;
+    font-weight: 500;
+}
+
+/* Toggle Switch Styles */
+.toggle-container {
+    width: 100%;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-text {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background: #ccc;
+    border-radius: 34px;
+    transition: background 0.3s;
+}
+
+.toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider {
+    background: #4a90e2;
+}
+
+.toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
+    transform: translateX(26px);
+}
+
+.toggle-label:hover .toggle-slider {
+    opacity: 0.9;
 }

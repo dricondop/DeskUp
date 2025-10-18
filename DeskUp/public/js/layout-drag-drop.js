@@ -6,6 +6,7 @@ let isSelecting = false;
 let selectedDesks = new Set();
 let dragState = { desk: null, offsetX: 0, offsetY: 0, startPositions: [] };
 let selectionState = { box: null, startX: 0, startY: 0 };
+let editModeEnabled = true;
 
 loadDefaultLayout();
 
@@ -48,7 +49,7 @@ function addDesk(x, y, name = null) {
 }
 
 function startDrag(e) {
-    if (e.shiftKey) return;
+    if (e.shiftKey || !editModeEnabled) return;
     e.preventDefault();
 
     const desk = e.target.closest('.desk');
@@ -199,6 +200,15 @@ document.getElementById('deleteSelected').addEventListener('click', () => {
         deskCounter = document.querySelectorAll('.desk').length + 1;
         updateDeskCount();
     }
+});
+
+// Toggle move mode
+document.getElementById('moveModeToggle').addEventListener('change', (e) => {
+    editModeEnabled = e.target.checked;
+    canvas.style.cursor = editModeEnabled ? 'grab' : 'default';
+    document.querySelectorAll('.desk').forEach(desk => {
+        desk.style.cursor = editModeEnabled ? 'move' : 'default';
+    });
 });
 
 updateDeskCount();

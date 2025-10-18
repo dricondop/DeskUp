@@ -10,14 +10,22 @@
     <body>
         <main id="canvas"></main>
         
-        <nav class="toolbar">
-            <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
+        <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
+        
+        <nav class="toolbar">   
+            <div class="toggle-container">
+                <label class="toggle-label">
+                    <span class="toggle-text">Edit Mode</span>
+                    <input type="checkbox" id="editModeToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
             <button id="addDesk" class="toolbar-btn">Add Desk</button>
             <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
             <label for="loadLayout" class="toolbar-btn file-btn">
-            <input type="file" id="loadLayout" accept="application/json">
-            <span>Load Layout</span>
+                Load Layout
+                <input type="file" id="loadLayout" accept="application/json">
             </label>
         </nav>
 

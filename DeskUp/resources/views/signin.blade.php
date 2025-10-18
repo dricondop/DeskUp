@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>DeskUp-SignIn</title>
-        <link rel="stylesheet" href="{{ asset ('css/sign-in-style.css') }}">
+        <title>Sign In | DeskUp</title>
+        <link rel="stylesheet" href="{{ asset ('css/signin.css') }}">
         <meta charset="utf-8">
     </head>
     <body class="signin-body">
