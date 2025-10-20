@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class LayoutController extends Controller
 {
     public function index()
     {
-        return view('layout');
+        $isAdmin = Auth::check() && Auth::user()->isAdmin();
+        
+        return view('layout', [
+            'isAdmin' => $isAdmin,
+            'isLoggedIn' => Auth::check()
+        ]);
     }
 
     public function save(Request $request)
