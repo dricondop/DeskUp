@@ -7,13 +7,20 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::get('/signin', function () {
     return view('signin');
+});
+
+Route::get('/profile', function () {
+    return view('profile');
+});
+
+Route::get('/edit-profile', function () {
+    return view('edit-profile');
 });
 
 Route::post('/signin', function (Request $request): Response|RedirectResponse {
