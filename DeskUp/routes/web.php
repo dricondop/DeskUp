@@ -39,8 +39,6 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
     return back()
         ->withErrors(['auth' => 'Incorrect email or password'])
         ->withInput(['email' => $request->input('email')]);
-});
-
 })->middleware('throttle:5,1'); 
 //The throttle is a security measure to limit the ammount of sing-ins to 5 per minute.
 
