@@ -5,7 +5,6 @@ use App\Http\Controllers\LayoutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-// Home page
 Route::get('/', function () {
     return view('welcome');
 });
@@ -18,8 +17,15 @@ Route::get('/signin', function () {
     return view('signin');
 })->name('login')->middleware('guest');
 
-// Sign in logic
-Route::post('/signin', function (Request $request) {
+Route::get('/profile', function () {
+    return view('profile');
+});
+
+Route::get('/edit-profile', function () {
+    return view('edit-profile');
+});
+
+Route::post('/signin', function (Request $request): Response|RedirectResponse {
     $credentials = $request->validate([
         'email' => ['required', 'email'],
         'password' => ['required'],
