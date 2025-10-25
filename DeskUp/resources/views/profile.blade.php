@@ -124,5 +124,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Include Footer Component -->
+    {{ include('components/footer.html') }}
+
+    <script src="{{ asset('js/profile.js') }}"></script>
 </body>
 </html>
