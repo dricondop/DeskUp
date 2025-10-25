@@ -41,6 +41,10 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
         ->withInput(['email' => $request->input('email')]);
 });
 
+})->middleware('throttle:5,1'); 
+//The throttle is a security measure to limit the ammount of sing-ins to 5 per minute.
+
+Route::view('/health', 'health')->name('health');
 // Logout
 Route::post('/logout', function (Request $request) {
     Auth::logout();
