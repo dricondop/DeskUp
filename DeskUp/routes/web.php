@@ -3,16 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Layout page (requires authentication)
 Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth');
 
-// Sign in page
 Route::get('/signin', function () {
     return view('signin');
 })->name('login')->middleware('guest');
@@ -40,10 +40,9 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
         ->withErrors(['auth' => 'Incorrect email or password'])
         ->withInput(['email' => $request->input('email')]);
 })->middleware('throttle:5,1'); 
-//The throttle is a security measure to limit the ammount of sing-ins to 5 per minute.
 
 Route::view('/health', 'health')->name('health');
-// Logout
+
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();

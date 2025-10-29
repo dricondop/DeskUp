@@ -10,8 +10,13 @@ class LayoutController extends Controller
 {
     public function index()
     {
-        $isAdmin = Auth::check() && Auth::user()->isAdmin();
-        
+        $isAdmin = false;
+
+        if (Auth::check()) {
+            Auth::user()->refresh();
+            $isAdmin = Auth::user()->isAdmin();
+        }
+
         return view('layout', [
             'isAdmin' => $isAdmin,
             'isLoggedIn' => Auth::check()
