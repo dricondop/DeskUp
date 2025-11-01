@@ -98,6 +98,7 @@ button.toggle-password {
 button.toggle-password img {
     height: 20px;
     width: 20px;
+    cursor: pointer;
 }
 
 button.submit {
@@ -114,6 +115,12 @@ button.submit {
     color: white;
     background-color: transparent;
     align-self: center;
+    cursor: pointer;
+}
+
+button.submit:hover {
+    background-color: white;
+    color: #2A7B9B;
 }
 
 form.sign-in-form input.password {

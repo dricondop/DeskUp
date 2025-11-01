@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Desk Control</title>
-        <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desk Control | DeskUp</title>
+    
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
+</head>
+<body>
+    @include('components.sidebar')
+    
+    <div class="main-content">
         <main class="desk-control">
             <section class="desk-view">
                 <h1>Desk Control</h1>
@@ -53,10 +59,9 @@
                 </section>
             </div>
         </main>
-    </body>
-</html>
-<script>
+    </div>
 
+    <script>
     // Single range slider: update color fill and value
     window.addEventListener("load", () => {
     document.querySelectorAll(".srange").forEach(wrap => {
@@ -74,7 +79,6 @@
         update(); // init
     });
     });
-
-</script>
-
-
+    </script>
+</body>
+</html>

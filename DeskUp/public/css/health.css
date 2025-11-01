@@ -8,7 +8,7 @@
   --glass: rgba(58,80,107,0.04);
   --radius: 12px;
   --shadow: 0 6px 18px rgba(58,80,107,0.08);
-  font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 *{box-sizing:border-box}
