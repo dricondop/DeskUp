@@ -1,23 +1,23 @@
 const canvas = document.getElementById('canvas');
 const MAX_DESKS = 50;
+const isAdmin = window.isAdmin || false;
+
 let deskCounter = 1;
+let editModeEnabled = isAdmin;
 let isDragging = false;
 let isSelecting = false;
 let selectedDesks = new Set();
 let dragState = { desk: null, offsetX: 0, offsetY: 0, startPositions: [] };
 let selectionState = { box: null, startX: 0, startY: 0 };
-let editModeEnabled = true;
-
-const isAdmin = window.isAdmin || false;
 
 loadDefaultLayout();
 
 async function loadDefaultLayout() {
     try {
-        const response = await fetch('/default-layout.json');
+        const response = await fetch('/layout/load');
         const data = await response.json();
-        if (data.desks) {
-            data.desks.forEach(d => addDesk(d.x, d.y, d.name));
+        if (data.desks && data.desks.length > 0) {
+            data.desks.forEach(d => addDesk(d.x, d.y, d.name, d.id));
             deskCounter = Math.max(...data.desks.map(d => parseInt(d.name.match(/\d+/)?.[0] || 0))) + 1;
         }
     } catch (error) {
@@ -32,16 +32,24 @@ function updateDeskCount() {
         deskCountElement.textContent = count;
     }
 
-    // Only update addDesk button if it exists
     const addDeskBtn = document.getElementById('addDesk');
+    const deleteBtn = document.getElementById('deleteSelected');
+    
     if (addDeskBtn) {
-        addDeskBtn.disabled = count >= MAX_DESKS;
+        addDeskBtn.disabled = !editModeEnabled || count >= MAX_DESKS;
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.disabled = !editModeEnabled;
     }
 }
 
-function addDesk(x, y, name = null) {
-    if (document.querySelectorAll('.desk').length >= MAX_DESKS) {
-        if (isAdmin) alert(`Maximum of ${MAX_DESKS} desks reached!`);
+function addDesk(x, y, name = null, deskId = null) {
+    const currentCount = document.querySelectorAll('.desk').length;
+    if (currentCount >= MAX_DESKS) {
+        if (isAdmin) {
+            alert(`Maximum of ${MAX_DESKS} desks reached!`);
+        }
         return;
     }
 
@@ -49,22 +57,54 @@ function addDesk(x, y, name = null) {
     desk.className = 'desk';
     desk.style.left = `${x}px`;
     desk.style.top = `${y}px`;
+    
+    if (deskId) {
+        desk.setAttribute('data-desk-id', deskId);
+    }
+    
     desk.innerHTML = `
-                <img src="desk_icon.png" alt="Desk" style="width:48px;height:48px;display:block;margin:0 auto">
-                <div class="desk-label" style="font-size:16px;margin-top:4px">${name || `Desk ${deskCounter++}`}</div>
-            `;
+        <img src="desk_icon.png" alt="Desk" style="width:48px;height:48px;display:block;margin:0 auto">
+        <div class="desk-label" style="font-size:16px;margin-top:4px">${name || `Desk ${deskCounter++}`}</div>
+    `;
+
+    desk.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        const id = desk.getAttribute('data-desk-id');
+        if (id) {
+            window.location.href = `/desk-control/${id}`;
+        } else {
+            const message = isAdmin 
+                ? 'Please save the layout first to enable desk control access.'
+                : 'This desk has not been saved yet. Please ask an admin to save the layout first.';
+            alert(message);
+        }
+    });
 
     if (isAdmin) {
         desk.addEventListener('mousedown', startDrag);
     }
 
+    updateDeskCursor(desk);
+
     canvas.appendChild(desk);
     updateDeskCount();
 }
 
+function updateDeskCursor(desk) {
+    if (isAdmin && editModeEnabled) {
+        desk.style.cursor = 'move';
+    } else {
+        desk.style.cursor = 'pointer';
+    }
+}
+
 function startDrag(e) {
-    if (!isAdmin || e.shiftKey || !editModeEnabled) return;
+    if (!isAdmin || !editModeEnabled || e.shiftKey) {
+        return;
+    }
+    
     e.preventDefault();
+    e.stopPropagation();
 
     const desk = e.target.closest('.desk');
     if (!desk) return;
@@ -73,7 +113,6 @@ function startDrag(e) {
     dragState.desk = desk;
 
     if (desk.classList.contains('selected') && selectedDesks.size > 1) {
-        // Multi-desk drag
         dragState.startPositions = Array.from(selectedDesks).map(d => ({
             desk: d,
             x: d.offsetLeft,
@@ -83,7 +122,6 @@ function startDrag(e) {
         dragState.offsetY = e.clientY;
         selectedDesks.forEach(d => d.classList.add('dragging'));
     } else {
-        // Single desk drag
         dragState.offsetX = e.clientX - desk.offsetLeft;
         dragState.offsetY = e.clientY - desk.offsetTop;
         desk.classList.add('dragging');
@@ -100,7 +138,6 @@ function clampToCanvas(x, y, width, height) {
 document.addEventListener('mousemove', (e) => {
     if (isDragging && dragState.desk) {
         if (dragState.startPositions.length > 0) {
-            // Multi-desk drag
             const dx = e.clientX - dragState.offsetX;
             const dy = e.clientY - dragState.offsetY;
             dragState.startPositions.forEach(({ desk, x, y }) => {
@@ -109,7 +146,6 @@ document.addEventListener('mousemove', (e) => {
                 desk.style.top = `${pos.y}px`;
             });
         } else {
-            // Single desk drag
             const pos = clampToCanvas(
                 e.clientX - dragState.offsetX,
                 e.clientY - dragState.offsetY,
@@ -153,17 +189,14 @@ document.addEventListener('mouseup', () => {
     }
 });
 
-// Start selection box
 canvas.addEventListener('mousedown', (e) => {
-    if (e.target === canvas && !e.shiftKey) {
-        if (isAdmin) {
-            selectedDesks.forEach(d => d.classList.remove('selected'));
-            selectedDesks.clear();
-        }
+    if (e.target === canvas && !e.shiftKey && isAdmin) {
+        selectedDesks.forEach(d => d.classList.remove('selected'));
+        selectedDesks.clear();
         return;
     }
 
-    if (isAdmin && e.shiftKey && e.target === canvas) {
+    if (isAdmin && editModeEnabled && e.shiftKey && e.target === canvas) {
         isSelecting = true;
         canvas.classList.add('selecting');
         selectionState.startX = e.clientX;
@@ -192,11 +225,11 @@ function updateSelection(boxLeft, boxTop, boxWidth, boxHeight) {
     });
 }
 
-// Only add event listeners if user is admin
 if (isAdmin) {
     const addDeskBtn = document.getElementById('addDesk');
     if (addDeskBtn) {
         addDeskBtn.addEventListener('click', () => {
+            if (!editModeEnabled) return;
             addDesk(
                 Math.random() * (window.innerWidth - 150),
                 Math.random() * (window.innerHeight - 150)
@@ -207,7 +240,7 @@ if (isAdmin) {
     const deleteBtn = document.getElementById('deleteSelected');
     if (deleteBtn) {
         deleteBtn.addEventListener('click', () => {
-            if (selectedDesks.size === 0) {
+            if (!editModeEnabled || selectedDesks.size === 0) {
                 alert('No desks selected. Hold Shift and drag to select desks.');
                 return;
             }
@@ -218,7 +251,9 @@ if (isAdmin) {
 
                 document.querySelectorAll('.desk').forEach((desk, i) => {
                     const label = desk.querySelector('.desk-label');
-                    if (label) label.textContent = `Desk ${i + 1}`;
+                    if (label) {
+                        label.textContent = `Desk ${i + 1}`;
+                    }
                 });
                 deskCounter = document.querySelectorAll('.desk').length + 1;
                 updateDeskCount();
@@ -226,20 +261,25 @@ if (isAdmin) {
         });
     }
 
-    // Toggle edit mode
     const editModeToggle = document.getElementById('editModeToggle');
     if (editModeToggle) {
         editModeToggle.addEventListener('change', (e) => {
             editModeEnabled = e.target.checked;
+            
             canvas.style.cursor = editModeEnabled ? 'grab' : 'default';
+            
             document.querySelectorAll('.desk').forEach(desk => {
-                desk.style.cursor = editModeEnabled ? 'move' : 'default';
+                updateDeskCursor(desk);
             });
+            
+            updateDeskCount();
+            
+            if (!editModeEnabled) {
+                selectedDesks.forEach(d => d.classList.remove('selected'));
+                selectedDesks.clear();
+            }
         });
     }
-} else {
-    editModeEnabled = false;
-    canvas.style.cursor = 'default';
 }
 
 updateDeskCount();

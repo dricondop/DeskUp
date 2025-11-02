@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
+use App\Http\Controllers\DeskController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -12,8 +13,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/layout', [LayoutController::class, 'index'])
-    ->middleware(['auth', 'admin']);
+Route::get('/desk-control/{id}', [DeskController::class, 'show'])->name('desk.control');
+
+Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth');
+Route::post('/layout/save', [LayoutController::class, 'save'])->middleware('auth');
+Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/api/desks', [DeskController::class, 'index']);
+    Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
+    Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
+    Route::post('/api/desks/{id}/activities', [DeskController::class, 'addActivity']);
+});
 
 Route::get('/signin', function () {
     return view('signin');

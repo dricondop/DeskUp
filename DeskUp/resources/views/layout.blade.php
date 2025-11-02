@@ -31,29 +31,24 @@
         </form>
     </div>
 
-    <main id="canvas" data-is-admin="{{ $isAdmin ? 'true' : 'false' }}"></main>
-    
-    <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
-    
-    @if($isAdmin)
-    <nav class="toolbar">   
-        <div class="toggle-container">
-            <label class="toggle-label">
-                <span class="toggle-text">Edit Mode</span>
-                <input type="checkbox" id="editModeToggle" checked>
-                <span class="toggle-slider"></span>
-            </label>
-        </div>
-        <button id="addDesk" class="toolbar-btn">Add Desk</button>
-        <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
-        <button id="saveLayout" class="toolbar-btn">Save Layout</button>
-        <label for="loadLayout" class="toolbar-btn file-btn">
-            Load Layout
-            <input type="file" id="loadLayout" accept="application/json">
-        </label>
-    </nav>
-    @endif
-    </div>
+        <main id="canvas" data-is-admin="{{ $isAdmin ? 'true' : 'false' }}"></main>
+        
+        <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
+        
+        @if($isAdmin)
+        <nav class="toolbar">   
+            <div class="toggle-container">
+                <label class="toggle-label">
+                    <span class="toggle-text">Edit Mode</span>
+                    <input type="checkbox" id="editModeToggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <button id="addDesk" class="toolbar-btn">Add Desk</button>
+            <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
+            <button id="saveLayout" class="toolbar-btn">Save Layout</button>
+        </nav>
+        @endif
 
     <script>window.isAdmin = {{ $isAdmin ? 'true' : 'false' }};</script>
     <script src="{{ asset('js/layout-drag-drop.js') }}"></script>
