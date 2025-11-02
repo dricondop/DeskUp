@@ -1,7 +1,7 @@
 <footer class="app-footer">
     <div class="footer-content">
         <div class="footer-section">
-            <h3>desk<span>Up</span></h3>
+            <h3>Desk<span>Up</span></h3>
             <p>Elevate Your Work. Elevate Your Health.</p>
         </div>
         <div class="footer-section">
@@ -24,6 +24,6 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <p>&copy; 2023 DeskUp. All rights reserved.</p>
+        <p>&copy; 2025 DeskUp. All rights reserved.</p>
     </div>
 </footer>

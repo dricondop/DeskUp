@@ -1,0 +1,53 @@
+.app-footer {
+    background: linear-gradient(180deg, #1e6387 0%, #2A7B9B 100%);
+    color: white;
+    padding: 3rem 2rem 1rem;
+    margin-top: auto;
+    position: relative;
+    z-index: 101;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-section h3,
+.footer-section h4 {
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.footer-section h3 span {
+    color: #57C785;
+}
+
+.footer-section p {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 1rem;
+}
+
+.footer-section a {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: #57C785;
+    padding-left: 5px;
+}
+
+.footer-bottom {
+    max-width: 1200px;
+    margin: 2rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+}

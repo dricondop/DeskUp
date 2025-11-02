@@ -1,15 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Insights — DeskUp</title>
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset ('css/health.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/health.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    @include('components.sidebar')
+    
+    <div class="main-content">
     <header class="site-header" role="banner">
         <div class="container">
             <div class="header-left">
@@ -143,11 +147,10 @@
             <small>DeskUp © 2025</small>
         </div>
     </footer>
+    </div>
 
-    <script src="health.js"></script>
-</body>
-</html>
-<script>
+    <script src="{{ asset('js/health.js') }}"></script>
+    <script>
     /* Health insights — Chart rendering, timeframe and UI interactions */
     'use strict';
 
@@ -439,4 +442,6 @@
     } else {
     init();
     }
-</script>
+    </script>
+</body>
+</html>

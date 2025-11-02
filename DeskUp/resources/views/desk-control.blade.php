@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $desk->name }} - Desk Control</title>
-        <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desk Control | DeskUp</title>
+    
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
+</head>
+<body>
+    @include('components.sidebar')
+    
+    <div class="main-content">
         <main class="desk-control">
             <section class="desk-view">
                 <h1>Desk Control</h1>

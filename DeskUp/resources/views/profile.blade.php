@@ -4,9 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeskUp - User Profile</title>
-    <link rel="stylesheet" href="css/profile-style.css">
+    
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    
 </head>
 <body>
+    @include('components.sidebar')
+    
+    <div class="main-content">
     <a href="#" class="back-button">
         <img src="{{ asset ('assets/back.png') }}" alt="Back">
     </a>
@@ -126,7 +133,8 @@
     </div>
 
     <!-- Include Footer Component -->
-    {{ include('components/footer.html') }}
+    @include('components.footer')
+    </div>
 
     <script src="{{ asset('js/profile.js') }}"></script>
 </body>
