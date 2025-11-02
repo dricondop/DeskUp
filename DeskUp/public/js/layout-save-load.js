@@ -1,44 +1,31 @@
-document.getElementById('saveLayout').addEventListener('click', () => {
+document.getElementById('saveLayout').addEventListener('click', async () => {
     const desks = Array.from(document.querySelectorAll('.desk')).map(desk => ({
         name: desk.querySelector('.desk-label')?.textContent || 'Desk',
         x: parseInt(desk.style.left),
         y: parseInt(desk.style.top)
     }));
     
-    const blob = new Blob([JSON.stringify({ desks }, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'layout.json';
-    link.click();
-    URL.revokeObjectURL(url);
-});
+    try {
+        const response = await fetch('/layout/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ desks })
+        });
 
-document.getElementById('loadLayout').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        try {
-            const data = JSON.parse(event.target.result);
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Layout saved successfully to database!');
             
-            if (!data.desks || !Array.isArray(data.desks)) {
-                alert('Invalid layout file.');
-                return;
-            }
-            
-            document.querySelectorAll('.desk').forEach(desk => desk.remove());
-            if (typeof selectedDesks !== 'undefined') selectedDesks.clear();
-            
-            data.desks.forEach(d => addDesk(d.x, d.y, d.name));
-            
-            deskCounter = Math.max(...data.desks.map(d => parseInt(d.name.match(/\d+/)?.[0] || 0))) + 1;
-            
-            alert('Layout loaded successfully!');
-        } catch (err) {
-            alert('Error reading layout file: ' + err.message);
+            location.reload();
+        } else {
+            alert('Error saving layout: ' + (data.message || 'Unknown error'));
         }
-    };
-    reader.readAsText(file);
+    } catch (error) {
+        console.error('Error saving layout:', error);
+        alert('Error saving layout. Check console for details.');
+    }
 });
