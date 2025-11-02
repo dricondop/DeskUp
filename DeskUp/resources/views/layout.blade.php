@@ -42,10 +42,6 @@
             <button id="addDesk" class="toolbar-btn">Add Desk</button>
             <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
-            <label for="loadLayout" class="toolbar-btn file-btn">
-                Load Layout
-                <input type="file" id="loadLayout" accept="application/json">
-            </label>
         </nav>
         @endif
 
