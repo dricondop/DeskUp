@@ -1,0 +1,127 @@
+/* Theme & layout */
+:root{
+  --bg: #F4F7F8;
+  --text: #3A506B;
+  --accent: #00A8A8;
+  --muted: #7D8893;
+  --card: #ffffff;
+  --glass: rgba(58,80,107,0.04);
+  --radius: 12px;
+  --shadow: 0 6px 18px rgba(58,80,107,0.08);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.35;
+  font-weight:300;
+  font-size:16px;
+}
+
+/* Container */
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px;
+}
+
+/* Header */
+.site-header{
+  background:linear-gradient(90deg, rgba(58,80,107,0.04), transparent);
+  border-bottom:1px solid rgba(58,80,107,0.04);
+}
+.site-header .container{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding-top:20px;
+  padding-bottom:12px;
+  justify-content:space-between;
+}
+.header-left h1{margin:0;font-size:1.4rem;font-weight:700;color:var(--text)}
+.subtitle{margin:0 0 0.25rem 0;font-size:0.95rem;color:var(--muted)}
+
+/* Grid layout for main dashboard */
+.dashboard{
+  display:grid;
+  grid-template-columns: 1fr 2fr;
+  gap:20px;
+  align-items:start;
+  margin-top:20px;
+}
+
+/* Summary cards (left column) */
+.summary{
+  display:grid;
+  gap:12px;
+  grid-auto-rows:min-content;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{
+  transform:translateY(-6px);
+}
+
+/* Metric card specifics */
+.metric-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.metric-title{margin:0;font-size:0.9rem;font-weight:600;color:var(--text)}
+.metric-value{margin:6px 0 0 0;font-size:1.35rem;font-weight:700;color:var(--text)}
+.metric-badge{background:var(--glass);color:var(--text);padding:6px 8px;border-radius:8px;font-size:0.8rem;align-self:flex-start}
+.muted.small{font-size:0.8rem;color:var(--muted);margin-top:6px}
+
+/* Progress bar for posture score */
+.progress-wrap{width:120px;height:8px;background:rgba(0,0,0,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);width:0%;transition:width .6s ease}
+
+/* Charts column */
+.charts{grid-column: span 1}
+.charts-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.controls{display:flex;gap:8px}
+.range-btn{background:transparent;border:1px solid rgba(58,80,107,0.06);padding:6px 10px;border-radius:8px;cursor:pointer}
+.range-btn.active{background:var(--accent);color:white;border-color:transparent}
+
+/* Chart grid */
+.chart-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:14px;
+}
+.chart-card{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px;
+}
+.chart-title{margin:0; font-size:0.95rem; font-weight:600; color:var(--muted)}
+.chart-container{position:relative;height:220px}
+
+/* Recommendations */
+.recommendations{
+  margin-top:18px;
+  grid-column: 1 / -1;
+  display:grid;
+  grid-template-columns: 2fr 1fr;
+  gap:14px;
+}
+.insights{display:flex;flex-direction:column;gap:10px}
+.insight{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,168,168,0.04),transparent);border-left:4px solid var(--accent)}
+.insight h4{margin:0 0 6px 0;font-size:0.95rem}
+.aside-tips{padding:12px}
+
+/* Footer */
+.site-footer{margin-top:28px;padding:18px 0;text-align:center;color:var(--muted);font-size:0.9rem}
