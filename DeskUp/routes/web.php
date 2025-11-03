@@ -35,8 +35,17 @@ Route::get('/profile', function () {
 });
 
 Route::get('/desk-control', function () {
-    return view('desk-control');
-});
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->assigned_desk_id) {
+            return redirect()->route('desk.control', ['id' => $user->assigned_desk_id]);
+        }
+
+        return redirect('/layout')->with('error', 'You do not have an assigned desk.');
+    }
+
+    return redirect()->route('login');
+})->name('desk.control.redirect');
 
 Route::get('/health', function () {
     return view('health');
@@ -65,7 +74,14 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
         RateLimiter::clear($key); // Clear attemps when successful login
-        return redirect()->intended('/desk-control');
+        
+        // Redirect user to their assigned desk or layout if admin/no desk
+        $user = Auth::user();
+        if ($user->assigned_desk_id) {
+            return redirect()->route('desk.control', ['id' => $user->assigned_desk_id]);
+        }
+        
+        return redirect()->intended('/layout');
     }
 
     // Increase failed attemps

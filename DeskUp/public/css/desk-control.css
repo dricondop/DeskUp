@@ -12,44 +12,55 @@ button:hover {
 .desk-control {
     display: flex;
     align-items: stretch;
-    height: 100vh;
+    min-height: calc(100vh - 80px);
+    max-height: 100vh;
+    overflow: hidden;
 }
 
 .desk-view {
     width: 70%;
     background-color: #EFF1F2;
-    padding-left: 150px;
-    padding-top: 40px;
+    padding-left: 80px;
+    padding-top: 30px;
+    padding-bottom: 30px;
     height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .desk-view h1 {
     margin-bottom: 0px;
+    font-size: 32px;
 }
 .desk-view h3 {
-    margin-top: 13px;
+    margin-top: 10px;
     color: #3e3e3e;
+    font-size: 18px;
 }
 
 .desk-view img {
-    height: 700px;
+    max-height: 400px;
+    max-width: 100%;
+    object-fit: contain;
     margin-left: 20px;
-    margin-top: 40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .desk-view-btns {
-    padding: 15px 50px;
-    font-size: 30px;
+    padding: 12px 40px;
+    font-size: 20px;
     border-radius: 25px;
     border: none;
-    margin-right: 12px;
-    margin-left: 12px;
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 
 .sitting {
     background-color: #CFEAD5;
-    margin-left: 250px;
+    margin-left: 100px;
 }
 .sitting:hover {
     background-color: #91cd9e;;
@@ -64,8 +75,10 @@ button:hover {
 .desk-management {
     width: 30%;
     background-color: #FFFFFF;
-    padding-top: 40px;
-    padding-right: 40px;
+    padding-top: 30px;
+    padding-right: 30px;
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
 .profile {
@@ -85,11 +98,12 @@ button:hover {
 
 .desk-adjustment {
     margin-left: 50px;
-    margin-top: 80px;
+    margin-top: 40px;
 }
 
 #height {
-    width: 430px;
+    width: 100%;
+    max-width: 350px;
 }
 
 .slider-header {
@@ -126,7 +140,7 @@ button:hover {
 }
 
 .height-preset-btns {
-    margin-bottom: 150px;
+    margin-bottom: 40px;
 }
 .height-preset-btns button {
     background-color: #EDEDED;
@@ -145,5 +159,5 @@ button:hover {
     padding: 10px 20px;
     margin-bottom: 15px;
     border-radius: 20px;
-    width: 430px;
+    max-width: 350px;
 }
