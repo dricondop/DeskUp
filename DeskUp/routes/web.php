@@ -30,9 +30,14 @@ Route::get('/signin', function () {
     return view('signin');
 })->name('login');
 
+Route::get('/admin-statistics', function () {
+    return view('admin-statistics');
+})->name('admin-statistics');
+
+
 Route::get('/admin-control', function () {
     $user = auth()->user();
-    $isAdmin = $user && $user->is_admin; // or whatever your admin column is called
+    $isAdmin = $user && $user->is_admin; 
     return view('admin-user-control', compact('isAdmin'));
 })->name('admin-user-control');
 
