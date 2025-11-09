@@ -98,3 +98,38 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/signin');
 })->name('logout');
+
+
+//API TESTING ROUTES
+Route::get('/apitest', function () {
+    $height = 790.0;
+    $deskId = 'cd:fb:1a:53:fb:e6';
+
+    $response = raiseDesk($height, $deskId);
+
+    return $response;
+});
+
+Route::get('/apitest2', function () {
+
+    $response = getAllDesks();
+
+    return $response;
+});
+
+Route::get('/apitest3', function () {
+    $category = "state";
+    $deskId = 'cd:fb:1a:53:fb:e6';
+
+    $response = getCategoryData($category, $deskId);
+
+    return $response;
+});
+
+Route::get('/apitest4', function () {
+    $deskId = '70:9e:d5:e7:8c:98';
+
+    $response = getDeskData($deskId);
+
+    return $response;
+});
