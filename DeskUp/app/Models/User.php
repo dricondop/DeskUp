@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'assigned_desk_id',
     ];
 
     /**
@@ -51,5 +52,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->is_admin;
+    }
+
+    /**
+     * Get the desk assigned to the user.
+     */
+    public function assignedDesk()
+    {
+        return $this->belongsTo(Desk::class, 'assigned_desk_id');
     }
 }
