@@ -74,7 +74,7 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
 
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        RateLimiter::clear($key); // Clear attemps when successful login
+        RateLimiter::clear($key); // Clear attempts when successful login
         
         // Redirect user to their assigned desk or layout if admin/no desk
         $user = Auth::user();
