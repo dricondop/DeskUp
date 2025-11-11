@@ -34,9 +34,7 @@ Route::get('/profile', function () {
     return view('profile');
 });
 
-Route::get('/desk-control', function () {
-    return view('desk-control');
-});
+Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 
 Route::get('/health', function () {
     return view('health');

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Desk;
+use App\Models\User;
 use App\Models\DeskActivity;
 
 class DeskSeeder extends Seeder
@@ -36,5 +37,13 @@ class DeskSeeder extends Seeder
                 'scheduled_at' => now()->addHours(1)
             ]);
         }
+
+        // Added later
+        $userId = User::where('email', 'user@deskup.com')->value('id');
+        $adminId = User::where('email', 'admin@deskup.com')->value('id');
+
+        Desk::where('desk_number', 201)->update(['user_id' => $userId]);
+        Desk::where('desk_number', 202)->update(['user_id' => $adminId]);
+
     }
 }
