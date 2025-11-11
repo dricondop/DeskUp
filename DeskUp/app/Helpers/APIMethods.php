@@ -1,10 +1,13 @@
 <?php
 
+namespace App\Helpers;
+
 use Illuminate\Support\Facades\Http;
 
-// Raise or lower especific desk
-if (!function_exists('raiseDesk')) {
-    function raiseDesk(float $newHeight, string $deskID) {
+class APIMethods {
+
+    // Raise or lower especific desk
+    public static function raiseDesk(float $newHeight, string $deskID) {
         $api_key = env('DESK_API_KEY');
         $api_url = env('DESK_API_URL');
 
@@ -17,11 +20,10 @@ if (!function_exists('raiseDesk')) {
         ]);
         return $response;
     }
-}
 
-//Get a list of all desks (returns array of strings)
-if (!function_exists('getAllDesks')) {
-    function getAllDesks() {
+
+    //Get a list of all desks (returns array of strings)
+    public static function getAllDesks() {
         $api_key = env('DESK_API_KEY');
         $api_url = env('DESK_API_URL');
 
@@ -33,12 +35,10 @@ if (!function_exists('getAllDesks')) {
 
         return $response->json();
     }
-}
 
-//Get the data from a specific category (config, state, usage, lastErrors)
-//It returns an array of keyvaluepairs, like "key = position_mm" "value = 790" 
-if (!function_exists('getCategoryData')) {
-    function getCategoryData(string $category, string $deskID) {
+    //Get the data from a specific category (config, state, usage, lastErrors)
+    //It returns an array of keyvaluepairs, like "key = position_mm" "value = 790" 
+    public static function getCategoryData(string $category, string $deskID) {
         $api_key = env('DESK_API_KEY');
         $api_url = env('DESK_API_URL');
 
@@ -50,13 +50,11 @@ if (!function_exists('getCategoryData')) {
 
         return $response->json();
     }
-}
 
-//This method get all the data across all the categories of a particular desk
-/*It returns an array of keyvaluepairs, but it has the category name "in the middle", this means that if 
-  you want to retrive the position you'd have to do: "$position = $response['state']['position_mm'];" */
-if (!function_exists('getDeskData')) {
-    function getDeskData(string $deskID) {
+    //This method get all the data across all the categories of a particular desk
+    /*It returns an array of keyvaluepairs, but it has the category name "in the middle", this means that if 
+    you want to retrive the position you'd have to do: "$position = $response['state']['position_mm'];" */
+    public static function getDeskData(string $deskID) {
         $api_key = env('DESK_API_KEY');
         $api_url = env('DESK_API_URL');
 

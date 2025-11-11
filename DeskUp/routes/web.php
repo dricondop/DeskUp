@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\APIMethods;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
@@ -8,6 +9,10 @@ use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use function App\Helpers\raiseDesk;
+use function App\Helpers\getAllDesks;
+use function App\Helpers\getCategoryData;
+use function App\Helpers\getDeskData;
 
 Route::get('/', function () {
     return view('welcome');
@@ -105,14 +110,14 @@ Route::get('/apitest', function () {
     $height = 790.0;
     $deskId = 'cd:fb:1a:53:fb:e6';
 
-    $response = raiseDesk($height, $deskId);
+    $response = APIMethods::raiseDesk($height, $deskId);
 
     return $response;
 });
 
 Route::get('/apitest2', function () {
 
-    $response = getAllDesks();
+    $response = APIMethods::getAllDesks();
 
     return $response;
 });
@@ -121,7 +126,7 @@ Route::get('/apitest3', function () {
     $category = "state";
     $deskId = 'cd:fb:1a:53:fb:e6';
 
-    $response = getCategoryData($category, $deskId);
+    $response = APIMethods::getCategoryData($category, $deskId);
 
     return $response;
 });
@@ -129,7 +134,7 @@ Route::get('/apitest3', function () {
 Route::get('/apitest4', function () {
     $deskId = '70:9e:d5:e7:8c:98';
 
-    $response = getDeskData($deskId);
+    $response = APIMethods::getDeskData($deskId);
 
     return $response;
 });
