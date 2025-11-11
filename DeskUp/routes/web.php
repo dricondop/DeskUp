@@ -9,10 +9,6 @@ use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use function App\Helpers\raiseDesk;
-use function App\Helpers\getAllDesks;
-use function App\Helpers\getCategoryData;
-use function App\Helpers\getDeskData;
 
 Route::get('/', function () {
     return view('welcome');
