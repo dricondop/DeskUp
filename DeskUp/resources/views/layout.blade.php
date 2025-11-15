@@ -13,6 +13,9 @@
     @include('components.sidebar')
     
     <div class="main-content">
+        <!-- Hover Tooltip -->
+        <div id="hoverTooltip" class="hover-tooltip"></div>
+
         <!-- User Info -->
     <div style="position: fixed; bottom: 10px; right: 10px; background: #fff; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; display: flex; align-items: center; gap: 15px;">
         <span style="color: #333; font-weight: 500;">
@@ -47,6 +50,9 @@
             <button id="addDesk" class="toolbar-btn">Add Desk</button>
             <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
+            <button id="downloadJSON" class="toolbar-btn">Download JSON</button>
+            <button id="uploadJSON" class="toolbar-btn">Upload JSON</button>
+            <input type="file" id="uploadJSONInput" accept=".json" style="display: none;">
         </nav>
         @endif
 

@@ -1,14 +1,23 @@
 const canvas = document.getElementById('canvas');
 const MAX_DESKS = 50;
 const isAdmin = window.isAdmin || false;
+const tooltip = document.getElementById('hoverTooltip');
 
 let deskCounter = 1;
 let editModeEnabled = isAdmin;
-let isDragging = false;
-let isSelecting = false;
 let selectedDesks = new Set();
-let dragState = { desk: null, offsetX: 0, offsetY: 0, startPositions: [] };
-let selectionState = { box: null, startX: 0, startY: 0 };
+
+// Drag state
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let draggedDesks = [];
+
+// Selection state
+let isSelecting = false;
+let selectionBox = null;
+let selectStartX = 0;
+let selectStartY = 0;
 
 loadDefaultLayout();
 
@@ -28,28 +37,25 @@ async function loadDefaultLayout() {
 function updateDeskCount() {
     const count = document.querySelectorAll('.desk').length;
     const deskCountElement = document.getElementById('deskCount');
-    if (deskCountElement) {
-        deskCountElement.textContent = count;
-    }
+    if (deskCountElement) deskCountElement.textContent = count;
 
     const addDeskBtn = document.getElementById('addDesk');
     const deleteBtn = document.getElementById('deleteSelected');
+    const saveBtn = document.getElementById('saveLayout');
+    const downloadBtn = document.getElementById('downloadJSON');
+    const uploadBtn = document.getElementById('uploadJSON');
     
-    if (addDeskBtn) {
-        addDeskBtn.disabled = !editModeEnabled || count >= MAX_DESKS;
-    }
-    
-    if (deleteBtn) {
-        deleteBtn.disabled = !editModeEnabled;
-    }
+    if (addDeskBtn) addDeskBtn.disabled = !editModeEnabled || count >= MAX_DESKS;
+    if (deleteBtn) deleteBtn.disabled = !editModeEnabled;
+    if (saveBtn) saveBtn.disabled = !editModeEnabled;
+    if (downloadBtn) downloadBtn.disabled = !editModeEnabled;
+    if (uploadBtn) uploadBtn.disabled = !editModeEnabled;
 }
 
 function addDesk(x, y, name = null, deskId = null) {
     const currentCount = document.querySelectorAll('.desk').length;
     if (currentCount >= MAX_DESKS) {
-        if (isAdmin) {
-            alert(`Maximum of ${MAX_DESKS} desks reached!`);
-        }
+        if (isAdmin) alert(`Maximum of ${MAX_DESKS} desks reached!`);
         return;
     }
 
@@ -58,9 +64,7 @@ function addDesk(x, y, name = null, deskId = null) {
     desk.style.left = `${x}px`;
     desk.style.top = `${y}px`;
     
-    if (deskId) {
-        desk.setAttribute('data-desk-id', deskId);
-    }
+    if (deskId) desk.setAttribute('data-desk-id', deskId);
     
     desk.innerHTML = `
         <img src="desk_icon.png" alt="Desk" style="width:48px;height:48px;display:block;margin:0 auto">
@@ -73,35 +77,41 @@ function addDesk(x, y, name = null, deskId = null) {
         if (id) {
             window.location.href = `/desk-control/${id}`;
         } else {
-            const message = isAdmin 
+            alert(isAdmin 
                 ? 'Please save the layout first to enable desk control access.'
-                : 'This desk has not been saved yet. Please ask an admin to save the layout first.';
-            alert(message);
+                : 'This desk has not been saved yet. Please ask an admin to save the layout first.');
         }
     });
 
-    if (isAdmin) {
-        desk.addEventListener('mousedown', startDrag);
-    }
+    if (isAdmin) desk.addEventListener('mousedown', startDrag);
+    
+    desk.addEventListener('mouseenter', () => showTooltip(desk));
+    desk.addEventListener('mouseleave', hideTooltip);
 
     updateDeskCursor(desk);
-
     canvas.appendChild(desk);
     updateDeskCount();
 }
 
 function updateDeskCursor(desk) {
-    if (isAdmin && editModeEnabled) {
-        desk.style.cursor = 'move';
-    } else {
-        desk.style.cursor = 'pointer';
-    }
+    desk.style.cursor = (isAdmin && editModeEnabled) ? 'move' : 'pointer';
+}
+
+function showTooltip(desk) {
+    if (!tooltip) return;
+    
+    tooltip.textContent = (isAdmin && editModeEnabled) 
+        ? 'Drag to move • Double-click to control'
+        : 'Double-click to control';
+    tooltip.className = `hover-tooltip show ${(isAdmin && editModeEnabled) ? 'edit-mode' : 'view-mode'}`;
+}
+
+function hideTooltip() {
+    if (tooltip) tooltip.classList.remove('show');
 }
 
 function startDrag(e) {
-    if (!isAdmin || !editModeEnabled || e.shiftKey) {
-        return;
-    }
+    if (!isAdmin || !editModeEnabled || e.shiftKey) return;
     
     e.preventDefault();
     e.stopPropagation();
@@ -110,65 +120,54 @@ function startDrag(e) {
     if (!desk) return;
 
     isDragging = true;
-    dragState.desk = desk;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
 
+    // Prepare all desks to be dragged
     if (desk.classList.contains('selected') && selectedDesks.size > 1) {
-        dragState.startPositions = Array.from(selectedDesks).map(d => ({
-            desk: d,
-            x: d.offsetLeft,
-            y: d.offsetTop
+        draggedDesks = Array.from(selectedDesks).map(d => ({
+            element: d,
+            startX: d.offsetLeft,
+            startY: d.offsetTop
         }));
-        dragState.offsetX = e.clientX;
-        dragState.offsetY = e.clientY;
         selectedDesks.forEach(d => d.classList.add('dragging'));
     } else {
-        dragState.offsetX = e.clientX - desk.offsetLeft;
-        dragState.offsetY = e.clientY - desk.offsetTop;
+        draggedDesks = [{
+            element: desk,
+            startX: desk.offsetLeft,
+            startY: desk.offsetTop
+        }];
         desk.classList.add('dragging');
     }
 }
 
-function clampToCanvas(x, y, width, height) {
-    return {
-        x: Math.max(0, Math.min(x, window.innerWidth - width)),
-        y: Math.max(0, Math.min(y, window.innerHeight - height))
-    };
-}
-
 document.addEventListener('mousemove', (e) => {
-    if (isDragging && dragState.desk) {
-        if (dragState.startPositions.length > 0) {
-            const dx = e.clientX - dragState.offsetX;
-            const dy = e.clientY - dragState.offsetY;
-            dragState.startPositions.forEach(({ desk, x, y }) => {
-                const pos = clampToCanvas(x + dx, y + dy, desk.offsetWidth, desk.offsetHeight);
-                desk.style.left = `${pos.x}px`;
-                desk.style.top = `${pos.y}px`;
-            });
-        } else {
-            const pos = clampToCanvas(
-                e.clientX - dragState.offsetX,
-                e.clientY - dragState.offsetY,
-                dragState.desk.offsetWidth,
-                dragState.desk.offsetHeight
-            );
-            dragState.desk.style.left = `${pos.x}px`;
-            dragState.desk.style.top = `${pos.y}px`;
-        }
+    if (isDragging && draggedDesks.length > 0) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        
+        draggedDesks.forEach(({ element, startX, startY }) => {
+            const newX = Math.max(0, Math.min(startX + dx, canvas.offsetWidth - element.offsetWidth));
+            const newY = Math.max(0, Math.min(startY + dy, canvas.offsetHeight - element.offsetHeight));
+            element.style.left = `${newX}px`;
+            element.style.top = `${newY}px`;
+        });
     }
 
-    if (isSelecting && selectionState.box) {
-        const left = Math.min(selectionState.startX, e.clientX);
-        const top = Math.min(selectionState.startY, e.clientY);
-        const width = Math.abs(e.clientX - selectionState.startX);
-        const height = Math.abs(e.clientY - selectionState.startY);
+    if (isSelecting && selectionBox) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const relativeX = e.clientX - canvasRect.left;
+        const relativeY = e.clientY - canvasRect.top;
+        
+        const left = Math.min(selectStartX, relativeX);
+        const top = Math.min(selectStartY, relativeY);
+        const width = Math.abs(relativeX - selectStartX);
+        const height = Math.abs(relativeY - selectStartY);
 
-        Object.assign(selectionState.box.style, {
-            left: `${left}px`,
-            top: `${top}px`,
-            width: `${width}px`,
-            height: `${height}px`
-        });
+        selectionBox.style.left = `${left}px`;
+        selectionBox.style.top = `${top}px`;
+        selectionBox.style.width = `${width}px`;
+        selectionBox.style.height = `${height}px`;
 
         updateSelection(left, top, width, height);
     }
@@ -178,12 +177,12 @@ document.addEventListener('mouseup', () => {
     if (isDragging) {
         document.querySelectorAll('.desk.dragging').forEach(d => d.classList.remove('dragging'));
         isDragging = false;
-        dragState = { desk: null, offsetX: 0, offsetY: 0, startPositions: [] };
+        draggedDesks = [];
     }
 
-    if (isSelecting && selectionState.box) {
-        selectionState.box.remove();
-        selectionState.box = null;
+    if (isSelecting && selectionBox) {
+        selectionBox.remove();
+        selectionBox = null;
         isSelecting = false;
         canvas.classList.remove('selecting');
     }
@@ -199,13 +198,16 @@ canvas.addEventListener('mousedown', (e) => {
     if (isAdmin && editModeEnabled && e.shiftKey && e.target === canvas) {
         isSelecting = true;
         canvas.classList.add('selecting');
-        selectionState.startX = e.clientX;
-        selectionState.startY = e.clientY;
-        selectionState.box = document.createElement('div');
-        selectionState.box.className = 'selection-box';
-        selectionState.box.style.left = `${e.clientX}px`;
-        selectionState.box.style.top = `${e.clientY}px`;
-        canvas.appendChild(selectionState.box);
+        
+        const canvasRect = canvas.getBoundingClientRect();
+        selectStartX = e.clientX - canvasRect.left;
+        selectStartY = e.clientY - canvasRect.top;
+        
+        selectionBox = document.createElement('div');
+        selectionBox.className = 'selection-box';
+        selectionBox.style.left = `${selectStartX}px`;
+        selectionBox.style.top = `${selectStartY}px`;
+        canvas.appendChild(selectionBox);
     }
 });
 
@@ -230,10 +232,9 @@ if (isAdmin) {
     if (addDeskBtn) {
         addDeskBtn.addEventListener('click', () => {
             if (!editModeEnabled) return;
-            addDesk(
-                Math.random() * (window.innerWidth - 150),
-                Math.random() * (window.innerHeight - 150)
-            );
+            const maxX = canvas.offsetWidth - 150;
+            const maxY = canvas.offsetHeight - 150;
+            addDesk(Math.random() * maxX, Math.random() * maxY);
         });
     }
 
@@ -251,9 +252,7 @@ if (isAdmin) {
 
                 document.querySelectorAll('.desk').forEach((desk, i) => {
                     const label = desk.querySelector('.desk-label');
-                    if (label) {
-                        label.textContent = `Desk ${i + 1}`;
-                    }
+                    if (label) label.textContent = `Desk ${i + 1}`;
                 });
                 deskCounter = document.querySelectorAll('.desk').length + 1;
                 updateDeskCount();
@@ -265,13 +264,9 @@ if (isAdmin) {
     if (editModeToggle) {
         editModeToggle.addEventListener('change', (e) => {
             editModeEnabled = e.target.checked;
-            
             canvas.style.cursor = editModeEnabled ? 'grab' : 'default';
             
-            document.querySelectorAll('.desk').forEach(desk => {
-                updateDeskCursor(desk);
-            });
-            
+            document.querySelectorAll('.desk').forEach(desk => updateDeskCursor(desk));
             updateDeskCount();
             
             if (!editModeEnabled) {

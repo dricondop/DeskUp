@@ -20,13 +20,6 @@ Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth');
 Route::post('/layout/save', [LayoutController::class, 'save'])->middleware('auth');
 Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/api/desks', [DeskController::class, 'index']);
-    Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
-    Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
-    Route::post('/api/desks/{id}/activities', [DeskController::class, 'addActivity']);
-});
-
 Route::get('/signin', function () {
     return view('signin');
 })->name('login');

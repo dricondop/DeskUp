@@ -45,36 +45,33 @@ body {
     transform: scale(1.05);
 }
 
-.desk[style*="cursor: pointer"]:hover::after {
-    content: "Double-click to control";
-    position: absolute;
-    bottom: -25px;
+.hover-tooltip {
+    position: fixed;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
     white-space: nowrap;
     pointer-events: none;
-    z-index: 1001;
+    z-index: 10000;
+    display: none;
 }
 
-.desk[style*="cursor: move"]:hover::after {
-    content: "Drag to move • Double-click to control";
-    position: absolute;
-    bottom: -25px;
-    left: 50%;
-    transform: translateX(-50%);
+.hover-tooltip.show {
+    display: block;
+}
+
+.hover-tooltip.view-mode {
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+}
+
+.hover-tooltip.edit-mode {
     background: rgba(74, 144, 226, 0.9);
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    white-space: nowrap;
-    pointer-events: none;
-    z-index: 1001;
 }
 
 .desk.dragging {
@@ -117,8 +114,7 @@ body {
     gap: 10px;
 }
 
-.toolbar .toolbar-btn,
-.toolbar .file-btn {
+.toolbar-btn {
     padding: 10px 15px;
     border: none;
     background: #4a90e2;
@@ -129,33 +125,29 @@ body {
     text-align: center;
     font-size: 14px;
     font-weight: 400;
+    transition: background 0.2s;
 }
 
-.toolbar .toolbar-btn:hover,
-.toolbar .file-btn:hover {
+.toolbar-btn:hover {
     background: #357abd;
 }
 
-.toolbar .toolbar-btn:disabled {
+.toolbar-btn:disabled {
     background: #95a5a6;
     cursor: not-allowed;
     opacity: 0.6;
 }
 
-.toolbar .toolbar-btn:disabled:hover {
-    background: #95a5a6;
-}
-
-.toolbar .delete-btn {
+.toolbar-btn.delete-btn {
     background: #e74c3c;
 }
 
-.toolbar .delete-btn:hover {
+.toolbar-btn.delete-btn:hover {
     background: #c0392b;
 }
 
-.toolbar .file-btn input[type="file"] {
-    display: none;
+.toolbar-btn.delete-btn:disabled {
+    background: #95a5a6;
 }
 
 .desk-count {
@@ -172,7 +164,7 @@ body {
     font-weight: 500;
 }
 
-/* Toggle Switch Styles */
+/* Toggle Switch */
 .toggle-container {
     width: 100%;
 }
@@ -222,8 +214,4 @@ body {
 
 .toggle-label input[type="checkbox"]:checked + .toggle-slider::before {
     transform: translateX(26px);
-}
-
-.toggle-label:hover .toggle-slider {
-    opacity: 0.9;
 }
