@@ -3,51 +3,80 @@ document.addEventListener("DOMContentLoaded", () => {
     const inc = document.getElementById("increment");
     const dec = document.getElementById("decrement");
 
-    display.textContent = desk.height + " cm"?? 0;
+    display.textContent = desk.height + " cm" ?? 0;
 
-    // Increase / Decrease Desk height buttons
-    inc.addEventListener("click", () => changeHeight(1));
-    dec.addEventListener("click", () => changeHeight(-1));
+    // Button-Hold function
+    function holdButton(btn, placeholderFunction, holdDelay = 1000) {
+        let activationTimeout;
+        let repeatTimeout;
+        let isHolding = false;
+        
+        const start = () => {
+            if (isHolding) return;
+            isHolding = true;
+            placeholderFunction(); // Immediately changes +/- 1 value, functions as ordinary click
+            activationTimeout = setTimeout(run, holdDelay);
+        };
+
+        const run = () => {
+            if (!isHolding) return;
+            placeholderFunction();
+            // const repeatDelay = desk.speed || 1;
+            repeatTimeout = setTimeout(run, 50);
+        };
+
+        const stop = () => {
+            if (!isHolding) return;
+            isHolding = false;
+            clearTimeout(activationTimeout);
+            clearTimeout(repeatTimeout);
+            updateDesk("height"); // Sends final height to database
+        };
+
+        btn.addEventListener("mousedown", start);
+        btn.addEventListener("mouseup", stop);
+        btn.addEventListener("mouseleave", stop);
+    };
+
+    holdButton(inc, () => changeHeight(1));
+    holdButton(dec, () => changeHeight(-1));
 
 
     function changeHeight(number) {
         desk.height = Math.min(150, Math.max(0, desk.height + number));
         display.textContent = desk.height + " cm";
-        calculateHeight(desk.height);
     }
     
-    async function calculateHeight(newValue) {
+    async function updateDesk(field, value) {
+
+        if (typeof value === "undefined") {
+            if (field === "height") value = desk.height;
+            if (field === "speed") value = desk.speed;
+        }
+
+        const pair = {};
+        pair[field] = value; // This will e.g. give { height: 100 }
+
+
         try {
-            const response = await fetch(desk.url, {
+            const response = await fetch(`${desk.url}/${field}`, {
                 method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
                 },
-                body: JSON.stringify({height: newValue})
+                body: JSON.stringify(pair)
             });
 
             const data = await response.json(); 
             if (data.success) {
-                    console.log('Height updated successfully');
+                    console.log(`${field} updated successfully`);
                 }
             } 
         catch (error) {
-            console.error('Error updating height:', error);
+            console.error(`Error updating ${field}:`, error);
         }
-    }
-
-    // Load deskMoveSpeed values
-    const selection = document.getElementById("deskMoveSpeed");
-    const maxSpeed = Number(selection.dataset.max) || 36;
-    const selected = typeof desk.speed !== 'undefined' ? Number(desk.speed) : 1;
-
-    let options = '';
-    for (let i = 1; i <= maxSpeed; i++) {
-        options += `<option value="${i}" ${i === selected ? 'selected' : ''}>${i} mm/s</option>`;
-    }
-    selection.innerHTML = options;
-
+    }  
 });
 
 

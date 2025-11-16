@@ -43,8 +43,7 @@
                         <h3 class="height-adjustment-line">
                             Height Adjustment
                             <span>
-                                <label for="deskMoveSpeed">Speed: </label>
-                                <select id="deskMoveSpeed" class="deskMoveSpeed" data-max="{{ (int) $desk->speed }}"></select> <!-- CHANGE VARIABLE TO MAX SPEED LATER -->
+                                <h3>Speed: 36</h3>
                             </span>
                         </h3>
 
@@ -84,7 +83,7 @@
                 id: {{ $desk->id }},
                 height: {{ $desk->height }},
                 speed: {{ $desk->speed }},
-                url: "/api/desks/{{ $desk->id }}/height",
+                url: "/api/desks/{{ $desk->id }}",
             };
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
