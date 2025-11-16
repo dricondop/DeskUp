@@ -26,6 +26,18 @@ class DeskController extends Controller
         ]);
     }
 
+    public function showAssignedDesk()
+    {
+        $user = Auth::user();
+        $desk = Desk::where('user_id', $user->id)->with('activities')->firstOrFail();
+        
+        return view('desk-control', [
+            'desk' => $desk,
+            'isAdmin' => $user->isAdmin(),
+            'isLoggedIn' => true,
+        ]);
+    }
+
     public function updateHeight(Request $request, $id)
     {
         $validated = $request->validate([

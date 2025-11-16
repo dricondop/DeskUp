@@ -46,6 +46,7 @@ Route::get('/profile', function () {
     return view('profile');
 });
 
+Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
     if (Auth::check()) {
         $user = Auth::user();
