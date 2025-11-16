@@ -15,6 +15,10 @@ class LayoutController extends Controller
         if (Auth::check()) {
             Auth::user()->refresh();
             $isAdmin = Auth::user()->isAdmin();
+            
+            if (!$isAdmin && Auth::user()->assigned_desk_id) {
+                return redirect()->route('desk.control', ['id' => Auth::user()->assigned_desk_id]);
+            }
         }
 
         return view('layout', [

@@ -72,8 +72,8 @@ button:hover {
   display: block;
   max-width: min(760px, 100%);
   height: auto;
-  margin: clamp(16px, 3vw, 28px) auto 0;   /* centered like the other pages */
-  object-fit: contain;
+  margin: clamp(16px, 3vw, 28px) auto 0;  
+   object-fit: contain;
 }
 
 
