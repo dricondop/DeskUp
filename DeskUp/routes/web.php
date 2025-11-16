@@ -24,10 +24,22 @@ Route::get('/signin', function () {
     return view('signin');
 })->name('login');
 
+Route::get('/admin-statistics', function () {
+    return view('admin-statistics');
+})->name('admin-statistics');
+
+
+Route::get('/admin-control', function () {
+    $user = auth()->user();
+    $isAdmin = $user && $user->is_admin; 
+    return view('admin-user-control', compact('isAdmin'));
+})->name('admin-user-control');
+
 Route::get('/profile', function () {
     return view('profile');
 });
 
+Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
     if (Auth::check()) {
         $user = Auth::user();
