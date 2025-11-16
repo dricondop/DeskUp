@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
+use App\Http\Controllers\HealthController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +28,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/desks/{id}/activities', [DeskController::class, 'addActivity']);
+    
+    // Health page view
+    Route::get('/health', [HealthController::class, 'index'])->name('health');
+    // Health stats API endpoint
+    Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
+    Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
+    Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
 });
 
 Route::get('/signin', function () {
@@ -64,10 +72,6 @@ Route::get('/desk-control', function () {
 
     return redirect()->route('login');
 })->name('desk.control.redirect');
-
-Route::get('/health', function () {
-    return view('health');
-});
 
 Route::post('/signin', function (Request $request): Response|RedirectResponse {
     $key = 'login-attempts:' . $request->ip();
