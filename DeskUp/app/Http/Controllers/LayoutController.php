@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Desk;
+use App\Services\DeskSyncService;
 
 class LayoutController extends Controller
 {
+    protected $syncService;
+
+    public function __construct(DeskSyncService $syncService)
+    {
+        $this->syncService = $syncService;
+    }
     public function index()
     {
         $isAdmin = false;
@@ -60,13 +67,15 @@ class LayoutController extends Controller
 
     public function load()
     {
-        $desks = Desk::all()->map(function ($desk) {
+        $desks = Desk::where('is_active', true)->get()->map(function ($desk) {
             return [
                 'id' => $desk->id,
                 'name' => $desk->name,
                 'x' => $desk->position_x,
                 'y' => $desk->position_y,
-                'status' => $desk->status
+                'status' => $desk->status,
+                'api_desk_id' => $desk->api_desk_id,
+                'is_connected' => $desk->isConnectedToAPI()
             ];
         });
 

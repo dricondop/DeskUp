@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->integer('desk_number')->unique();
+            $table->string('api_desk_id')->nullable()->unique();
             $table->float('position_x')->nullable();
             $table->float('position_y')->nullable();
             $table->string('status')->default('OK');
+            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete();
             $table->integer('height')->default(110); // in cm
             $table->integer('speed')->default(36); // in mm/s
             $table->boolean('is_active')->default(true);

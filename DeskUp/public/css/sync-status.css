@@ -1,0 +1,129 @@
+/* API Sync Status Indicator Styles */
+.api-status-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.api-status-indicator.connected {
+    background: #4CAF50;
+    color: white;
+}
+
+.api-status-indicator.disconnected {
+    background: #f44336;
+    color: white;
+}
+
+.api-status-indicator.checking {
+    background: #FF9800;
+    color: white;
+}
+
+.api-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: pulse 2s infinite;
+}
+
+.api-status-indicator.disconnected .api-status-dot {
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Sync button enhanced styles */
+#syncAPI {
+    position: relative;
+    overflow: hidden;
+}
+
+#syncAPI.syncing::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Desk connection badge */
+.desk-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.desk-badge.connected {
+    background: #4CAF50;
+    color: white;
+}
+
+.desk-badge.disconnected {
+    background: #9E9E9E;
+    color: white;
+}
+
+/* Real-time update indicator */
+.realtime-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4CAF50;
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0.4);
+    animation: sonar 2s infinite;
+}
+
+@keyframes sonar {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
+
+.realtime-indicator.inactive {
+    background: #9E9E9E;
+    animation: none;
+}

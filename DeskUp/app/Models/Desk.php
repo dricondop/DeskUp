@@ -12,6 +12,7 @@ class Desk extends Model
     protected $fillable = [
         'name',
         'desk_number',
+        'api_desk_id',
         'position_x',
         'position_y',
         'status',
@@ -31,5 +32,21 @@ class Desk extends Model
     public function activities()
     {
         return $this->hasMany(DeskActivity::class);
+    }
+
+    /**
+     * Check if desk is connected to API simulator
+     */
+    public function isConnectedToAPI(): bool
+    {
+        return !is_null($this->api_desk_id);
+    }
+
+    /**
+     * Get formatted position for display
+     */
+    public function getFormattedHeightAttribute(): string
+    {
+        return $this->height . ' cm';
     }
 }

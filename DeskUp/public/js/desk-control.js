@@ -2,8 +2,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const display = document.getElementById("height-display");
     const inc = document.getElementById("increment");
     const dec = document.getElementById("decrement");
+    const statusDisplay = document.getElementById("deskStatus");
 
     display.textContent = desk.height + " cm" ?? 0;
+
+    // Poll for real-time desk data every 2 seconds
+    let pollingInterval;
+    if (desk.id) {
+        pollingInterval = setInterval(fetchRealTimeData, 2000);
+    }
+
+    async function fetchRealTimeData() {
+        try {
+            const response = await fetch(`/api/desks/${desk.id}/realtime`, {
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                }
+            });
+
+            const result = await response.json();
+            
+            if (result.success && result.data && result.connected) {
+                // Update height display if changed
+                if (result.data.position_cm !== null) {
+                    const newHeight = Math.round(result.data.position_cm);
+                    if (newHeight !== desk.height) {
+                        desk.height = newHeight;
+                        display.textContent = desk.height + " cm";
+                    }
+                }
+                
+                // Update status
+                if (result.data.status && statusDisplay) {
+                    statusDisplay.textContent = result.data.status;
+                }
+
+                // Update speed if available
+                if (result.data.speed_mms !== null) {
+                    desk.speed = result.data.speed_mms;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching real-time data:', error);
+        }
+    }
+
+    // Clean up interval when page unloads
+    window.addEventListener('beforeunload', () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+    });
 
     // Button-Hold function
     function holdButton(btn, placeholderFunction, holdDelay = 1000) {

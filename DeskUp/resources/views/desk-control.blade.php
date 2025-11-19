@@ -8,15 +8,31 @@
         
         <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
         <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/sync-status.css') }}">
     </head>
     <body>
         @include('components.sidebar')
         
         <div class="main-content">
+            <!-- Real-time indicator -->
+            @if($desk->isConnectedToAPI())
+                <div class="realtime-indicator" id="realtimeIndicator" title="Real-time updates active"></div>
+            @else
+                <div class="realtime-indicator inactive" title="Not connected to API"></div>
+            @endif
+
             <main class="desk-view">
                 <section class="desk-control">
                     <h1>Desk Control</h1>
-                    <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
+                    <h3>
+                        {{ $desk->name }} 
+                        &vert; Status: 
+                        @if($desk->isConnectedToAPI())
+                            <span class="desk-badge connected" id="deskStatus">Connected</span>
+                        @else
+                            <span class="desk-badge disconnected" id="deskStatus">Offline</span>
+                        @endif
+                    </h3>
 
                 <img src="{{ asset('assets/desk.png') }}" alt="desk">
                     
@@ -90,6 +106,7 @@
         </script>
 
         <script src="{{ asset('js/desk-control.js') }}"></script>
+        <script src="{{ asset('js/background-sync.js') }}"></script>
     </body>
 </html>
 

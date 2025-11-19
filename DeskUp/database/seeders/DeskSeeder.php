@@ -12,12 +12,36 @@ class DeskSeeder extends Seeder
 {
     public function run(): void
     {
+        $userId = User::where('email', 'user@deskup.com')->value('id');
+        $adminId = User::where('email', 'admin@deskup.com')->value('id');
+
         $desks = [
-            ['name' => 'Desk 101', 'desk_number' => 101, 'position_x' => 100, 'position_y' => 100],
-            ['name' => 'Desk 102', 'desk_number' => 102, 'position_x' => 300, 'position_y' => 100],
-            ['name' => 'Desk 103', 'desk_number' => 103, 'position_x' => 500, 'position_y' => 100],
-            ['name' => 'Desk 201', 'desk_number' => 201, 'position_x' => 100, 'position_y' => 300],
-            ['name' => 'Desk 202', 'desk_number' => 202, 'position_x' => 300, 'position_y' => 300],
+            [
+                'id' => 1,
+                'name' => 'Admin Desk',
+                'desk_number' => 0001,
+                'api_desk_id' => null,
+                'position_x' => 100.0,
+                'position_y' => 100.0,
+                'status' => 'OK',
+                'user_id' => $adminId,
+                'height' => 110,
+                'speed' => 36,
+                'is_active' => true,
+            ],
+            [
+                'id' => 2,
+                'name' => 'Regular Desk',
+                'desk_number' => 0002,
+                'api_desk_id' => null,
+                'position_x' => 300.0,
+                'position_y' => 100.0,
+                'status' => 'OK',
+                'user_id' => $userId,
+                'height' => 110,
+                'speed' => 36,
+                'is_active' => true,
+            ],
         ];
 
         foreach ($desks as $deskData) {
@@ -37,13 +61,5 @@ class DeskSeeder extends Seeder
                 'scheduled_at' => now()->addHours(1)
             ]);
         }
-
-        // Added later
-        $userId = User::where('email', 'user@deskup.com')->value('id');
-        $adminId = User::where('email', 'admin@deskup.com')->value('id');
-
-        Desk::where('desk_number', 201)->update(['user_id' => $userId]);
-        Desk::where('desk_number', 202)->update(['user_id' => $adminId]);
-
     }
 }

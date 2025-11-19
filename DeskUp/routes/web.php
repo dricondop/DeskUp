@@ -4,6 +4,7 @@ use App\Helpers\APIMethods;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
+use App\Services\DeskSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -15,10 +16,45 @@ Route::get('/', function () {
 });
 
 Route::get('/desk-control/{id}', [DeskController::class, 'show'])->name('desk.control');
+Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight'])->middleware('auth');
+Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus'])->middleware('auth');
+Route::get('/api/desks/{id}/realtime', function ($id, DeskSyncService $syncService) {
+    $desk = \App\Models\Desk::findOrFail($id);
+    $realtimeData = $syncService->getRealTimeDeskData($desk);
+    
+    return response()->json([
+        'success' => true,
+        'data' => $realtimeData,
+        'connected' => $desk->isConnectedToAPI()
+    ]);
+})->middleware('auth');
 
-Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth');
+Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth')->name('layout');
 Route::post('/layout/save', [LayoutController::class, 'save'])->middleware('auth');
 Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth');
+
+// Desk synchronization routes
+Route::post('/api/desks/sync', function (DeskSyncService $syncService) {
+    try {
+        $results = $syncService->syncFromAPI();
+        return response()->json([
+            'success' => true,
+            'results' => $results
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+})->middleware('auth');
+
+Route::get('/api/desks/status', function (DeskSyncService $syncService) {
+    return response()->json([
+        'api_available' => $syncService->isAPIAvailable(),
+        'timestamp' => now()->toDateTimeString()
+    ]);
+})->middleware('auth');
 
 Route::get('/signin', function () {
     return view('signin');
@@ -37,7 +73,7 @@ Route::get('/admin-control', function () {
 
 Route::get('/profile', function () {
     return view('profile');
-});
+})->name('profile');
 
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
@@ -55,7 +91,7 @@ Route::get('/desk-control', function () {
 
 Route::get('/health', function () {
     return view('health');
-});
+})->name('health');
 
 Route::get('/edit-profile', function () {
     return view('edit-profile');
