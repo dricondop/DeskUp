@@ -7,7 +7,11 @@
     
     <label>My desk:</label>
     <nav>
-        <a href="/desk-control">Desk Control</a>
+        @if (Auth::check() && Auth::user()->assigned_desk_id)
+            <a href="{{ route('desk.control', ['id' => Auth::user()->assigned_desk_id]) }}">Desk Control</a>
+        @else
+            <a href="{{ route('desk.control.redirect') }}">Desk Control</a>
+        @endif
         <a href="/health">My Usage</a>
         <a href="/profile">My Profile</a>
     </nav>

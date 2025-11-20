@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('is_admin')->default(false)->after('password');
+            $table->foreignId('assigned_desk_id')->nullable()->constrained('desks')->onDelete('set null');
         });
     }
 
@@ -23,6 +24,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('is_admin');
+            $table->dropForeign(['assigned_desk_id']);
+            $table->dropColumn('assigned_desk_id');
         });
     }
 };

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'assigned_desk_id',
     ];
 
     /**
@@ -57,4 +58,12 @@ class User extends Authenticatable
     return $this->hasManyThrough(DeskActivity::class, Desk::class, 'user_id', 'desk_id', 'id', 'id');
     }
 
+
+    /**
+     * Get the desk assigned to the user.
+     */
+    public function assignedDesk()
+    {
+        return $this->belongsTo(Desk::class, 'assigned_desk_id');
+    }
 }

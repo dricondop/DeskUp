@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\APIMethods;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
@@ -48,9 +49,19 @@ Route::get('/profile', function () {
     return view('profile');
 });
 
+Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
-    return view('desk-control');
-});
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->assigned_desk_id) {
+            return redirect()->route('desk.control', ['id' => $user->assigned_desk_id]);
+        }
+
+        return redirect('/layout')->with('error', 'You do not have an assigned desk.');
+    }
+
+    return redirect()->route('login');
+})->name('desk.control.redirect');
 
 Route::get('/health', function () {
     return view('health');
@@ -78,8 +89,15 @@ Route::post('/signin', function (Request $request): Response|RedirectResponse {
 
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        RateLimiter::clear($key); // Clear attemps when successful login
-        return redirect()->intended('/desk-control');
+        RateLimiter::clear($key); // Clear attempts when successful login
+        
+        // Redirect user to their assigned desk or layout if admin/no desk
+        $user = Auth::user();
+        if ($user->assigned_desk_id) {
+            return redirect()->route('desk.control', ['id' => $user->assigned_desk_id]);
+        }
+        
+        return redirect()->intended('/layout');
     }
 
     // Increase failed attemps
@@ -96,3 +114,38 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/signin');
 })->name('logout');
+
+
+//API TESTING ROUTES
+Route::get('/apitest', function () {
+    $height = 790.0;
+    $deskId = 'cd:fb:1a:53:fb:e6';
+
+    $response = APIMethods::raiseDesk($height, $deskId);
+
+    return $response;
+});
+
+Route::get('/apitest2', function () {
+
+    $response = APIMethods::getAllDesks();
+
+    return $response;
+});
+
+Route::get('/apitest3', function () {
+    $category = "state";
+    $deskId = 'cd:fb:1a:53:fb:e6';
+
+    $response = APIMethods::getCategoryData($category, $deskId);
+
+    return $response;
+});
+
+Route::get('/apitest4', function () {
+    $deskId = '70:9e:d5:e7:8c:98';
+
+    $response = APIMethods::getDeskData($deskId);
+
+    return $response;
+});
