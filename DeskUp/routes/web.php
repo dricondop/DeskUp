@@ -4,6 +4,7 @@ use App\Helpers\APIMethods;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
+use App\Http\Controllers\ProfileController; 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -35,16 +36,17 @@ Route::get('/admin-statistics', function () {
     return view('admin-statistics');
 })->name('admin-statistics');
 
-
 Route::get('/admin-control', function () {
     $user = auth()->user();
     $isAdmin = $user && $user->is_admin; 
     return view('admin-user-control', compact('isAdmin'));
 })->name('admin-user-control');
 
-Route::get('/profile', function () {
-    return view('profile');
-});
+Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->middleware('auth');
+
+Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+Route::delete('/profile/picture/delete', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
 
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
@@ -62,10 +64,6 @@ Route::get('/desk-control', function () {
 
 Route::get('/health', function () {
     return view('health');
-});
-
-Route::get('/edit-profile', function () {
-    return view('edit-profile');
 });
 
 Route::post('/signin', function (Request $request): Response|RedirectResponse {
@@ -111,7 +109,6 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/signin');
 })->name('logout');
-
 
 //API TESTING ROUTES
 Route::get('/apitest', function () {
