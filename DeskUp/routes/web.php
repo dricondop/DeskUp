@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use App\Http\Controllers\AdminStatisticsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,9 +33,11 @@ Route::get('/signin', function () {
     return view('signin');
 })->name('login');
 
-Route::get('/admin-statistics', function () {
-    return view('admin-statistics');
-})->name('admin-statistics');
+
+Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
+    ->name('admin-statistics')
+    ->middleware('auth');
+
 
 Route::get('/admin-control', function () {
     $user = auth()->user();
