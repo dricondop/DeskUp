@@ -428,6 +428,100 @@ html, body {
     margin: 20px 0;
 }
 
+/* Profile Picture Upload Styles */
+.profile-picture-upload-container {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    background-color: #F8FAFC;
+    border-radius: 12px;
+    border: 2px dashed #E2E8F0;
+}
+
+.current-picture {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.current-picture img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.remove-picture-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 1rem;
+    background-color: #FED7D7;
+    color: #C53030;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.remove-picture-btn:hover {
+    background-color: #FEB2B2;
+}
+
+.upload-controls {
+    flex: 1;
+}
+
+.file-input {
+    display: none;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #4299E1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.upload-btn:hover {
+    background-color: #3182CE;
+}
+
+.file-info {
+    font-size: 0.875rem;
+    color: #4A5568;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+}
+
+.upload-hint {
+    font-size: 0.75rem;
+    color: #718096;
+    line-height: 1.4;
+}
+
+/* Image Preview Animation */
+.current-picture img {
+    transition: transform 0.3s ease;
+}
+
+.current-picture img:hover {
+    transform: scale(1.05);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .profile-content {

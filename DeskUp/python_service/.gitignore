@@ -1,0 +1,30 @@
+# Entorno virtual
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Dependencies
+pip-log.txt
+pip-delete-this-directory.txt
+
+# MediaPipe
+.hidden_models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
