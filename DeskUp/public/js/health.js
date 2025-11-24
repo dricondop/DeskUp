@@ -54,8 +54,8 @@ async function fetchStats(range = 'today') {
         // Update doughnut chart
         if (chartInstances.timePercentage) {
             chartInstances.timePercentage.data.datasets[0].data = [
-                data.sitting_pct || 65,
-                data.standing_pct || 35
+                data.sitting_pct || 50,
+                data.standing_pct || 50
             ];
             chartInstances.timePercentage.update();
         }
@@ -108,6 +108,24 @@ async function fetchChartData(range = 'today') {
             chartInstances.heightAverage.update();
         }
         
+        // NEW: Update height overview chart
+        if (chartInstances.heightOverview && data.height_overview && data.height_overview.length > 0) {
+            chartInstances.heightOverview.data.labels = data.labels;
+            
+            const heights = data.height_overview.map(h => h.height);
+            const modes = data.height_overview.map(h => h.mode);
+            
+            chartInstances.heightOverview.data.datasets[0].data = heights;
+            chartInstances.heightOverview.data.datasets[0].modes = modes; // Store modes for color lookup
+            
+            const validHeights = heights.filter(h => h !== null);
+            if (validHeights.length > 0) {
+                setYAxisRange(chartInstances.heightOverview, validHeights, { minClamp: null, maxClamp: null });
+            }
+            
+            chartInstances.heightOverview.update();
+        }
+        
         return data;
     } catch (error) {
         console.error('Error fetching chart data:', error);
@@ -141,13 +159,13 @@ function createCharts() {
             chartInstances.timePercentage = new Chart(pctCtx, {
                 type: 'doughnut',
                 data: { 
-                    labels: ['Sitting', 'Standing'], 
+                    labels: ['Standing', 'Sitting'], 
                     datasets: [{
-                        data: [65, 35],
-                        backgroundColor: [palette.primary, palette.accent]
+                        data: [50, 50],
+                        backgroundColor: [palette.accent,palette.primary]
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', reverse: true} } }
             });
         }
 
@@ -200,36 +218,58 @@ function createCharts() {
             });
         }
 
-        const heightCtx = q('#heightAverageChart')?.getContext('2d');
-        if (heightCtx) {
-            chartInstances.heightAverage = new Chart(heightCtx, {
+        // NEW: Height Overview Chart with color segments
+        const heightOverviewCtx = q('#heightOverviewChart')?.getContext('2d');
+        if (heightOverviewCtx) {
+            chartInstances.heightOverview = new Chart(heightOverviewCtx, {
                 type: 'line',
                 data: { 
                     labels: [],
-                    datasets: [
-                        {
-                            label: 'Avg Sit (cm)',
-                            data: [],
-                            borderColor: palette.alt,
-                            backgroundColor: 'rgba(159,179,200,0.06)',
-                            tension: 0.25,
-                            pointRadius: 2
+                    datasets: [{
+                        label: 'Desk Height (cm)',
+                        data: [],
+                        borderColor: '#9FB3C8', // Default gray
+                        backgroundColor: 'rgba(159,179,200,0.1)',
+                        segment: {
+                            borderColor: ctx => {
+                                const idx = ctx.p0DataIndex;
+                                const mode = chartInstances.heightOverview?.data?.datasets[0]?.modes?.[idx];
+                                return mode === 'standing' ? '#00A8A8' : '#9FB3C8'; // Blue for standing, gray for sitting
+                            }
                         },
-                        {
-                            label: 'Avg Stand (cm)',
-                            data: [],
-                            borderColor: palette.accent,
-                            backgroundColor: 'rgba(0,168,168,0.06)',
-                            tension: 0.25,
-                            pointRadius: 2
+                        spanGaps: true, // Connect line across null values
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: ctx => {
+                            const idx = ctx.dataIndex;
+                            const mode = chartInstances.heightOverview?.data?.datasets[0]?.modes?.[idx];
+                            return mode === 'standing' ? '#00A8A8' : (mode === 'sitting' ? '#9FB3C8' : '#CCCCCC');
                         }
-                    ]
+                    }]
                 },
                 options: { 
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    scales: { y: { beginAtZero: false } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const mode = chartInstances.heightOverview?.data?.datasets[0]?.modes?.[ctx.dataIndex];
+                                    return `${ctx.parsed.y} cm (${mode || 'unknown'})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Height (cm)'
+                            }
+                        } 
+                    }
                 }
             });
         }

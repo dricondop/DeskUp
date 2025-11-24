@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class HealthStatsService
 {
+    // Threshold in mm to differentiate sitting vs standing
+    private const SIT_THRESHOLD_MM = 1000;
+
     /**
      * Fetch user health stats with optional date filtering.
      *
@@ -50,9 +53,8 @@ class HealthStatsService
         }
 
         // Calculate sitting vs standing percentages
-        $sitThreshold = 1000; // mm - adjust based on your desk specs
-        $sittingRecords = $stats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->count();
-        $standingRecords = $stats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->count();
+        $sittingRecords = $stats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->count();
+        $standingRecords = $stats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->count();
         $totalRecords = $stats->count();
 
         $sittingPct = $totalRecords > 0 ? round(($sittingRecords / $totalRecords) * 100) : 0;
@@ -66,17 +68,17 @@ class HealthStatsService
         // Calculate averages
         $avgHeight = round($stats->avg('desk_height_mm'));
         $avgSitHeight = $sittingRecords > 0 
-            ? round($stats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->avg('desk_height_mm') / 10) // convert to cm
+            ? round($stats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) // convert to cm
             : 72;
         $avgStandHeight = $standingRecords > 0 
-            ? round($stats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->avg('desk_height_mm') / 10) // convert to cm
+            ? round($stats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) // convert to cm
             : 110;
 
         // Estimate breaks (changes from sitting to standing or vice versa)
-        $breaks = $this->calculateBreaks($stats, $sitThreshold);
+        $breaks = $this->calculateBreaks($stats, self::SIT_THRESHOLD_MM);
         
         // Estimate calories (very rough: 0.15 kcal/min standing vs sitting)
-        $caloriesPerHour = 10; // approximate difference
+        $caloriesPerHour = 9; // approximate difference
         $calories = round($standingHours * $caloriesPerHour);
 
         return [
@@ -112,8 +114,6 @@ class HealthStatsService
             return $this->getEmptyChartData($range);
         }
 
-        $sitThreshold = 1000;
-
         // Group by time buckets
         $buckets = $this->groupByTimeBuckets($stats, $range);
 
@@ -124,6 +124,7 @@ class HealthStatsService
             'posture_scores' => $buckets['posture_scores'],
             'avg_sit_heights' => $buckets['avg_sit_heights'],
             'avg_stand_heights' => $buckets['avg_stand_heights'],
+            'height_overview' => $buckets['height_overview'],
         ];
     }
 
@@ -143,9 +144,8 @@ class HealthStatsService
                 'last_adjusted' => 'Never',
             ];
         }
-
         $heightCm = round($latestStat->desk_height_mm / 10);
-        $mode = $latestStat->desk_height_mm < 850 ? 'Sitting' : 'Standing';
+        $mode = $latestStat->desk_height_mm < self::SIT_THRESHOLD_MM ? 'Sitting' : 'Standing';
         $minutesAgo = round((now()->diffInMinutes($latestStat->recorded_at))*-1);
         
         $lastAdjusted = $minutesAgo < 60 
@@ -160,13 +160,13 @@ class HealthStatsService
         ];
     }
 
-    private function calculateBreaks(Collection $stats, int $sitThreshold): int
+    private function calculateBreaks(Collection $stats): int
     {
         $breaks = 0;
         $prevMode = null;
 
         foreach ($stats->sortBy('recorded_at') as $stat) {
-            $currentMode = $stat->desk_height_mm < $sitThreshold ? 'sit' : 'stand';
+            $currentMode = $stat->desk_height_mm < self::SIT_THRESHOLD_MM ? 'sit' : 'stand';
             if ($prevMode && $prevMode !== $currentMode) {
                 $breaks++;
             }
@@ -179,7 +179,6 @@ class HealthStatsService
     
     private function groupByTimeBuckets(Collection $stats, string $range): array
     {
-        $sitThreshold = 1000;
         $labels = [];
         $sitting_hours = [];  // Changed from $sittingHours
         $standing_hours = []; // Changed from $standingHours
@@ -190,20 +189,38 @@ class HealthStatsService
         switch ($range) {
             case 'today':
                 $grouped = $stats->groupBy(fn($s) => $s->recorded_at->format('H:00'));
-                foreach (range(8, 17) as $hour) {
+                foreach (range(8, 17) as $hour) { // Assuming work hours 8 AM to 5 PM, still working this out
                     $key = sprintf('%02d:00', $hour);
                     $labels[] = $key;
                     $hourStats = $grouped->get($key, collect());
                     
-                    $sit = $hourStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->count();
-                    $stand = $hourStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->count();
+                    $sit = $hourStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->count();
+                    $stand = $hourStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->count();
                     $total = max(1, $sit + $stand);
                     
-                    $sitting_hours[] = round($sit / $total, 2);
-                    $standing_hours[] = round($stand / $total, 2);
+                    $sitting_hours[] = $sit;
+                    $standing_hours[] = $stand;
+
                     $posture_scores[] = round((($stand / $total) * 100), 1);
-                    $avg_sit_heights[] = $sit > 0 ? round($hourStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->avg('desk_height_mm') / 10) : 72;
-                    $avg_stand_heights[] = $stand > 0 ? round($hourStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->avg('desk_height_mm') / 10) : 110;
+                    $avg_sit_heights[] = $sit > 0 ? round($hourStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 72;
+                    $avg_stand_heights[] = $stand > 0 ? round($hourStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 110;
+                
+                    // HEIGHT OVERVIEW LOGIC
+                    if ($hourStats->isEmpty()) {
+                        // No data: null will create a gap in the line
+                        $height_overview[] = [
+                            'height' => null,
+                            'mode' => 'unknown'
+                        ];
+                    } else {
+                        $avgHeight = round($hourStats->avg('desk_height_mm') / 10);
+                        $mode = $avgHeight > self::SIT_THRESHOLD_MM / 10 ? 'standing' : 'sitting';
+                        $height_overview[] = [
+                            'height' => $avgHeight,
+                            'mode' => $mode
+                        ];
+                    }
+                
                 }
                 break;
 
@@ -214,15 +231,24 @@ class HealthStatsService
                     $labels[] = $day;
                     $dayStats = $grouped->get($day, collect());
                     
-                    $sit = $dayStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->count();
-                    $stand = $dayStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->count();
+                    $sit = $dayStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->count();
+                    $stand = $dayStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->count();
                     $total = max(1, $sit + $stand);
                     
-                    $sitting_hours[] = round($sit / $total, 2);
-                    $standing_hours[] = round($stand / $total, 2);
+                    $sitting_hours[] = $sit;
+                    $standing_hours[] = $stand;
+
                     $posture_scores[] = round((($stand / $total) * 100), 1);
-                    $avg_sit_heights[] = $sit > 0 ? round($dayStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->avg('desk_height_mm') / 10) : 72;
-                    $avg_stand_heights[] = $stand > 0 ? round($dayStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->avg('desk_height_mm') / 10) : 110;
+                    $avg_sit_heights[] = $sit > 0 ? round($dayStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 72;
+                    $avg_stand_heights[] = $stand > 0 ? round($dayStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 110;
+                
+                    if ($dayStats->isEmpty()) {
+                        $height_overview[] = ['height' => null, 'mode' => 'unknown'];
+                    } else {
+                        $avgHeight = round($dayStats->avg('desk_height_mm') / 10);
+                        $mode = $avgHeight > self::SIT_THRESHOLD_MM / 10 ? 'standing' : 'sitting';
+                        $height_overview[] = ['height' => $avgHeight, 'mode' => $mode];
+                    }
                 }
                 break;
 
@@ -231,15 +257,24 @@ class HealthStatsService
                     $labels[] = "Week {$i}";
                     $weekStats = $stats->filter(fn($s) => ceil($s->recorded_at->day / 7) == $i);
                     
-                    $sit = $weekStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->count();
-                    $stand = $weekStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->count();
+                    $sit = $weekStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->count();
+                    $stand = $weekStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->count();
                     $total = max(1, $sit + $stand);
                     
-                    $sitting_hours[] = round($sit / $total, 2);
-                    $standing_hours[] = round($stand / $total, 2);
+                    $sitting_hours[] = $sit;
+                    $standing_hours[] = $stand;
+
                     $posture_scores[] = round((($stand / $total) * 100), 1);
-                    $avg_sit_heights[] = $sit > 0 ? round($weekStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->avg('desk_height_mm') / 10) : 72;
-                    $avg_stand_heights[] = $stand > 0 ? round($weekStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->avg('desk_height_mm') / 10) : 110;
+                    $avg_sit_heights[] = $sit > 0 ? round($weekStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 72;
+                    $avg_stand_heights[] = $stand > 0 ? round($weekStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 110;
+                
+                    if ($weekStats->isEmpty()) {
+                        $height_overview[] = ['height' => null, 'mode' => 'unknown'];
+                    } else {
+                        $avgHeight = round($weekStats->avg('desk_height_mm') / 10);
+                        $mode = $avgHeight > self::SIT_THRESHOLD_MM / 10 ? 'standing' : 'sitting';
+                        $height_overview[] = ['height' => $avgHeight, 'mode' => $mode];
+                    }
                 }
                 break;
 
@@ -250,20 +285,29 @@ class HealthStatsService
                     $labels[] = $month;
                     $monthStats = $grouped->get($month, collect());
                     
-                    $sit = $monthStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->count();
-                    $stand = $monthStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->count();
+                    $sit = $monthStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->count();
+                    $stand = $monthStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->count();
                     $total = max(1, $sit + $stand);
                     
-                    $sitting_hours[] = round($sit / $total, 2);
-                    $standing_hours[] = round($stand / $total, 2);
+                    $sitting_hours[] = $sit;
+                    $standing_hours[] = $stand;
+                    
                     $posture_scores[] = round((($stand / $total) * 100), 1);
-                    $avg_sit_heights[] = $sit > 0 ? round($monthStats->filter(fn($s) => $s->desk_height_mm < $sitThreshold)->avg('desk_height_mm') / 10) : 72;
-                    $avg_stand_heights[] = $stand > 0 ? round($monthStats->filter(fn($s) => $s->desk_height_mm >= $sitThreshold)->avg('desk_height_mm') / 10) : 110;
+                    $avg_sit_heights[] = $sit > 0 ? round($monthStats->filter(fn($s) => $s->desk_height_mm < self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 72;
+                    $avg_stand_heights[] = $stand > 0 ? round($monthStats->filter(fn($s) => $s->desk_height_mm >= self::SIT_THRESHOLD_MM)->avg('desk_height_mm') / 10) : 110;
+                
+                    if ($monthStats->isEmpty()) {
+                        $height_overview[] = ['height' => null, 'mode' => 'unknown'];
+                    } else {
+                        $avgHeight = round($monthStats->avg('desk_height_mm') / 10);
+                        $mode = $avgHeight > self::SIT_THRESHOLD_MM / 10 ? 'standing' : 'sitting';
+                        $height_overview[] = ['height' => $avgHeight, 'mode' => $mode];
+                    }
                 }
                 break;
     }
 
-    return compact('labels', 'sitting_hours', 'standing_hours', 'posture_scores', 'avg_sit_heights', 'avg_stand_heights');
+    return compact('labels', 'sitting_hours', 'standing_hours', 'posture_scores', 'avg_sit_heights', 'avg_stand_heights', 'height_overview');
     }
 
     private function getEmptyChartData(string $range): array
@@ -275,6 +319,7 @@ class HealthStatsService
             'posture_scores' => [],
             'avg_sit_heights' => [],
             'avg_stand_heights' => [],
+            'height_overview' => [],
         ];
     }
 

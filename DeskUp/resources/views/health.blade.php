@@ -117,10 +117,10 @@
                     </div>
                 </figure>
 
-                <figure class="card chart-card" data-key="heightAverage" aria-label="Sitting and standing height average">
-                    <h3 class="chart-title">Height Average — Sit vs Stand</h3>
+                <figure class="card chart-card" data-key="heightOverview" aria-label="Height overview">
+                    <h3 class="chart-title">Height Overview</h3>
                     <div class="chart-container">
-                        <canvas id="heightAverageChart" role="img" aria-label="Two-line chart of sitting and standing heights"></canvas>
+                        <canvas id="heightOverviewChart" role="img" aria-label="Line chart showing desk height with color-coded sitting and standing"></canvas>
                     </div>
                 </figure>
             </div>
