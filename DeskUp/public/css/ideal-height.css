@@ -1,0 +1,335 @@
+/* Ideal Height Page Styles */
+.ideal-height-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: calc(100vh - 40px);
+    box-sizing: border-box;
+}
+
+/* Profile Header Styles */
+.profile-header {
+    background: linear-gradient(125deg, #07325F 0%, #2A7B9B 40%, #57C785 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-main {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.profile-info h1 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.profile-info .position {
+    margin: 0;
+    font-size: 15px;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Profile Content Layout */
+.profile-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+/* Info Cards */
+.info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #07325F;
+}
+
+/* Instructions Grid */
+.instructions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.instruction-item {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.instruction-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.instruction-step {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: linear-gradient(125deg, #07325F 0%, #2A7B9B 100%);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(7, 50, 95, 0.3);
+}
+
+.instruction-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.instruction-image {
+    width: 70px;
+    height: 70px;
+    flex-shrink: 0;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e2e8f0;
+}
+
+.placeholder-icon {
+    font-size: 2.2rem;
+    opacity: 0.7;
+}
+
+.instruction-text {
+    flex: 1;
+}
+
+.step-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #07325F;
+    margin: 0 0 6px 0;
+}
+
+.step-subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.back-to-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    color: #4a5568;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.back-to-profile-btn:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+    color: #2d3748;
+    text-decoration: none;
+}
+
+.analyze-posture-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(125deg, #07325F 0%, #2A7B9B 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(7, 50, 95, 0.3);
+}
+
+.analyze-posture-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(7, 50, 95, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+/* Back Button */
+.back-button {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    backdrop-filter: blur(5px);
+}
+
+.back-button img {
+    width: 25px;
+    height: 25px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ideal-height-container {
+        padding: 15px;
+        min-height: calc(100vh - 30px);
+    }
+    
+    .profile-header {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .profile-info h1 {
+        font-size: 22px;
+    }
+    
+    .profile-info .position {
+        font-size: 14px;
+    }
+    
+    .info-card {
+        padding: 20px;
+    }
+    
+    .instruction-item {
+        padding: 18px;
+    }
+    
+    .instruction-content {
+        gap: 15px;
+    }
+    
+    .instruction-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .placeholder-icon {
+        font-size: 1.8rem;
+    }
+    
+    .step-title {
+        font-size: 1.1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .back-to-profile-btn,
+    .analyze-posture-btn {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .ideal-height-container {
+        padding: 12px;
+    }
+    
+    .profile-header {
+        padding: 18px;
+    }
+    
+    .profile-info h1 {
+        font-size: 20px;
+    }
+    
+    .instruction-step {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+    
+    .instruction-content {
+        gap: 12px;
+    }
+    
+    .instruction-image {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .back-button {
+        top: 12px;
+        left: 12px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .back-button img {
+        width: 20px;
+        height: 20px;
+    }
+}

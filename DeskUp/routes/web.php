@@ -51,6 +51,17 @@ Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.e
 Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile/picture/delete', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
 
+Route::get('/ideal-height', function () {
+    return view('ideal-height');
+})->name('ideal.height')->middleware('auth');
+
+Route::get('/posture-analysis', function () {
+    return view('posture-analysis');
+})->name('posture.analysis')->middleware('auth');
+
+Route::post('/height-detection/analyze', [HeightDetectionController::class, 'analyze'])->name('height.detection.analyze');
+Route::get('/height-detection/result', [HeightDetectionController::class, 'result'])->name('height.detection.result');
+
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
     if (Auth::check()) {

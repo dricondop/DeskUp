@@ -152,19 +152,20 @@
                 
                 <div class="divider"></div>
                 
-                <div class="height-section">
-                    <div class="card-header">
-                        <h2 class="card-title">Ideal Height</h2>
-                    </div>
-                    <div class="ideal-height-container">
-                        <div class="height-display">
-                            <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
-                            <span class="height-unit">cm</span>
+                    <div class="height-section">
+                        <div class="card-header">
+                            <h2 class="card-title">Ideal Height</h2>
                         </div>
-                        <p class="height-description">
-                            Your personalized ideal desk height for optimal ergonomics
-                        </p>
-                        <button class="height-button">Configure Ideal Height</button>
+                        <div class="ideal-height-container">
+                            <div class="height-display">
+                                <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
+                                <span class="height-unit">cm</span>
+                            </div>
+                            <p class="height-description">
+                                Your personalized ideal desk height for optimal ergonomics
+                            </p>
+                            <a href="{{ route('ideal.height') }}" class="height-button">Configure Ideal Height</a>
+                        </div>
                     </div>
                 </div>
             </div>
