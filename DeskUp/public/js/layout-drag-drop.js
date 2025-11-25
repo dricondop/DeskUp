@@ -59,14 +59,12 @@ function updateDeskCount() {
     const deskCountElement = document.getElementById('deskCount');
     if (deskCountElement) deskCountElement.textContent = count;
 
-    const addDeskBtn = document.getElementById('addDesk');
-    const deleteBtn = document.getElementById('deleteSelected');
+    const syncBtn = document.getElementById('syncAPI');
     const saveBtn = document.getElementById('saveLayout');
     const downloadBtn = document.getElementById('downloadJSON');
     const uploadBtn = document.getElementById('uploadJSON');
     
-    if (addDeskBtn) addDeskBtn.disabled = !editModeEnabled || count >= MAX_DESKS;
-    if (deleteBtn) deleteBtn.disabled = !editModeEnabled;
+    // Sync button state is managed by ManualSyncService
     if (saveBtn) saveBtn.disabled = !editModeEnabled;
     if (downloadBtn) downloadBtn.disabled = !editModeEnabled;
     if (uploadBtn) uploadBtn.disabled = !editModeEnabled;
@@ -248,38 +246,6 @@ function updateSelection(boxLeft, boxTop, boxWidth, boxHeight) {
 }
 
 if (isAdmin) {
-    const addDeskBtn = document.getElementById('addDesk');
-    if (addDeskBtn) {
-        addDeskBtn.addEventListener('click', () => {
-            if (!editModeEnabled) return;
-            const maxX = canvas.offsetWidth - 150;
-            const maxY = canvas.offsetHeight - 150;
-            addDesk(Math.random() * maxX, Math.random() * maxY);
-        });
-    }
-
-    const deleteBtn = document.getElementById('deleteSelected');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => {
-            if (!editModeEnabled || selectedDesks.size === 0) {
-                alert('No desks selected. Hold Shift and drag to select desks.');
-                return;
-            }
-
-            if (confirm(`Delete ${selectedDesks.size} selected desk(s)?`)) {
-                selectedDesks.forEach(d => d.remove());
-                selectedDesks.clear();
-
-                document.querySelectorAll('.desk').forEach((desk, i) => {
-                    const label = desk.querySelector('.desk-label');
-                    if (label) label.textContent = `Desk ${i + 1}`;
-                });
-                deskCounter = document.querySelectorAll('.desk').length + 1;
-                updateDeskCount();
-            }
-        });
-    }
-
     const editModeToggle = document.getElementById('editModeToggle');
     if (editModeToggle) {
         editModeToggle.addEventListener('change', (e) => {
