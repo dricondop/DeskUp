@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'python_detection' => [
+    'url' => env('PYTHON_SERVICE_URL', 'http://localhost:5001'),
+    ],
+
 ];
