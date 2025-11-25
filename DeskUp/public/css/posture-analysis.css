@@ -1,62 +1,95 @@
 .posture-analysis-container {
     min-height: 100vh;
     background: #f8fafc;
+    margin-left: 250px; /* Compensa el sidebar izquierdo */
 }
 
+/* Header Centrado */
 .analysis-header {
     background: white;
     border-bottom: 1px solid #e2e8f0;
-    padding: 1rem 2rem;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.header-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
+    max-width: 1200px;
+    width: 100%;
 }
 
-.back-button img {
-    width: 24px;
-    height: 24px;
+.header-text {
+    flex: 1;
+    text-align: center;
 }
 
-.header-content h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
+.header-text h1 {
+    font-size: 2rem;
+    font-weight: 700;
     color: #1a202c;
-    margin: 0;
+    margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
     color: #718096;
-    margin: 0.25rem 0 0 0;
+    margin: 0;
+    font-size: 1.1rem;
 }
 
-.analysis-content {
+.back-button img {
+    width: 28px;
+    height: 28px;
+}
+
+/* Layout Principal de 3 Columnas */
+.analysis-main-layout {
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 2rem;
-    padding: 2rem;
-    max-width: 1200px;
+    grid-template-columns: 250px 1fr 300px;
+    min-height: calc(100vh - 120px);
+    max-width: 1400px;
     margin: 0 auto;
 }
 
-.camera-section {
-    background: white;
-    border-radius: 12px;
+/* Sección Central - Cámara */
+.camera-main-section {
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.camera-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+}
+
+.camera-wrapper {
+    margin-bottom: 2rem;
 }
 
 .camera-feed {
     width: 100%;
-    max-width: 640px;
-    height: 480px;
-    border-radius: 8px;
+    max-width: 800px;
+    height: 600px; /* Más grande */
+    border-radius: 12px;
     background: #f7fafc;
-    border: 2px dashed #cbd5e0;
+    border: 3px dashed #cbd5e0;
+    object-fit: cover;
 }
 
 .camera-feed.camera-active {
     border-color: #48bb78;
     border-style: solid;
+    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
 }
 
 .capture-canvas {
@@ -66,74 +99,96 @@
 .camera-controls {
     display: flex;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
 .btn-primary, .btn-secondary {
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 2rem;
     border: none;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 10px;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    min-width: 160px;
+    justify-content: center;
 }
 
 .btn-primary {
     background: #4299e1;
     color: white;
+    box-shadow: 0 4px 6px rgba(66, 153, 225, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
     background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(66, 153, 225, 0.4);
 }
 
 .btn-primary:disabled {
     background: #a0aec0;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .btn-secondary {
     background: #e2e8f0;
     color: #4a5568;
+    border: 2px solid #cbd5e0;
 }
 
 .btn-secondary:hover {
     background: #cbd5e0;
+    transform: translateY(-2px);
 }
 
 .analyze-btn {
     background: #48bb78;
+    box-shadow: 0 4px 6px rgba(72, 187, 120, 0.3);
 }
 
 .analyze-btn:hover:not(:disabled) {
     background: #38a169;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(72, 187, 120, 0.4);
 }
 
 .camera-status {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
 }
 
 .status-info { color: #4299e1; }
 .status-success { color: #48bb78; }
 .status-error { color: #f56565; }
 
+/* Loading State */
 .loading-state {
     text-align: center;
-    padding: 3rem;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 900px;
 }
 
 .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #e2e8f0;
-    border-top: 4px solid #4299e1;
+    width: 60px;
+    height: 60px;
+    border: 5px solid #e2e8f0;
+    border-top: 5px solid #4299e1;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
+    margin: 0 auto 2rem;
 }
 
 @keyframes spin {
@@ -141,68 +196,77 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Results Section */
 .results-section {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.5s ease-in;
+    width: 100%;
+    max-width: 900px;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 .result-card {
-    border-radius: 12px;
-    padding: 2rem;
+    border-radius: 16px;
+    padding: 3rem;
     background: white;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .result-card.success {
-    border-left: 4px solid #48bb78;
+    border-left: 6px solid #48bb78;
 }
 
 .result-card.error {
-    border-left: 4px solid #f56565;
+    border-left: 6px solid #f56565;
 }
 
 .result-header h2 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 1rem 0;
     color: #1a202c;
+    font-size: 2rem;
 }
 
 .result-header p {
     color: #718096;
     margin: 0;
+    font-size: 1.2rem;
 }
 
 .result-data {
-    margin: 2rem 0;
+    margin: 2.5rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .data-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
     background: #f7fafc;
-    border-radius: 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
 }
 
 .data-label {
-    font-weight: 500;
+    font-weight: 600;
     color: #4a5568;
+    font-size: 1.1rem;
 }
 
 .data-value {
-    font-weight: 600;
+    font-weight: 700;
     color: #1a202c;
+    font-size: 1.2rem;
 }
 
 .data-value.highlight {
     color: #48bb78;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
 }
 
 .score-excellent { color: #48bb78; }
@@ -212,41 +276,63 @@
 
 .result-actions {
     display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    justify-content: center;
 }
 
+/* Sidebar Derecha - Instrucciones */
 .instructions-sidebar {
+    padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
 }
 
 .instruction-card {
     background: white;
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #4299e1;
 }
 
 .instruction-card h3 {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1.5rem 0;
     color: #1a202c;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 .instruction-card ul {
     margin: 0;
-    padding-left: 1.25rem;
+    padding-left: 1.5rem;
     color: #4a5568;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
 .instruction-card li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .analysis-main-layout {
+        grid-template-columns: 200px 1fr 280px;
+    }
+    
+    .posture-analysis-container {
+        margin-left: 200px;
+    }
 }
 
 @media (max-width: 768px) {
-    .analysis-content {
+    .posture-analysis-container {
+        margin-left: 0;
+    }
+    
+    .analysis-main-layout {
         grid-template-columns: 1fr;
         padding: 1rem;
     }
@@ -255,15 +341,28 @@
         padding: 1rem;
     }
     
-    .camera-section {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .camera-main-section {
         padding: 1rem;
     }
     
+    .camera-container {
+        padding: 1.5rem;
+    }
+    
     .camera-feed {
-        height: 300px;
+        height: 400px;
     }
     
     .result-actions {
         flex-direction: column;
+    }
+    
+    .instructions-sidebar {
+        padding: 1rem;
     }
 }

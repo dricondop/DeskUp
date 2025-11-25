@@ -26,27 +26,37 @@
         const HeightDetection = {
             template: `
                 <div class="posture-analysis-container">
+                    <!-- Header Centrado -->
                     <div class="analysis-header">
-                        <a href="/ideal-height" class="back-button">
-                            <img src="/assets/back.png" alt="Back">
-                        </a>
                         <div class="header-content">
-                            <h1>Posture Analysis</h1>
-                            <p class="subtitle">Position yourself in frame for accurate height detection</p>
+                            <a href="/ideal-height" class="back-button">
+                                <img src="/assets/back.png" alt="Back">
+                            </a>
+                            <div class="header-text">
+                                <h1>Posture Analysis</h1>
+                                <p class="subtitle">Position yourself in frame for accurate height detection</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="analysis-content">
-                        <div class="camera-section">
+                    <!-- Contenido Principal con Layout de 3 Columnas -->
+                    <div class="analysis-main-layout">
+                        <!-- Sidebar Izquierda (vacía para balance) -->
+                        <div class="sidebar-left"></div>
+
+                        <!-- Sección Central - Cámara -->
+                        <div class="camera-main-section">
                             <div class="camera-container" v-if="!isAnalyzing && !analysisResult">
-                                <video 
-                                    ref="videoElement" 
-                                    autoplay 
-                                    playsinline 
-                                    class="camera-feed"
-                                    :class="{ 'camera-active': isCameraActive }"
-                                ></video>
-                                <canvas ref="canvasElement" class="capture-canvas"></canvas>
+                                <div class="camera-wrapper">
+                                    <video 
+                                        ref="videoElement" 
+                                        autoplay 
+                                        playsinline 
+                                        class="camera-feed"
+                                        :class="{ 'camera-active': isCameraActive }"
+                                    ></video>
+                                    <canvas ref="canvasElement" class="capture-canvas"></canvas>
+                                </div>
                                 
                                 <div class="camera-controls">
                                     <button 
@@ -143,7 +153,7 @@
                             </div>
                         </div>
 
-                        <!-- Instructions Sidebar -->
+                        <!-- Sidebar Derecha - Instrucciones -->
                         <div class="instructions-sidebar">
                             <div class="instruction-card">
                                 <h3>📸 Camera Setup</h3>
@@ -187,8 +197,8 @@
                     try {
                         this.cameraStream = await navigator.mediaDevices.getUserMedia({
                             video: { 
-                                width: 640, 
-                                height: 480,
+                                width: 1280,  // Aumentada resolución
+                                height: 720,
                                 facingMode: 'user'
                             }
                         });
