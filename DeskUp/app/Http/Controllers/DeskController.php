@@ -45,13 +45,12 @@ class DeskController extends Controller
         ]);
 
         $desk = Desk::findOrFail($id);
-        $desk->height = $validated['height'];
-        $desk->save();
+        $desk->updateHeight($validated['height']); // Use new method
 
         return response()->json([
             'success' => true,
             'message' => 'Height updated successfully',
-            'height' => $desk->height
+            'height' => $desk->height // This will now get the value from latest stats
         ]);
     }
 
@@ -62,13 +61,12 @@ class DeskController extends Controller
         ]);
 
         $desk = Desk::findOrFail($id);
-        $desk->status = $validated['status'];
-        $desk->save();
+        $desk->updateStatus($validated['status']); // Use new method
 
         return response()->json([
             'success' => true,
             'message' => 'Status updated successfully',
-            'status' => $desk->status
+            'status' => $desk->status // This will now get the value from latest stats
         ]);
     }
 

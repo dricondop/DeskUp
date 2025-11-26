@@ -100,12 +100,16 @@ body{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
   gap:14px;
+  margin-top:25px;
 }
 .chart-card{
   display:flex;
   flex-direction:column;
   gap:8px;
   padding:12px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 .chart-title{margin:0; font-size:0.95rem; font-weight:600; color:var(--muted)}
 .chart-container{position:relative;height:220px}
