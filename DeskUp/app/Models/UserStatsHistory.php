@@ -9,11 +9,14 @@ class UserStatsHistory extends Model
 {
     use HasFactory;
 
+    // This table does not have created_at / updated_at columns
+    public $timestamps = false;
+
     protected $table = 'user_stats_history';
 
     protected $fillable = [
         'user_id',
-        'desk_id',
+        'desk_id', // This refers to desk_number
         'desk_height_mm',
         'desk_speed_mms',
         'desk_status',
@@ -41,6 +44,7 @@ class UserStatsHistory extends Model
 
     public function desk()
     {
-        return $this->belongsTo(Desk::class);
+        // Desk_number as the foreign key
+        return $this->belongsTo(Desk::class, 'desk_id', 'desk_number');
     }
 }

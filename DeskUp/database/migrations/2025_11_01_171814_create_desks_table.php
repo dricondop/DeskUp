@@ -17,9 +17,6 @@ return new class extends Migration
             $table->integer('desk_number')->unique();
             $table->float('position_x')->nullable();
             $table->float('position_y')->nullable();
-            $table->string('status')->default('OK');
-            $table->integer('height')->default(110); // in cm
-            $table->integer('speed')->default(36); // in mm/s
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

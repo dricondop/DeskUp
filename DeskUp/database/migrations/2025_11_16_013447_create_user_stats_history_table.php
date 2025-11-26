@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('user_stats_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('desk_id')->constrained()->onDelete('cascade');
+            $table->integer('desk_id'); // Changed from foreignId to integer
             $table->integer('desk_height_mm');
             $table->integer('desk_speed_mms')->default(0);
             $table->string('desk_status')->default('Normal');
@@ -22,9 +22,10 @@ return new class extends Migration
             $table->integer('activations_count')->default(0);
             $table->integer('sit_stand_count')->default(0);
             $table->timestamp('recorded_at');
-            // THIS CREATES THE created_at and updated_at columns: $table->timestamps();
             
             $table->index(['user_id', 'recorded_at']);
+            // Add foreign key constraint referencing desk_number
+            $table->foreign('desk_id')->references('desk_number')->on('desks')->onDelete('cascade');
         });
     }
 
