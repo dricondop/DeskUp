@@ -13,11 +13,14 @@ class DeskActivity extends Model
         'desk_id',
         'activity_type',
         'description',
-        'scheduled_at'
+        'scheduled_at',
+        'scheduled_to',
+        'status'
     ];
 
     protected $casts = [
-        'scheduled_at' => 'datetime'
+        'scheduled_at' => 'datetime',
+        'scheduled_to' => 'datetime'
     ];
 
     public function desk()

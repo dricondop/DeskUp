@@ -12,6 +12,8 @@ class DeskController extends Controller
     public function show($id)
     {
         $desk = Desk::with('activities')->findOrFail($id);
+
+        $desks = Desk::all();
         
         $isAdmin = false;
         if (Auth::check()) {
@@ -21,37 +23,50 @@ class DeskController extends Controller
 
         return view('desk-control', [
             'desk' => $desk,
+            'desks' => $desks,
             'isAdmin' => $isAdmin,
             'isLoggedIn' => Auth::check()
-        ]);
-    }
-
-    public function showAssignedDesk()
-    {
-        $user = Auth::user();
-        $desk = Desk::where('user_id', $user->id)->with('activities')->firstOrFail();
-        
-        return view('desk-control', [
-            'desk' => $desk,
-            'isAdmin' => $user->isAdmin(),
-            'isLoggedIn' => true,
         ]);
     }
 
     public function updateHeight(Request $request, $id)
     {
         $validated = $request->validate([
-            'height' => 'required|integer|min:0|max:150'
+            'height' => 'required|integer'
         ]);
 
         $desk = Desk::findOrFail($id);
-        $desk->updateHeight($validated['height']); // Use new method
+
+        //  $heightMm = $validated['height'] * 10; 
+
+        // $simResponse = \App\Helpers\APIMethods::raiseDesk($heightMm, $desk->id);
+
+        // // Gets the allowed height by the simulator
+        // $data = $simResponse->json();
+        // $resultInMm = $data['position_mm'] ?? null;
+
+        // if ($resultInMm === null) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Height did not updated successfully',
+        //         'response' => $data
+        //     ], 500);
+        // }
+
+        // $desk->height = $resultInMm;
+
+
+
+
+        $desk->height = $validated['height'];
+        $desk->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Height updated successfully',
             'height' => $desk->height // This will now get the value from latest stats
         ]);
+        
     }
 
     public function updateStatus(Request $request, $id)
@@ -81,7 +96,8 @@ class DeskController extends Controller
         $validated = $request->validate([
             'activity_type' => 'required|string|max:50',
             'description' => 'nullable|string',
-            'scheduled_at' => 'required|date'
+            'scheduled_at' => 'required|date',
+            'scheduled_to' => 'required|date'
         ]);
 
         $desk = Desk::findOrFail($id);

@@ -1,0 +1,151 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #F4F7FB;
+    margin: 0;
+    display: flex;
+    color: #3A506B;
+}
+
+.main-content {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+    min-height: 100vh;
+}
+
+.admin-container {
+    width: 90%;
+    max-width: 1100px;
+    margin-bottom: 30px;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    color: #3A506B;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.page-header .subtitle {
+    color: #6C7A89;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    border-top: 5px solid #00A8A8;
+    transition: transform 0.2s ease;
+    margin-bottom: 2rem;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+th, td {
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 1px solid #E3E9EF;
+}
+
+th {
+    background-color: #3A506B;
+    color: white;
+    font-weight: 600;
+}
+
+tr:hover td {
+    background-color: #F1F6FA;
+}
+
+.status {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.status.active {
+    background-color: #00A8A8;
+    color: white;
+}
+
+.status.inactive {
+    background-color: #B0BEC5;
+    color: #3A506B;
+}
+
+.desk-select {
+    padding: 6px 10px;
+    border: 1px solid #B0BEC5;
+    border-radius: 6px;
+    font-family: inherit;
+    background: #F4F7FB;
+    color: #3A506B;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.desk-select:hover {
+    border-color: #00A8A8;
+}
+
+
+.btn-remove {
+    background-color: #E63946;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-remove:hover {
+    background-color: #c51212;
+    transform: scale(1.05);
+}
+.btn-unassign {
+    background-color: #e6a439;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-unassign:hover {
+    background-color: #e18d06;
+    transform: scale(1.05);
+}
+.btn-unassign:disabled {
+    background-color: grey;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.fade-out {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
