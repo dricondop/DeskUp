@@ -6,16 +6,15 @@
     <title>DeskUp - User Profile</title>
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/profile-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
-    
 </head>
 <body>
     @include('components.sidebar')
     
     <div class="main-content">
-    <a href="#" class="back-button">
-        <img src="{{ asset ('assets/back.png') }}" alt="Back">
+    <a href="{{ url()->previous() }}" class="back-button">
+        <img src="{{ asset('assets/back.png') }}" alt="Back">
     </a>
 
     <div class="profile-container">
@@ -23,15 +22,21 @@
         <div class="profile-header">
             <div class="header-content">
                 <div class="profile-main">
-                    <img src="{{ asset ('assets/default-avatar.png') }}" alt="Profile Picture" class="profile-picture">
+                    <img src="{{ $userProfile->profile_picture ?? asset('assets/default-avatar.png') }}" alt="Profile Picture" class="profile-picture">
                     <div class="profile-info">
-                        <h1>Alex Johnson</h1>
-                        <p class="position">Senior UX Designer</p>
+                        <h1>{{ $user->name ?? 'Guest' }}</h1>
+                        <p class="position">
+                            @if($isAdmin)
+                                Admin
+                            @else
+                                User
+                            @endif
+                        </p>
                         <p class="location">
                             <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                             </svg>
-                            Sønderborg Office, 3rd Floor
+                            {{ $userProfile->location ?? 'Location not set' }}
                         </p>
                     </div>
                 </div>
@@ -55,38 +60,72 @@
             <div class="info-card">
                 <div class="card-header">
                     <h2 class="card-title">Personal Information</h2>
-                    <a href="edit-profile" class="edit-btn">
+                    @if($user)
+                    <a href="{{ route('profile.edit') }}" class="edit-btn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                         </svg>
                         Edit
                     </a>
+                    @endif
                 </div>
                 <div class="personal-info-grid">
                     <div class="info-item">
                         <span class="info-label">Email</span>
-                        <span class="info-value">alex.johnson@company.com</span>
+                        <span class="info-value">{{ $user->email ?? 'Not available' }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Phone</span>
-                        <span class="info-value">+34 612 345 678</span>
+                        <span class="info-value">{{ $userProfile->phone ?? 'Not available' }}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Department</span>
-                        <span class="info-value">Product Design</span>
+                        <span class="info-label">Date of Birth</span>
+                        <span class="info-value">
+                            @if($userProfile && $userProfile->date_of_birth)
+                                {{ \Carbon\Carbon::parse($userProfile->date_of_birth)->format('F j, Y') }}
+                            @else
+                                Not available
+                            @endif
+                        </span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Join Date</span>
-                        <span class="info-value">March 15, 2020</span>
+                        <span class="info-label">User ID</span>
+                        <span class="info-value">{{ $user->id ?? 'N/A' }}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Employee ID</span>
-                        <span class="info-value">EMP-0452</span>
+                        <span class="info-label">Assigned Desk</span>
+                        <span class="info-value">
+                            @if($user && $user->assigned_desk_id)
+                                Desk {{ $user->assigned_desk_id }}
+                            @else
+                                Not assigned
+                            @endif
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Member Since</span>
+                        <span class="info-value">
+                            @if($user)
+                                {{ \Carbon\Carbon::parse($user->created_at)->format('F j, Y') }}
+                            @else
+                                Not available
+                            @endif
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Account Type</span>
+                        <span class="info-value">
+                            @if($isAdmin)
+                                <span style="color: #4CAF50;">Administrator</span>
+                            @else
+                                Regular User
+                            @endif
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Health Stats Insigts (needs rework) -->
+            <!-- Health Stats Insights -->
             <div class="info-card combined-card">
                 <div class="health-section">
                     <div class="card-header">
@@ -119,7 +158,7 @@
                     </div>
                     <div class="ideal-height-container">
                         <div class="height-display">
-                            <span class="height-value">72.5</span>
+                            <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
                             <span class="height-unit">cm</span>
                         </div>
                         <p class="height-description">
