@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@deskup.com',
             'password' => Hash::make('admin123'),
             'is_admin' => true,
-            'assigned_desk_id' => 1,
+            'assigned_desk_id' => null,
         ]);
 
         User::factory()->create([
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'email' => 'user@deskup.com',
             'password' => Hash::make('password123'),
             'is_admin' => false,
-            'assigned_desk_id' => 2,
+            'assigned_desk_id' => null,
         ]);
     }
 }

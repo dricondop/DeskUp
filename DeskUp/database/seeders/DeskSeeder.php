@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Desk;
+use App\Models\User;
 
 class DeskSeeder extends Seeder
 {
@@ -17,33 +18,35 @@ class DeskSeeder extends Seeder
             [
                 'id' => 1,
                 'name' => 'Admin Desk',
-                'desk_number' => 0001,
+                'desk_number' => 1,
                 'api_desk_id' => null,
                 'position_x' => 100.0,
                 'position_y' => 100.0,
-                'status' => 'OK',
                 'user_id' => $adminId,
-                'height' => 110,
-                'speed' => 36,
                 'is_active' => true,
             ],
             [
                 'id' => 2,
                 'name' => 'Regular Desk',
-                'desk_number' => 0002,
+                'desk_number' => 2,
                 'api_desk_id' => null,
                 'position_x' => 300.0,
                 'position_y' => 100.0,
-                'status' => 'OK',
                 'user_id' => $userId,
-                'height' => 110,
-                'speed' => 36,
                 'is_active' => true,
             ],
         ];
 
         foreach ($desks as $deskData) {
             Desk::create($deskData);
+        }
+
+        // Now update users with their assigned desks
+        if ($adminId) {
+            User::find($adminId)->update(['assigned_desk_id' => 1]);
+        }
+        if ($userId) {
+            User::find($userId)->update(['assigned_desk_id' => 2]);
         }
     }
 }

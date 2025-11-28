@@ -9,9 +9,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            DeskSeeder::class,              // Create desks first (without user_id)
-            UserSeeder::class,              // Create users and assign desks
-            DeskUserAssignmentSeeder::class, // NEW: Assign users to desks
+            UserSeeder::class,              // Create users first
+            DeskSeeder::class,              // Create desks with user assignments
             UserStatsHistorySeeder::class,   // Create history data
         ]);
     }
