@@ -25,7 +25,7 @@
 
         <main id="canvas" data-is-admin="{{ $isAdmin ? 'true' : 'false' }}"></main>
         
-        <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
+
         
         @if($isAdmin)
         <nav class="toolbar">   
