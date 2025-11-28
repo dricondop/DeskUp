@@ -7,24 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class DeskActivity extends Model
 {
-    use HasFactory;
+    // use HasFactory;
 
-    protected $fillable = [
-        'desk_id',
-        'activity_type',
-        'description',
-        'scheduled_at',
-        'scheduled_to',
-        'status'
-    ];
+    // const STATUS_ACTIVE = 'active';
+    // const STATUS_REJECTED = 'rejected';
 
-    protected $casts = [
-        'scheduled_at' => 'datetime',
-        'scheduled_to' => 'datetime'
-    ];
+    // protected $fillable = [
+    //     'desk_id',
+    //     'activity_type',
+    //     'description',
+    //     'scheduled_at',
+    //     'scheduled_to',
+    //     'status',
+    //     'created_by'
+    // ];
 
-    public function desk()
-    {
-        return $this->belongsTo(Desk::class);
-    }
+    // protected $casts = [
+    //     'scheduled_at' => 'datetime',
+    //     'scheduled_to' => 'datetime'
+    // ];
+
+    // public function desk()
+    // {
+    //     return $this->belongsTo(Desk::class);
+    // }
 }

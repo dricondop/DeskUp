@@ -47,16 +47,10 @@ function changeHeight(number) {
     display.textContent = desk.height + " cm";
 }
 
-async function updateDesk(field, value) {
-
-    if (typeof value === "undefined") {
-        if (field === "height") value = desk.height;
-        if (field === "speed") value = desk.speed;
-    }
-
-    const payload = {};
-    payload[field] = value; // This will e.g. give { height: 100 }
-
+// Save desk height in database
+async function updateDesk(field, value) 
+{
+    const payload = {'height': desk.height};
 
     try {
         const response = await fetch(`${desk.url}/${desk.id}/${field}`, {
@@ -80,6 +74,7 @@ async function updateDesk(field, value) {
     }
 }  
 
+// Switch between Activity or Pending (activities - user view only)
 const tabs = document.querySelectorAll('.activity-tab');
 const panels = document.querySelectorAll('.activity-panel');
 
@@ -103,15 +98,17 @@ tabs.forEach(tab => {
     })
 })
 
-
+// Open modal
 function openModal() {
     document.getElementById('activityModal').style.display = 'block';
 }
 
+// close modal
 function closeModal() {
     document.getElementById('activityModal').style.display = 'none';
 }
 
+// Mini layout inside the "Add Activities" for choosing desks
 const miniLayout = document.getElementById('miniLayout');
 const selectedDesksInputs = document.getElementById('selectedDesksInputs');
 const selectedDeskIds = new Set();
@@ -160,8 +157,7 @@ async function loadMiniLayout() {
 }
 
 
-// create activity
-
+// Create activity
 const activityForm = document.getElementById('activityForm');
 
 activityForm.addEventListener('submit', async (event) => {
@@ -186,27 +182,42 @@ activityForm.addEventListener('submit', async (event) => {
     const scheduledTo = `${scheduledToDate} ${timeTo}:00`;
 
     const payload = {
-        activity_type: 'meeting',
+        event_type: 'meeting',
         description: description,
         scheduled_at: scheduledAt,
-        scheduled_to: scheduledTo
+        scheduled_to: scheduledTo,
+        desk_ids: Array.from(selectedDeskIds) // convert Set to an array
     };
 
-    for (const id of selectedDeskIds) {
-        try {
-            const response = await fetch(`${desk.url}/${id}/activities`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken,
-                },
-                body: JSON.stringify(payload)
-            });
-        
-        } catch (error) {
-            console.error(`Failed to create activity for desk ${id}`, error);
+   
+    try {
+        const response = await fetch(`/api/user/addEvent`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json(); 
+
+        if (!response.ok) {
+            console.error('Server error', response.status, data);
+            return;
         }
+
+        if (!data.success) {
+                console.error('Application/validation error', data);
+                return;
+            }
+        
+        console.log('Event created', data.event);
+    
+    } catch (error) {
+        console.error(`Failed to create an event`, error);
     }
+    
 
     activityForm.reset();
     selectedDeskIds.clear();

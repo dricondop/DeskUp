@@ -66,4 +66,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Desk::class, 'assigned_desk_id');
     }
+
+    /**
+     * Get the events created by the user.
+     */
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'created_by');
+    }
 }

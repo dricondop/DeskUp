@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Desk;
+use App\Models\Event;
+use App\Models\User;
 use App\Models\DeskActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +13,16 @@ class DeskController extends Controller
 {
     public function show($id)
     {
-        $desk = Desk::with('activities')->findOrFail($id);
+        $desk = Desk::with('events')->findOrFail($id);
 
         $desks = Desk::all();
+    
+        $user = Auth::user();
+
+        $pendingEvents = $user->events()
+            ->pendingEvents()
+            ->orderBy('scheduled_at', 'desc')
+            ->get();
         
         $isAdmin = false;
         if (Auth::check()) {
@@ -25,7 +34,8 @@ class DeskController extends Controller
             'desk' => $desk,
             'desks' => $desks,
             'isAdmin' => $isAdmin,
-            'isLoggedIn' => Auth::check()
+            'isLoggedIn' => Auth::check(),
+            'pendingEvents' => $pendingEvents
         ]);
     }
 
@@ -37,29 +47,7 @@ class DeskController extends Controller
 
         $desk = Desk::findOrFail($id);
 
-        //  $heightMm = $validated['height'] * 10; 
-
-        // $simResponse = \App\Helpers\APIMethods::raiseDesk($heightMm, $desk->id);
-
-        // // Gets the allowed height by the simulator
-        // $data = $simResponse->json();
-        // $resultInMm = $data['position_mm'] ?? null;
-
-        // if ($resultInMm === null) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => 'Height did not updated successfully',
-        //         'response' => $data
-        //     ], 500);
-        // }
-
-        // $desk->height = $resultInMm;
-
-
-
-
-        $desk->height = $validated['height'];
-        $desk->save();
+        $desk->updateHeight($validated['height']);
 
         return response()->json([
             'success' => true,
@@ -91,23 +79,38 @@ class DeskController extends Controller
         return response()->json(['desks' => $desks]);
     }
 
-    public function addActivity(Request $request, $id)
+    public function addEvent(Request $request)
     {
         $validated = $request->validate([
-            'activity_type' => 'required|string|max:50',
+            'event_type' => 'required|string|max:50',
             'description' => 'nullable|string',
             'scheduled_at' => 'required|date',
-            'scheduled_to' => 'required|date'
+            'scheduled_to' => 'required|date',
+            'desk_ids' => 'required|array|min:1',
+            'desk_ids.*' => 'exists:desks,id', // '.*' means it must apply to every element in an array
         ]);
 
-        $desk = Desk::findOrFail($id);
+        $user = Auth::user();
+        $status = $user && $user->isAdmin()
+            ? Event::STATUS_APPROVED
+            : Event::STATUS_PENDING;
         
-        $activity = $desk->activities()->create($validated);
+
+        $event = Event::create([
+            'event_type' => $validated['event_type'],
+            'description' => $validated['description'],
+            'scheduled_at' => $validated['scheduled_at'],
+            'scheduled_to' => $validated['scheduled_to'],
+            'status' => $status,
+            'created_by' => $user->id
+        ]);
+
+        $event->desks()->attach($validated['desk_ids']);
 
         return response()->json([
             'success' => true,
-            'message' => 'Activity added successfully',
-            'activity' => $activity
+            'message' => 'Event added successfully',
+            'event' => $event
         ]);
     }
 }

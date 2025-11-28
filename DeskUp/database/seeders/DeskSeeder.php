@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Desk;
-use App\Models\DeskActivity;
 
 class DeskSeeder extends Seeder
 {
@@ -20,21 +19,7 @@ class DeskSeeder extends Seeder
         ];
 
         foreach ($desks as $deskData) {
-            $desk = Desk::create($deskData);
-            
-            DeskActivity::create([
-                'desk_id' => $desk->id,
-                'activity_type' => 'cleaning',
-                'description' => 'Cleaning Schedule',
-                'scheduled_at' => now()->addHours(2)
-            ]);
-            
-            DeskActivity::create([
-                'desk_id' => $desk->id,
-                'activity_type' => 'meeting',
-                'description' => 'Team Meeting',
-                'scheduled_at' => now()->addHours(1)
-            ]);
+            Desk::create($deskData);
         }
     }
 }

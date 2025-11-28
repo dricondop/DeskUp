@@ -12,6 +12,7 @@
         @else
             <a href="{{ route('desk.control.redirect') }}">Desk Control</a>
         @endif
+        <a href="/events">Events</a>
         <a href="/health">My Usage</a>
         <a href="/profile">My Profile</a>
     </nav>

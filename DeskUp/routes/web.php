@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use App\Http\Controllers\AdminStatisticsController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/desks', [DeskController::class, 'index']);
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
-    Route::post('/api/desks/{id}/activities', [DeskController::class, 'addActivity']);
+    Route::post('/api/user/addEvent', [DeskController::class, 'addEvent']);
     
     // Health page view
     Route::get('/health', [HealthController::class, 'index'])->name('health');
@@ -47,20 +48,19 @@ Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     ->name('admin-statistics')
     ->middleware('auth');
 
+Route::get('/events', [EventController::class, 'index']);
 
-// Route::get('/admin-control', function () {
-//     $user = auth()->user();
-//     $isAdmin = $user && $user->is_admin; 
-//     return view('admin-user-control', compact('isAdmin'));
-// })->name('admin-user-control');
 
-Route::get('/users-management', [AdminController::class, 'index'])
-    ->name('users-management')
-    ->middleware('auth');
-    
-Route::post('/user/{id}/assign-desk-id', [AdminController::class, 'assignDesk']);
-Route::post('/user/{id}/unassign-desk-id', [AdminController::class, 'unassignDesk']);
-Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
+
+// Users Mannagement view
+Route::middleware('auth')->group(function () {
+    Route::get('/users-management', [AdminController::class, 'index']);
+    Route::post('/user/{id}/assign-desk-id', [AdminController::class, 'assignDesk']);
+    Route::post('/user/{id}/unassign-desk-id', [AdminController::class, 'unassignDesk']);
+    Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
+    Route::post('/event/{id}/approve', [AdminController::class, 'approveEvent']);
+    Route::post('/event/{id}/reject', [AdminController::class, 'rejectEvent']);
+});
 
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->middleware('auth');
 

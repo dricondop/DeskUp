@@ -46,7 +46,7 @@
                                             @if ($user->assigned_desk_id !== null)
                                                 {{ $user->assignedDesk->name}}
                                             @else
-                                                 — Assign Desk —
+                                                 <p>— Assign Desk —</p>
                                             @endif
                                         </option>
                                     </select>
@@ -54,18 +54,18 @@
                                 <td> 
                                     @if ($user->assignedDesk !== null)
                                         @if ($user->assignedDesk->is_active === true)
-                                            Online
+                                            <p>Online</p>
                                         @else
-                                            Offline
+                                            <p>Offline</p>
                                         @endif
                                         
                                     @else
-                                        Unassigned
+                                        <p>Unassigned</p>
                                     @endif
                                 </td> <!-- Needs to be changed -->
                                 <td><button class="btn-unassign" data-user-id='{{ $user->id }}'
                                 @if($user->assignedDesk === null) disabled @endif>Unassign</button></td>
-                                <td><button class="btn-remove" data-user-id='{{ $user->id }}'>Remove</button></td>
+                                <td><button class="btn-remove remove" data-user-id='{{ $user->id }}'>Remove</button></td>
                             <tr>
                         @endforeach
                     </tbody>
@@ -74,19 +74,19 @@
         </div>
 
 
-        <!-- Approve/Reject Meetings -->
+        <!-- Approve/Reject Events -->
         <div class="admin-container">
             <header class="page-header">
-                <h1>Meeting requests</h1>
-                <p class="subtitle">Approve or reject meeting requests</p>
+                <h1>Admin Events Control</h1>
+                <p class="subtitle">Approve or reject events requests</p>
             </header>
 
             <section class="card">
-                <h2 style="margin-bottom: 1rem; color:#3A506B;">Meeting Requests Overview</h2>
+                <h2 style="margin-bottom: 1rem; color:#3A506B;">Events Requests Overview</h2>
                 <table id="userTable">
                     <thead>
                         <tr>
-                            <th>User</th>
+                            <th>Requestor</th>
                             <th>Time From</th>
                             <th>Time To</th>
                             <th>Description</th>
@@ -96,56 +96,85 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{--
-                        @foreach ($pendingMeetings as $meeting)
+                        @foreach ($pendingEvents as $event)
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><span class="status inactive">Approve</span></td>
-                                <td><button class="btn-remove">Reject</button></td>
+                                <td>
+                                    {{ optional($event->creator)->name ?? 'Unknown' }}
+                                </td>
+                                <td>
+                                    {{ $event->scheduled_at 
+                                    ? $event->scheduled_at->format('F jS, g:i a, Y')
+                                    : 'Unknown' }}    
+                                </td>
+                                <td>
+                                    {{ $event->scheduled_to 
+                                    ? $event->scheduled_to->format('F jS, g:i a, Y')
+                                    : 'Unknown' }}  
+                                </td>
+                                <td>
+                                    @if($event->description)
+                                            <button type="button" class="btn-description" onclick="showMessage('{{ addslashes($event->description) }}')">
+                                                <p>Read</p>
+                                            </button>
+                                    @else
+                                            <p>No Description</p>
+                                    @endif
+                                </td>
+                                <td>
+                                    @forelse ($event->desks as $desk)
+                                        <span class="desk-tag">{{ $desk->name }}</span>
+                                    @empty
+                                        <span>No desks</span>
+                                    @endforelse
+                                    
+                                    
+                                    {{--<button type="button" class="btn-desks" onclick="showDesks('{{ addslashes(string: $deskNames) }}')">
+                                        <p>View</p>
+                                    </button>--}}
+                                </td>
+                                <td><span class="btn-approve" data-event-id='{{ $event->id }}'>Approve</span></td>
+                                <td><button class="btn-reject remove" data-event-id='{{ $event->id }}'>Reject</button></td>
                             </tr>
                         @endforeach
-                        --}}
-                    
-                    
-                        
-                    
-                        
-                    
-                    
-                    
-                    
-                        <tr>
-                            <td>Jane Doe</td>
-                            <td>jane@example.com</td>
-                            <td>
-                                <select class="desk-select" onchange="updateDesk(this)">
-                                    <option value="">— Select Desk —</option>
-                                </select>
-                            </td>
-                            <td><span class="status active" onclick="toggleDesk(this)">Active</span></td>
-                            <td>102 cm</td>
-                            <td><button class="btn-remove" onclick="removeUser(this)">Remove</button></td>
-                        </tr>
-                        <tr>
-                            <td>John Smith</td>
-                            <td>john@example.com</td>
-                            <td>
-                                <select class="desk-select" onchange="updateDesk(this)">
-                                    <option value="">— Select Desk —</option>
-                                </select>
-                            </td>
-                            <td><span class="status inactive" onclick="toggleDesk(this)">Disabled</span></td>
-                            <td>—</td>
-                            <td><button class="btn-remove" onclick="removeUser(this)">Remove</button></td>
-                        </tr>
                     </tbody>
                 </table>
             </section>
         </div>
+
+
+
+    <!-- Description Modal -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i data-lucide="message-circle"></i> Description</h3>
+                <span class="close closeModal" >&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="descriptionText"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-closeModal closeModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desks Modal -->
+    <div id="desksModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i data-lucide="message-circle"></i> Desks</h3>
+                <span class="close closeModal" >&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="radio">
+                <p id="desksText"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-closeModal closeModal">Close</button>
+            </div>
+        </div>
+    </div>
 
     </div>
     <script>

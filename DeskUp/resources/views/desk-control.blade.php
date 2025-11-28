@@ -23,7 +23,7 @@
                 
                 <div class="desk-view-btns-container">
                     <button class="desk-view-btns sitting">Sitting</button>
-                    <button class="desk-view-btns error-log" onclick="openModal()">Add Activity</button>
+                    <button class="desk-view-btns error-log" onclick="openModal()">Add Event</button>
                 </div>
             </section>
 
@@ -68,23 +68,28 @@
                     </div>
 
                     <div id="activityList" class="activity-panel">
-                        @forelse($desk->activities()->orderBy('scheduled_at', 'desc')->limit(5)->get() as $activity)
+                        @forelse($desk->events()->orderBy('scheduled_at', 'desc')->limit(5)->get() as $event)
                             <div class="temp-activity-box">
-                                <p>{{ $activity->scheduled_at->format('H:i') }} {{ $activity->description }}</p>
+                                <p>{{ $event->scheduled_at->format('H:i') }} {{ $event->description }}</p>
                             </div>
                         @empty
                             <div class="temp-activity-box">
-                                <p>No scheduled activities</p>
+                                <p>No scheduled events</p>
                             </div>
                         @endforelse
                     </div>
 
                     <div id="pendingList" class="activity-panel hidden">
-                            <!-- IMPLEMENT -->
-
+                        @forelse($pendingEvents as $event)
                             <div class="temp-activity-box">
-                                <p>No pending activities</p>
+                                <p>{{ $event->scheduled_at->format('H:i') }} {{ $event->description }}</p>
                             </div>
+                        @empty
+                            <div class="temp-activity-box">
+                                <p>No pending events</p>
+                            </div>
+                        @endforelse
+
                     </div>
 
                 
@@ -97,7 +102,7 @@
     <div id="activityModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create Activity</h2>
+                <h2>Create Event</h2>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
             <div class="modal-body">
@@ -148,10 +153,12 @@
     <script>
         const desk = {
             id: {{ $desk->id }},
-            height: {{ $desk->height / 10 }}, // convert from mm in database to cm
+            height: {{ $desk->height }},
             speed: {{ $desk->speed }},
             url: "/api/desks",
         };
+
+        const userId = {{ auth()->user()->id }};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     </script>
