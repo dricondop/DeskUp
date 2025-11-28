@@ -6,6 +6,7 @@ use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
 use App\Http\Controllers\HeightDetectionController; 
+use App\Http\Controllers\HealthController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -28,6 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/desks/{id}/activities', [DeskController::class, 'addActivity']);
+    
+    // Health page view
+    Route::get('/health', [HealthController::class, 'index'])->name('health');
+    // Health stats API endpoint
+    Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
+    Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
+    Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
 });
 
 Route::get('/signin', function () {
@@ -79,10 +87,6 @@ Route::get('/desk-control', function () {
 
     return redirect()->route('login');
 })->name('desk.control.redirect');
-
-Route::get('/health', function () {
-    return view('health');
-});
 
 Route::post('/signin', function (Request $request): Response|RedirectResponse {
     $key = 'login-attempts:' . $request->ip();
@@ -160,4 +164,58 @@ Route::get('/apitest4', function () {
     $response = APIMethods::getDeskData($deskId);
 
     return $response;
+});
+
+// Populates the desk table in the database with all the desks available from the simulator
+Route::get('/sync-desks-from-api', function () {
+    $deskSyncService = new \App\Services\DeskSyncService();
+    $results = $deskSyncService->syncDesksFromApi();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Desk sync completed',
+        'results' => $results,
+        'total_desks_in_db' => \App\Models\Desk::count()
+    ]);
+});
+
+// Sync current API data for ALL available desks (should be periodically loaded)
+Route::get('/sync-all-desks-data', function () {
+    $deskSyncService = new \App\Services\DeskSyncService();
+    $results = $deskSyncService->syncAllDesksData();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'All desks data synced',
+        'results' => $results,
+        'total_records' => \App\Models\UserStatsHistory::count()
+    ]);
+});
+
+// Sync current API data for a specific desk
+Route::get('/sync-desk-data/{apiDeskId}', function ($apiDeskId) {
+    $deskSyncService = new \App\Services\DeskSyncService();
+    $result = $deskSyncService->syncSingleDeskData($apiDeskId);
+    
+    return response()->json($result);
+});
+
+// Get all desks from the API with some info (for debugging)
+Route::get('/api-desk-mapping', function () {
+    $deskSyncService = new \App\Services\DeskSyncService();
+    
+    try {
+        $mapping = $deskSyncService->getApiDeskMapping();
+        
+        return response()->json([
+            'success' => true,
+            'mapping' => $mapping
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to get mapping: ' . $e->getMessage(),
+            'error' => $e->getMessage()
+        ], 500);
+    }
 });
