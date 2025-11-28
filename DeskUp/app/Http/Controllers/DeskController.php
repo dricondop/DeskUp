@@ -4,31 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Desk;
 use App\Models\DeskActivity;
-use App\Services\DeskSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DeskController extends Controller
 {
-    protected $syncService;
-
-    public function __construct(DeskSyncService $syncService)
-    {
-        $this->syncService = $syncService;
-    }
     public function show($id)
     {
         $desk = Desk::with('activities')->findOrFail($id);
-        
-        // Sync desk state from API if connected
-        if ($desk->isConnectedToAPI()) {
-            try {
-                $this->syncService->syncDeskState($desk);
-                $desk->refresh();
-            } catch (\Exception $e) {
-                \Log::warning("Failed to sync desk state for desk {$id}", ['error' => $e->getMessage()]);
-            }
-        }
         
         $isAdmin = false;
         if (Auth::check()) {
@@ -58,25 +41,10 @@ class DeskController extends Controller
     public function updateHeight(Request $request, $id)
     {
         $validated = $request->validate([
-            'height' => 'required|integer|min=0|max:150'
+            'height' => 'required|integer|min:0|max:150'
         ]);
 
         $desk = Desk::findOrFail($id);
-        
-        // If desk is connected to API, update via API
-        if ($desk->isConnectedToAPI()) {
-            try {
-                $result = $this->syncService->updateDeskPosition($desk, $validated['height']);
-                return response()->json($result);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to update desk via API: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-        
-        // Otherwise update database only
         $desk->height = $validated['height'];
         $desk->save();
 

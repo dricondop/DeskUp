@@ -48,7 +48,5 @@
     <script>window.isAdmin = {{ $isAdmin ? 'true' : 'false' }};</script>
     <script src="{{ asset('js/layout-drag-drop.js') }}"></script>
     <script src="{{ asset('js/layout-save-load.js') }}"></script>
-    <script src="{{ asset('js/background-sync.js') }}"></script>
-    <script src="{{ asset('js/simulator-clock.js') }}"></script>
 </body>
 </html>

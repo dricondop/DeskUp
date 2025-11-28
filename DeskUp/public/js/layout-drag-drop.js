@@ -26,27 +26,7 @@ async function loadDefaultLayout() {
         const response = await fetch('/layout/load');
         const data = await response.json();
         if (data.desks && data.desks.length > 0) {
-            let nextAutoX = 100;
-            let nextAutoY = 100;
-            const spacing = 150;
-            const maxPerRow = 5;
-            let currentRow = 0;
-            
-            data.desks.forEach((d, index) => {
-                // If desk has no position, auto-assign one
-                let x = d.x;
-                let y = d.y;
-                
-                if (x === null || y === null || x === 0 || y === 0) {
-                    const col = index % maxPerRow;
-                    currentRow = Math.floor(index / maxPerRow);
-                    x = nextAutoX + (col * spacing);
-                    y = nextAutoY + (currentRow * spacing);
-                }
-                
-                addDesk(x, y, d.name, d.id);
-            });
-            
+            data.desks.forEach(d => addDesk(d.x, d.y, d.name, d.id));
             deskCounter = Math.max(...data.desks.map(d => parseInt(d.name.match(/\d+/)?.[0] || 0))) + 1;
         }
     } catch (error) {
