@@ -62,28 +62,12 @@ class DeskController extends Controller
         ]);
 
         $desk = Desk::findOrFail($id);
-        
-        // If desk is connected to API, update via API
-        if ($desk->isConnectedToAPI()) {
-            try {
-                $result = $this->syncService->updateDeskPosition($desk, $validated['height']);
-                return response()->json($result);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to update desk via API: ' . $e->getMessage()
-                ], 500);
-            }
-        }
-        
-        // Otherwise update database only
-        $desk->height = $validated['height'];
-        $desk->save();
+        $desk->updateHeight($validated['height']); // Use new method
 
         return response()->json([
             'success' => true,
             'message' => 'Height updated successfully',
-            'height' => $desk->height
+            'height' => $desk->height // This will now get the value from latest stats
         ]);
     }
 
@@ -94,13 +78,12 @@ class DeskController extends Controller
         ]);
 
         $desk = Desk::findOrFail($id);
-        $desk->status = $validated['status'];
-        $desk->save();
+        $desk->updateStatus($validated['status']); // Use new method
 
         return response()->json([
             'success' => true,
             'message' => 'Status updated successfully',
-            'status' => $desk->status
+            'status' => $desk->status // This will now get the value from latest stats
         ]);
     }
 

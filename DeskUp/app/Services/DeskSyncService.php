@@ -3,222 +3,335 @@
 namespace App\Services;
 
 use App\Helpers\APIMethods;
+use App\Models\User;
 use App\Models\Desk;
+use App\Models\UserStatsHistory;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DeskSyncService
 {
-    /**
-     * Sync all desks from API to database
-     * This method fetches all desks from the API and creates/updates them in the database
-     */
-    public function syncFromAPI(): array
+    // Sync all desks (Ids & names) from the API endpoint into the database (desks table)
+    public function syncDesksFromApi(): array
     {
+        $syncResults = [
+            'created' => 0,
+            'updated' => 0,
+            'errors' => []
+        ];
+
         try {
-            // Get all desk IDs from the API
-            $apiDeskIds = APIMethods::getAllDesks();
+            $apiDesks = APIMethods::getAllDesks();
             
-            if (!is_array($apiDeskIds)) {
-                throw new \Exception('Failed to retrieve desk list from API');
+            if (empty($apiDesks)) {
+                Log::warning('No desks returned from API');
+                return $syncResults;
             }
 
-            $syncResults = [
-                'total_api_desks' => count($apiDeskIds),
-                'created' => 0,
-                'updated' => 0,
-                'unchanged' => 0,
-                'errors' => []
-            ];
-
-            foreach ($apiDeskIds as $apiDeskId) {
+            foreach ($apiDesks as $apiDeskId) {
                 try {
-                    $this->syncSingleDesk($apiDeskId, $syncResults);
+                    $result = $this->syncSingleDeskFromApi($apiDeskId);
+                    if ($result['created']) {
+                        $syncResults['created']++;
+                    } elseif ($result['updated']) {
+                        $syncResults['updated']++;
+                    }
                 } catch (\Exception $e) {
-                    $syncResults['errors'][] = "Desk {$apiDeskId}: {$e->getMessage()}";
-                    Log::error("Failed to sync desk {$apiDeskId}", ['error' => $e->getMessage()]);
+                    $error = "Error syncing desk {$apiDeskId}: " . $e->getMessage();
+                    Log::error($error);
+                    $syncResults['errors'][] = $error;
                 }
             }
 
-            // Mark desks not in API as inactive
-            $this->markMissingDesksInactive($apiDeskIds);
-
-            // Log sync summary (only if there were changes)
-            if ($syncResults['created'] > 0 || $syncResults['updated'] > 0) {
-                Log::info('Background sync completed', [
-                    'created' => $syncResults['created'],
-                    'updated' => $syncResults['updated'],
-                    'total' => $syncResults['total_api_desks']
-                ]);
-            }
-
-            return $syncResults;
+            Log::info('Desk sync completed', $syncResults);
 
         } catch (\Exception $e) {
-            Log::error('Desk sync failed', ['error' => $e->getMessage()]);
-            throw $e;
+            $error = 'Failed to fetch desks from API: ' . $e->getMessage();
+            Log::error($error);
+            $syncResults['errors'][] = $error;
         }
+
+        return $syncResults;
     }
 
-    /**
-     * Sync a single desk from API to database
-     */
-    private function syncSingleDesk(string $apiDeskId, array &$syncResults): void
+    // Sync current API data for ALL available desks to user_stats_history
+    public function syncAllDesksData(): array
     {
-        // Get full desk data from API
-        $apiDeskData = APIMethods::getDeskData($apiDeskId);
+        $syncResults = [
+            'synced' => 0,
+            'skipped' => 0,
+            'errors' => [],
+            'desk_details' => []
+        ];
 
-        if (!$apiDeskData) {
-            throw new \Exception('Failed to retrieve desk data');
+        try {
+            $apiDesks = APIMethods::getAllDesks();
+            
+            if (empty($apiDesks)) {
+                Log::warning('No desks returned from API for data sync');
+                return $syncResults;
+            }
+
+            foreach ($apiDesks as $apiDeskId) {
+                try {
+                    $result = $this->syncSingleDeskData($apiDeskId);
+                    
+                    if ($result['success']) {
+                        if ($result['synced'] > 0) {
+                            $syncResults['synced']++;
+                            $syncResults['desk_details'][] = [
+                                'api_desk_id' => $apiDeskId,
+                                'status' => 'synced',
+                                'data' => $result['desk_data']
+                            ];
+                        } else {
+                            $syncResults['skipped']++;
+                            $syncResults['desk_details'][] = [
+                                'api_desk_id' => $apiDeskId,
+                                'status' => 'skipped',
+                                'reason' => 'No user or desk found'
+                            ];
+                        }
+                    } else {
+                        $syncResults['errors'][] = "Desk {$apiDeskId}: " . $result['error'];
+                        $syncResults['desk_details'][] = [
+                            'api_desk_id' => $apiDeskId,
+                            'status' => 'error',
+                            'error' => $result['error']
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $error = "Error syncing desk {$apiDeskId}: " . $e->getMessage();
+                    Log::error($error);
+                    $syncResults['errors'][] = $error;
+                    $syncResults['desk_details'][] = [
+                        'api_desk_id' => $apiDeskId,
+                        'status' => 'error',
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+
+            Log::info('All desks data sync completed', [
+                'synced' => $syncResults['synced'],
+                'skipped' => $syncResults['skipped'],
+                'errors_count' => count($syncResults['errors'])
+            ]);
+
+        } catch (\Exception $e) {
+            $error = 'Failed to sync all desks data: ' . $e->getMessage();
+            Log::error($error);
+            $syncResults['errors'][] = $error;
         }
 
-        // Find existing desk or create new one
-        $desk = Desk::where('api_desk_id', $apiDeskId)->first();
+        return $syncResults;
+    }
 
+    // Used in syncDesksFromApi for creating/updating one desk at a time
+    private function syncSingleDeskFromApi(string $apiDeskId): array
+    {
+        // Generate desk number and name from API ID
+        $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
+        $deskName = $this->extractDeskNameFromApiId($apiDeskId);
+        
+        // Try to find existing desk by desk_number
+        $desk = Desk::where('desk_number', $deskNumber)->first();
+        
         $deskData = [
-            'api_desk_id' => $apiDeskId,
-            'name' => $apiDeskData['config']['name'] ?? "Desk {$apiDeskId}",
-            'status' => $apiDeskData['state']['status'] ?? 'Unknown',
-            'height' => isset($apiDeskData['state']['position_mm']) 
-                ? round($apiDeskData['state']['position_mm'] / 10) // Convert mm to cm
-                : 110,
-            'speed' => $apiDeskData['state']['speed_mms'] ?? 36,
-            'is_active' => true
+            'name' => $deskName,
+            'desk_number' => $deskNumber,
+            'position_x' => null,
+            'position_y' => null,
+            'is_active' => true,
+            'user_id' => null,
         ];
 
         if ($desk) {
-            $hasChanges = $desk->status !== $deskData['status'] ||
-                         $desk->height !== $deskData['height'] ||
-                         $desk->speed !== $deskData['speed'] ||
-                         $desk->is_active !== $deskData['is_active'];
-            
-            if ($hasChanges) {
-                // Update existing desk, explicitly preserving position_x, position_y, user_id, and name
-                $desk->status = $deskData['status'];
-                $desk->height = $deskData['height'];
-                $desk->speed = $deskData['speed'];
-                $desk->is_active = $deskData['is_active'];
-                $desk->save();
-                $syncResults['updated']++;
-            } else {
-                $syncResults['unchanged']++;
-            }
+            // Update existing desk
+            $desk->update($deskData);
+            Log::info("Updated desk: {$deskName} (API ID: {$apiDeskId})");
+            return ['created' => false, 'updated' => true, 'desk' => $desk];
         } else {
             // Create new desk
-            $deskNumber = Desk::max('desk_number') + 1 ?? 1;
-            $deskData['desk_number'] = $deskNumber;
-            $deskData['name'] = "Desk {$deskNumber}";
-            
-            Desk::create($deskData);
-            $syncResults['created']++;
+            $desk = Desk::create($deskData);
+            Log::info("Created new desk: {$deskName} (API ID: {$apiDeskId})");
+            return ['created' => true, 'updated' => false, 'desk' => $desk];
         }
     }
 
-    /**
-     * Mark desks that are no longer in the API as inactive
-     */
-    private function markMissingDesksInactive(array $apiDeskIds): void
+    // Sync current API data for a specific desk ID to user_stats_history
+    public function syncSingleDeskData(string $apiDeskId): array
     {
-        Desk::whereNotNull('api_desk_id')
-            ->whereNotIn('api_desk_id', $apiDeskIds)
-            ->update(['is_active' => false]);
-    }
+        try {
+            $deskData = APIMethods::getDeskData($apiDeskId);
 
-    /**
-     * Update desk position in API
-     */
-    public function updateDeskPosition(Desk $desk, float $newHeight): array
-    {
-        if (!$desk->api_desk_id) {
-            throw new \Exception('Desk is not connected to API');
-        }
+            // Format the API response into our expected data structure
+            $formattedData = [
+                "api_desk_id" => $apiDeskId,
+                "position_mm" => $deskData['state']['position_mm'] ?? null,
+                "speed_mms" => $deskData['state']['speed_mms'] ?? null,
+                "status" => $deskData['state']['status'] ?? 'Unknown',
+                "isPositionLost" => $deskData['state']['isPositionLost'] ?? false,
+                "isOverloadProtectionUp" => $deskData['state']['isOverloadProtectionUp'] ?? false,
+                "isOverloadProtectionDown" => $deskData['state']['isOverloadProtectionDown'] ?? false,
+                "isAntiCollision" => $deskData['state']['isAntiCollision'] ?? false,
+                "activationsCounter" => $deskData['usage']['activationsCounter'] ?? null,
+                "sitStandCounter" => $deskData['usage']['sitStandCounter'] ?? null,
+                "lastErrors" => $deskData['lastErrors'] ?? [],
+            ];
 
-        // Convert cm to mm
-        $heightInMm = $newHeight * 10;
+            $result = $this->insertDeskDataToHistory($formattedData);
 
-        $response = APIMethods::raiseDesk($heightInMm, $desk->api_desk_id);
-
-        if ($response->successful()) {
-            $desk->update(['height' => $newHeight]);
             return [
                 'success' => true,
-                'height' => $newHeight,
-                'message' => 'Desk position updated successfully'
+                'synced' => $result ? 1 : 0,
+                'desk_data' => $formattedData
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Failed to sync specific desk {$apiDeskId}: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
             ];
         }
-
-        throw new \Exception('Failed to update desk position in API');
     }
 
-    /**
-     * Sync desk state from API to database
-     */
-    public function syncDeskState(Desk $desk): void
+    // Insert a single desk's data into user_stats_history table
+    private function insertDeskDataToHistory(array $deskData): bool
     {
-        if (!$desk->api_desk_id) {
-            return;
-        }
+        // Find desk and user based on existing data structure
+        $user = $this->findUserForApiDesk($deskData['api_desk_id']);
+        $desk = $this->findDeskForApiDesk($deskData['api_desk_id']);
 
-        $stateData = APIMethods::getCategoryData('state', $desk->api_desk_id);
-
-        if ($stateData) {
-            $desk->update([
-                'height' => isset($stateData['position_mm']) 
-                    ? round($stateData['position_mm'] / 10) 
-                    : $desk->height,
-                'speed' => $stateData['speed_mms'] ?? $desk->speed,
-                'status' => $stateData['status'] ?? $desk->status,
+        if (!$user || !$desk) {
+            Log::warning('No user or desk found for API desk', [
+                'api_desk_id' => $deskData['api_desk_id'],
+                'user_found' => !!$user,
+                'desk_found' => !!$desk
             ]);
-        }
-    }
-
-    /**
-     * Get real-time desk data from API
-     */
-    public function getRealTimeDeskData(Desk $desk): ?array
-    {
-        if (!$desk->api_desk_id) {
-            return null;
-        }
-
-        try {
-            $apiData = APIMethods::getDeskData($desk->api_desk_id);
-            
-            if ($apiData) {
-                return [
-                    'position_mm' => $apiData['state']['position_mm'] ?? null,
-                    'position_cm' => isset($apiData['state']['position_mm']) 
-                        ? round($apiData['state']['position_mm'] / 10, 1) 
-                        : null,
-                    'speed_mms' => $apiData['state']['speed_mms'] ?? null,
-                    'status' => $apiData['state']['status'] ?? 'Unknown',
-                    'isPositionLost' => $apiData['state']['isPositionLost'] ?? false,
-                    'isOverloadProtectionUp' => $apiData['state']['isOverloadProtectionUp'] ?? false,
-                    'isOverloadProtectionDown' => $apiData['state']['isOverloadProtectionDown'] ?? false,
-                    'isAntiCollision' => $apiData['state']['isAntiCollision'] ?? false,
-                    'usage' => $apiData['usage'] ?? null,
-                    'lastErrors' => $apiData['lastErrors'] ?? []
-                ];
-            }
-        } catch (\Exception $e) {
-            Log::error("Failed to get real-time data for desk {$desk->id}", [
-                'error' => $e->getMessage()
-            ]);
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if API is available
-     */
-    public function isAPIAvailable(): bool
-    {
-        try {
-            $desks = APIMethods::getAllDesks();
-            return is_array($desks);
-        } catch (\Exception $e) {
-            Log::warning('API availability check failed', ['error' => $e->getMessage()]);
             return false;
         }
+
+        // Insert data using desk_number instead of desk->id
+        UserStatsHistory::create([
+            'user_id' => $user->id,
+            'desk_id' => $desk->desk_number,
+            'desk_height_mm' => $deskData['position_mm'],
+            'desk_speed_mms' => $deskData['speed_mms'],
+            'desk_status' => $deskData['status'],
+            'is_position_lost' => $deskData['isPositionLost'],
+            'is_overload_up' => $deskData['isOverloadProtectionUp'],
+            'is_overload_down' => $deskData['isOverloadProtectionDown'],
+            'is_anti_collision' => $deskData['isAntiCollision'],
+            'activations_count' => $deskData['activationsCounter'],
+            'sit_stand_count' => $deskData['sitStandCounter'],
+            'recorded_at' => now(), // To implement
+        ]);
+
+        Log::info('Desk data synced to history', [
+            'api_desk_id' => $deskData['api_desk_id'],
+            'user_id' => $user->id,
+            'desk_number' => $desk->desk_number,
+            'height' => $deskData['position_mm']
+        ]);
+
+        return true;
+    }
+
+    // Find user for a given API desk ID (looks for assigned user or returns first admin)
+    private function findUserForApiDesk(string $apiDeskId): ?User
+    {
+        // First, try to find the desk in our database
+        $desk = $this->findDeskForApiDesk($apiDeskId);
+        
+        if ($desk && $desk->user_id) {
+            return User::find($desk->user_id);
+        }
+
+        // Fallback: if no user is assigned to the desk, return the first admin user
+        return User::where('is_admin', true)->first();
+    }
+
+    // Find desk for a given API desk ID by extracting desk_number and searching database
+    private function findDeskForApiDesk(string $apiDeskId): ?Desk
+    {
+        try {
+            $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
+            return Desk::where('desk_number', $deskNumber)->first();
+        } catch (\Exception $e) {
+            Log::warning("Could not find desk for API ID {$apiDeskId}: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    // Get API desk mapping for debugging purposes (shows API ID to database desk relationship)
+    public function getApiDeskMapping(): array
+    {
+        try {
+            $apiDesks = APIMethods::getAllDesks();
+            $mapping = [];
+
+            foreach ($apiDesks as $apiDeskId) {
+                try {
+                    $deskData = APIMethods::getDeskData($apiDeskId);
+                    $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
+                    $desk = Desk::where('desk_number', $deskNumber)->first();
+                    
+                    $mapping[] = [
+                        'api_desk_id' => $apiDeskId,
+                        'api_desk_name' => $deskData['config']['name'] ?? 'Unknown',
+                        'extracted_desk_number' => $deskNumber,
+                        'found_in_db' => !!$desk,
+                        'db_desk_name' => $desk ? $desk->name : null,
+                        'assigned_user' => $desk && $desk->user_id ? $desk->user->name : null
+                    ];
+                } catch (\Exception $e) {
+                    $mapping[] = [
+                        'api_desk_id' => $apiDeskId,
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+
+            return $mapping;
+        } catch (\Exception $e) {
+            Log::error('Error getting API desk mapping: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Extract desk number from API desk ID by parsing the desk name from config
+    private function extractDeskNumberFromApiId(string $apiDeskId): int
+    {
+        try {
+            $deskData = APIMethods::getDeskData($apiDeskId);
+            $deskName = $deskData['config']['name'] ?? null;
+
+            // Try to extract number from desk name (e.g. "DESK 3677" -> 3677)
+            if ($deskName && preg_match('/(\d+)/', $deskName, $matches)) {
+                return (int) $matches[1];
+            }
+        } catch (\Exception $e) {
+            Log::warning("Could not extract desk number from name for {$apiDeskId}: " . $e->getMessage());
+        }
+
+        // Fallback: generate number from API ID hash
+        return abs(crc32($apiDeskId)) % 9999 + 1000;
+    }
+    
+    // Extract desk name from API desk ID and format it as "Desk [number]"
+    private function extractDeskNameFromApiId(string $apiDeskId): string
+    {
+        try {
+            $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
+            return "Desk " . $deskNumber;
+        } catch (\Exception $e) {
+            Log::warning("Could not fetch desk name for {$apiDeskId}: " . $e->getMessage());
+        }
+        
+        // Fallback: generate name from ID
+        return "Desk " . substr($apiDeskId, 0, 8);
     }
 }
