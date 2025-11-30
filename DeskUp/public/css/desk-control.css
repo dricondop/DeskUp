@@ -18,10 +18,12 @@ body {
   --card-bg:#fff;
   --panel-bg:#EFF1F2;         
   --green:#4db252;           
-  --red:#b24d4d;         
+  --red:#b24d4d;
+  --darkblue: #3A506B;         
   --muted:#666;
   --radius:14px;
   --shadow:0 2px 12px rgba(0,0,0,.06);
+  
   
 }
 
@@ -60,7 +62,6 @@ button:hover {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: auto;
-
 }
 
 /* Header spacing harmonized */
@@ -191,32 +192,30 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Activity list */
-.activity-header { 
+/* event list */
+.event-header { 
   display: flex;
   gap: 8px;
   align-items: center;
   margin: 0 0 .5rem;
 }
 
-.activity-tab {
+.event-tab {
   border: none;
   background: transparent;
-  padding: 0.25rem 0.75rem;
+  margin: 0.25rem 0.75rem;
   font-size: 1.25rem;
 }
 
-.activity-tab.active {
-  color: rgb(82, 124, 82);
-  text-decoration: underline;
-  
+.event-tab.active {
+  border-bottom: 2px solid var(--darkblue);
 }
 
-.activity-panel.hidden {
+.event-panel.hidden {
   display: none;
 }
 
-.temp-activity-box  {
+.temp-event-box  {
   background:#E6E6E6; 
   padding:10px 14px; 
   margin-bottom:10px;
