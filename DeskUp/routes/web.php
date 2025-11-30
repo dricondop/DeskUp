@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
+use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -58,6 +59,20 @@ Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->mid
 Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 Route::delete('/profile/picture/delete', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
+
+
+Route::get('/ideal-height', function () {
+    return view('ideal-height');
+})->name('ideal.height')->middleware('auth');
+
+Route::get('/posture-analysis', [HeightDetectionController::class, 'showAnalysis'])->name('posture.analysis')->middleware('auth');
+
+Route::post('/height-detection/analyze', [HeightDetectionController::class, 'analyze'])->name('height.detection.analyze')->middleware('auth');
+Route::get('/height-detection/result/{id}', [HeightDetectionController::class, 'result'])->name('height.detection.result')->middleware('auth'); // ✅ Añadir {id}
+
+Route::get('/height-detection/history', [HeightDetectionController::class, 'history'])->name('height.detection.history')->middleware('auth');
+Route::get('/height-detection/health', [HeightDetectionController::class, 'healthCheck'])->name('height.detection.health')->middleware('auth');
+
 
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {

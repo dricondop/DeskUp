@@ -87,15 +87,6 @@ function handleStatsClick(event) {
 }
 
 /**
- * Handle height button click
- */
-function handleHeightClick(event) {
-    console.log('Configure ideal height clicked');
-    // Ideal height cofig (will be done soon)
-    showNotification('Height configuration coming soon');
-}
-
-/**
  * Show temporary notification
  */
 function showNotification(message) {
