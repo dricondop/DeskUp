@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,              // Create users first
             DeskSeeder::class,              // Create desks with user assignments
             UserStatsHistorySeeder::class,   // Create history data
+            UserProfilesSeeder::class,      // NEW: Create user profiles
         ]);
     }
 }
