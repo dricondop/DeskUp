@@ -54,6 +54,7 @@
                                         playsinline 
                                         class="camera-feed"
                                         :class="{ 'camera-active': isCameraActive }"
+                                        @loadedmetadata="onVideoLoaded"
                                     ></video>
                                     <canvas ref="canvasElement" class="capture-canvas"></canvas>
                                 </div>
@@ -72,10 +73,11 @@
                                     <button 
                                         @click="captureAndAnalyze" 
                                         class="btn-primary analyze-btn"
-                                        :disabled="!isCameraActive || isAnalyzing"
+                                        :disabled="!isCameraActive || isAnalyzing || !isVideoReady"
                                         v-if="isCameraActive && !isAnalyzing"
                                     >
-                                        Analyze Posture
+                                        <span v-if="!isVideoReady">Preparing Camera...</span>
+                                        <span v-else>Analyze Posture</span>
                                     </button>
 
                                     <button 
@@ -142,8 +144,8 @@
                                         <p>@{{ analysisResult.error }}</p>  
                                     </div>
                                     <div class="result-actions">
-                                        <button @click="retryAnalysis" class="btn-primary">
-                                            Try Again
+                                        <button @click="fullRestart" class="btn-primary">
+                                            Start New Analysis
                                         </button>
                                         <button @click="goBack" class="btn-secondary">
                                             Go Back
@@ -183,6 +185,7 @@
                     isCameraActive: false,
                     isCameraStarting: false,
                     isAnalyzing: false,
+                    isVideoReady: false,
                     analysisResult: null,
                     cameraStream: null,
                     cameraStatus: null
@@ -192,28 +195,28 @@
             methods: {
                 async startCamera() {
                     this.isCameraStarting = true;
+                    this.isVideoReady = false;
                     this.cameraStatus = { type: 'info', message: 'Requesting camera access...' };
 
                     try {
+                        // Detener stream anterior si existe
+                        if (this.cameraStream) {
+                            this.cameraStream.getTracks().forEach(track => track.stop());
+                        }
+
                         this.cameraStream = await navigator.mediaDevices.getUserMedia({
                             video: { 
-                                width: 1280,  // Aumentada resolución
+                                width: 1280,
                                 height: 720,
                                 facingMode: 'user'
                             }
                         });
 
                         this.$refs.videoElement.srcObject = this.cameraStream;
-                        
-                        await new Promise((resolve) => {
-                            this.$refs.videoElement.onloadedmetadata = () => {
-                                resolve();
-                            };
-                        });
-
                         this.isCameraActive = true;
                         this.isCameraStarting = false;
-                        this.cameraStatus = { type: 'success', message: 'Camera active - Position yourself in frame' };
+                        
+                        this.cameraStatus = { type: 'info', message: 'Camera starting...' };
 
                     } catch (error) {
                         console.error('Camera error:', error);
@@ -225,26 +228,65 @@
                     }
                 },
 
+                onVideoLoaded() {
+                    console.log('Video metadata loaded, video is ready');
+                    this.isVideoReady = true;
+                    this.cameraStatus = { type: 'success', message: 'Camera active - Position yourself in frame' };
+                },
+
                 stopCamera() {
                     if (this.cameraStream) {
                         this.cameraStream.getTracks().forEach(track => track.stop());
                         this.cameraStream = null;
                     }
                     this.isCameraActive = false;
+                    this.isVideoReady = false;
                     this.cameraStatus = null;
                 },
 
                 captureFrame() {
-                    const video = this.$refs.videoElement;
-                    const canvas = this.$refs.canvasElement;
-                    const context = canvas.getContext('2d');
+                    try {
+                        const video = this.$refs.videoElement;
+                        const canvas = this.$refs.canvasElement;
+                        
+                        // Verificar que los elementos existan
+                        if (!video) {
+                            throw new Error('Video element not found');
+                        }
+                        
+                        if (!canvas) {
+                            throw new Error('Canvas element not found');
+                        }
 
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
+                        // Esperar a que el video esté realmente listo
+                        if (!this.isVideoReady || video.videoWidth === 0 || video.videoHeight === 0) {
+                            throw new Error('Video not ready. Please wait for camera to initialize.');
+                        }
 
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const context = canvas.getContext('2d');
+                        
+                        if (!context) {
+                            throw new Error('Could not get canvas context');
+                        }
 
-                    return canvas.toDataURL('image/jpeg', 0.8);
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                        
+                        if (!imageData || imageData.length < 1000) {
+                            throw new Error('Captured image is empty or too small');
+                        }
+
+                        console.log('Image captured successfully, size:', imageData.length, 'chars');
+                        return imageData;
+                        
+                    } catch (error) {
+                        console.error('Error in captureFrame:', error);
+                        throw new Error('Failed to capture image: ' + error.message);
+                    }
                 },
 
                 async captureAndAnalyze() {
@@ -252,9 +294,13 @@
                     this.cameraStatus = { type: 'info', message: 'Capturing image...' };
 
                     try {
+                        // Pequeña pausa para asegurar que la cámara esté estable
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
                         const imageData = this.captureFrame();
                         
                         this.cameraStatus = { type: 'info', message: 'Analyzing posture...' };
+                        console.log('Sending request to server...');
 
                         const response = await fetch('/height-detection/analyze', {
                             method: 'POST',
@@ -267,7 +313,15 @@
                             })
                         });
 
+                        console.log('Response status:', response.status);
+                        
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            throw new Error(`Server error (${response.status}): ${errorText}`);
+                        }
+
                         const result = await response.json();
+                        console.log('Analysis result:', result);
 
                         if (result.success) {
                             this.analysisResult = {
@@ -291,9 +345,9 @@
                         console.error('Analysis error:', error);
                         this.analysisResult = {
                             success: false,
-                            error: 'Network error. Please check your connection and try again.'
+                            error: error.message
                         };
-                        this.cameraStatus = { type: 'error', message: 'Network error' };
+                        this.cameraStatus = { type: 'error', message: 'Error: ' + error.message };
                     } finally {
                         this.isAnalyzing = false;
                     }
@@ -305,7 +359,20 @@
 
                 retryAnalysis() {
                     this.analysisResult = null;
-                    this.cameraStatus = { type: 'info', message: 'Ready for new analysis' };
+                    this.isAnalyzing = false;
+                    
+                    if (this.isCameraActive && this.isVideoReady) {
+                        this.cameraStatus = { type: 'info', message: 'Ready for new analysis' };
+                    } else {
+                        this.cameraStatus = { type: 'warning', message: 'Camera not ready. Please restart camera.' };
+                    }
+                },
+
+                fullRestart() {
+                    this.stopCamera();
+                    this.analysisResult = null;
+                    this.isAnalyzing = false;
+                    this.cameraStatus = { type: 'info', message: 'Click "Start Camera" to begin analysis' };
                 },
 
                 goBack() {
@@ -322,7 +389,8 @@
             },
 
             mounted() {
-                // Initialize component
+                console.log('Height Detection component mounted');
+                this.cameraStatus = { type: 'info', message: 'Click "Start Camera" to begin analysis' };
             },
 
             beforeUnmount() {

@@ -16,7 +16,7 @@ class HeightDetectionController extends Controller
 
     public function __construct()
     {
-        $this->pythonServiceUrl = config('services.python_detection.url');
+        $this->pythonServiceUrl = config('services.python_service.url');
     }
 
     /**
