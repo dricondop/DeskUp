@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Event;
 
 class Desk extends Model
 {
@@ -12,6 +13,7 @@ class Desk extends Model
     protected $fillable = [
         'name',
         'desk_number',
+        'api_desk_id',
         'position_x',
         'position_y',
         'is_active',
@@ -27,10 +29,10 @@ class Desk extends Model
     // Append these attributes to JSON serialization for API responses
     protected $appends = ['height', 'status', 'speed'];
 
-    // Relationship to desk activities (cleaning, meetings, etc.)
-    public function activities()
+    // Relationship to desk events (cleaning, meetings, etc.)
+    public function events()
     {
-        return $this->hasMany(DeskActivity::class);
+        return $this->belongsToMany(Event::class, 'event_desks');
     }
 
     // Relationship to user stats history using desk_number as foreign key

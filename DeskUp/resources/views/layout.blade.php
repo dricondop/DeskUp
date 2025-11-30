@@ -8,32 +8,24 @@
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sync-status.css') }}">
 </head>
 <body>
     @include('components.sidebar')
     
     <div class="main-content">
-        <!-- User Info -->
-    <div style="position: fixed; bottom: 10px; right: 10px; background: #fff; padding: 10px 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; display: flex; align-items: center; gap: 15px;">
-        <span style="color: #333; font-weight: 500;">
-            {{ auth()->user()->name }}
-            @if($isAdmin)
-                <span style="color: #4CAF50;">• Admin</span>
-            @else
-                <span style="color: #666;">• User</span>
-            @endif
-        </span>
-        <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
-            @csrf
-            <button type="submit" style="background: #f44336; color: white; border: none; padding: 5px 15px; border-radius: 3px; cursor: pointer; font-size: 14px;">
-                Logout
-            </button>
-        </form>
-    </div>
+        <!-- API Status Indicator -->
+        <div id="apiStatus" class="api-status-indicator checking">
+            <div class="api-status-dot"></div>
+            <span id="apiStatusText">Checking API...</span>
+        </div>
+
+        <!-- Hover Tooltip -->
+        <div id="hoverTooltip" class="hover-tooltip"></div>
 
         <main id="canvas" data-is-admin="{{ $isAdmin ? 'true' : 'false' }}"></main>
         
-        <section class="desk-count">Desks: <span id="deskCount">0</span>/50</section>
+
         
         @if($isAdmin)
         <nav class="toolbar">   
@@ -47,6 +39,9 @@
             <button id="addDesk" class="toolbar-btn">Add Desk</button>
             <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
+            <button id="downloadJSON" class="toolbar-btn">Download JSON</button>
+            <button id="uploadJSON" class="toolbar-btn">Upload JSON</button>
+            <input type="file" id="uploadJSONInput" accept=".json" style="display: none;">
         </nav>
         @endif
 

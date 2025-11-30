@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('desks', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete()->after('status');
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign('assigned_desk_id')->references('id')->on('desks')->onDelete('set null');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('desks', function (Blueprint $table) {
-            $table->dropColumn('user_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign(['assigned_desk_id']);
         });
     }
 };
