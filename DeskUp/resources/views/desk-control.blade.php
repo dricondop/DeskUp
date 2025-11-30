@@ -60,32 +60,32 @@
                         <button data-height="120">Stand</button>
                     </div>
 
-                    <div class="activity-header">
-                        <button class="activity-tab active" data-target="activityList">Activity</button>
+                    <div class="event-header">
+                        <button class="event-tab active" data-target="eventList">Events</button>
                         @if(!$isAdmin)
-                        <button class="activity-tab" data-target="pendingList">Pending</button>
+                        <button class="event-tab" data-target="pendingList">Pending</button>
                         @endif
                     </div>
 
-                    <div id="activityList" class="activity-panel">
+                    <div id="eventList" class="event-panel">
                         @forelse($desk->events()->orderBy('scheduled_at', 'desc')->limit(5)->get() as $event)
-                            <div class="temp-activity-box">
+                            <div class="temp-event-box">
                                 <p>{{ $event->scheduled_at->format('H:i') }} {{ $event->description }}</p>
                             </div>
                         @empty
-                            <div class="temp-activity-box">
+                            <div class="temp-event-box">
                                 <p>No scheduled events</p>
                             </div>
                         @endforelse
                     </div>
 
-                    <div id="pendingList" class="activity-panel hidden">
+                    <div id="pendingList" class="event-panel hidden">
                         @forelse($pendingEvents as $event)
-                            <div class="temp-activity-box">
+                            <div class="temp-event-box">
                                 <p>{{ $event->scheduled_at->format('H:i') }} {{ $event->description }}</p>
                             </div>
                         @empty
-                            <div class="temp-activity-box">
+                            <div class="temp-event-box">
                                 <p>No pending events</p>
                             </div>
                         @endforelse
@@ -98,15 +98,15 @@
         </main>
     </div>
 
-    <!-- Activity Modal -->
-    <div id="activityModal" class="modal">
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Create Event</h2>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <form id="activityForm">
+                <form id="eventForm">
                     @csrf
                     
                      <!-- Choose date -->
@@ -138,8 +138,8 @@
 
                     <!-- Description -->
                     <div class="form-group">
-                        <label for="activityFormDescription">Description *</label>
-                        <textarea id="activityFormDescription" name="activityFormDescription" rows="5" placeholder="Describe the purpose of the meeting" required></textarea>
+                        <label for="eventFormDescription">Description *</label>
+                        <textarea id="eventFormDescription" name="eventFormDescription" rows="5" placeholder="Describe the purpose of the meeting" required></textarea>
                     </div>
 
                     <button type="submit">Send request</button>
@@ -164,6 +164,7 @@
     </script>
 
     <script src="{{ asset('js/desk-control.js') }}"></script>
+    <script src="{{ asset('js/tab-switcher.js') }}"></script>
 </body>
 </html>
 

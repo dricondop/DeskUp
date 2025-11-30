@@ -74,38 +74,15 @@ async function updateDesk(field, value)
     }
 }  
 
-// Switch between Activity or Pending (activities - user view only)
-const tabs = document.querySelectorAll('.activity-tab');
-const panels = document.querySelectorAll('.activity-panel');
-
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-
-        // switch active tab
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-
-        // show correct panel
-        const targetPanel = tab.dataset.target;
-        panels.forEach(p => {
-            if (p.id === targetPanel) {
-                p.classList.remove('hidden');
-            } 
-            else {
-                p.classList.add('hidden');
-            }
-        })
-    })
-})
 
 // Open modal
 function openModal() {
-    document.getElementById('activityModal').style.display = 'block';
+    document.getElementById('eventModal').style.display = 'block';
 }
 
 // close modal
 function closeModal() {
-    document.getElementById('activityModal').style.display = 'none';
+    document.getElementById('eventModal').style.display = 'none';
 }
 
 // Mini layout inside the "Add Activities" for choosing desks
@@ -157,16 +134,16 @@ async function loadMiniLayout() {
 }
 
 
-// Create activity
-const activityForm = document.getElementById('activityForm');
+// Create event
+const eventForm = document.getElementById('eventForm');
 
-activityForm.addEventListener('submit', async (event) => {
+eventForm.addEventListener('submit', async (event) => {
     event.preventDefault(); // this prevents normal form submit
 
     const date = document.getElementById('meeting-date').value;
     const timeFrom = document.getElementById('meeting-time-from').value;
     const timeTo = document.getElementById('meeting-time-to').value;
-    const description = document.getElementById('activityFormDescription').value;
+    const description = document.getElementById('eventFormDescription').value;
 
     const scheduledAt = `${date} ${timeFrom}:00`;
     let scheduledToDate = date; 
@@ -219,7 +196,7 @@ activityForm.addEventListener('submit', async (event) => {
     }
     
 
-    activityForm.reset();
+    eventForm.reset();
     selectedDeskIds.clear();
     document.querySelectorAll('.mini-desk.selected').forEach(desk => desk.classList.remove('selected'));
     closeModal();

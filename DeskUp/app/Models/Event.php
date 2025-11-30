@@ -33,6 +33,12 @@ class Event extends Model
         return $this->belongsToMany(Desk::class, 'event_desks')->withTimestamps();
     }
 
+    // can be used to return all users from an event, or attach/detach users to events
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'event_users')->withTimestamps();
+    }
+
     // returns the creator of an event
     public function creator()
     {
