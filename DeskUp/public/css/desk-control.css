@@ -1,7 +1,8 @@
 /* ------- Base styles ------- */
 html, body { 
   height: 100%; 
-  margin: 0; 
+  margin: 0;
+  font-family: 'Inter', sans-serif; 
 }
 
 p, h1, h2, h3, span { 

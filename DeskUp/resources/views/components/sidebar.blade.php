@@ -52,7 +52,6 @@
         <label>Office management:</label>
         <nav>
             <a href="/layout">Office layout</a>
-            <a href="#">Usage stats</a>
             <a href="/users-management">Users management</a>
             <a href="/admin-statistics">Admin statistics</a>
         </nav>

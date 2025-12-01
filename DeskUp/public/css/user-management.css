@@ -1,3 +1,6 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
 
 :root {    
   --darkblue: #3A506B;
