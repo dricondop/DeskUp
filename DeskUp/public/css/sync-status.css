@@ -1,3 +1,7 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
+
 /* API Sync Status Indicator Styles */
 .api-status-indicator {
     position: fixed;

@@ -1,3 +1,7 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
+
 /* Ideal Height Page Styles */
 .ideal-height-container {
     max-width: 800px;

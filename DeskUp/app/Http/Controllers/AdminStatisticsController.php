@@ -13,9 +13,16 @@ class AdminStatisticsController extends Controller
 {
     public function index()
     {
-        $totalDesks = Desk::count();
 
-        $occupiedByStatus = Desk::where('status', '!=', 'OK')->count();
+        $desks = Desk::with('latestStats')
+            ->orderBy('desk_number')
+            ->get();
+
+        $totalDesks = $desks->count();
+
+        $occupiedByStatus = $desks
+            ->filter(fn (Desk $desk) => $desk->status !== 'OK')
+            ->count();
 
         $occupiedByRecentActivity = DeskActivity::where('scheduled_at', '>=', now()->subHour())
             ->distinct('desk_id')
@@ -44,7 +51,6 @@ class AdminStatisticsController extends Controller
             $topUsers = [];
         }
 
-        $desks = Desk::orderBy('desk_number')->get();
 
         $users = User::orderBy('name')->get();
        
