@@ -19,14 +19,19 @@
                 <h1>Desk Control</h1>
                 <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
 
-            <img src="{{ asset('assets/desk.png') }}" alt="desk">
+                <p id="clock"
+                aria-label="Current time"
+                style="margin-top:4px; font-size:0.9rem; color:#3A506B; font-weight:500; letter-spacing:0.03em;">
+                    --:--:--
+                </p>
+
+                <img src="{{ asset('assets/desk.png') }}" alt="desk">
                 
                 <div class="desk-view-btns-container">
                     <button class="desk-view-btns sitting">Sitting</button>
                     <button class="desk-view-btns error-log" onclick="openModal()">Add Event</button>
                 </div>
             </section>
-
             <div class="desk-management">
                 <div class="profile">
                     @if($isLoggedIn)
@@ -150,7 +155,7 @@
 
 
 
-    <script>
+        <script>
         const desk = {
             id: {{ $desk->id }},
             height: {{ $desk->height }},
@@ -160,13 +165,40 @@
 
         const userId = {{ auth()->user()->id }};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
     </script>
 
     <script src="{{ asset('js/desk-control.js') }}"></script>
     <script src="{{ asset('js/tab-switcher.js') }}"></script>
+
+    <script>
+        
+        function updateClock() {
+            const clockEl = document.getElementById('clock');
+            if (!clockEl) return;
+
+            const now = new Date();
+
+            const datePart = now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            const timePart = now.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            clockEl.textContent = `${datePart} ${timePart}`;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 </body>
 </html>
+
 
 
 

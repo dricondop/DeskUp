@@ -22,7 +22,14 @@
                     <h1>Admin Statistics</h1>
                     <p class="subtitle">Desk usage analytics</p>
                 </div>
-                <nav><span class="badge">DeskUp Admin</span></nav>
+                <nav style="display:flex; align-items:center; gap:12px;">
+                <div id="clock"
+                    aria-label="Current time"
+                    style="font-size:0.9rem; color:#3A506B; font-weight:500; letter-spacing:0.03em;">
+                    --:--:--
+                </div>
+                <span class="badge">DeskUp Admin</span>
+            </nav>
             </div>
         </header>
 
@@ -173,6 +180,31 @@
     <script>
     (function(){
         const palette = { primary: '#3A506B', accent: '#00A8A8', alt: '#9FB3C8', light: '#f1f3f5' };
+
+        function updateClock() {
+            const clockEl = document.getElementById('clock');
+            if (!clockEl) return;
+
+            const now = new Date();
+
+            const datePart = now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            const timePart = now.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            clockEl.textContent = `${datePart} ${timePart}`;
+        }
+
+        updateClock();      
+        setInterval(updateClock, 1000); 
+
 
         
         const ctxTop = document.getElementById('topUsersChart').getContext('2d');
