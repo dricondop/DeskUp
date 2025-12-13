@@ -18,7 +18,7 @@ class AdminController extends Controller
 
         return view('users-management', [
             'users' => $users,
-            'desks' => $unassignedDesks,
+            'unassignedDesks' => $unassignedDesks,
             'pendingEvents' => $pendingEvents
         ]);
     }
@@ -67,12 +67,12 @@ class AdminController extends Controller
     public function approveEvent($id)
     {
         $event = Event::findOrFail($id);
-        $event->status = Event::STATUS_ACTIVE;
+        $event->status = Event::STATUS_APPROVED;
         $event->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'DRY-RUN: Event has been approved successfully'
+            'message' => 'Event has been approved successfully'
         ]);
     }
 
@@ -84,7 +84,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'DRY-RUN: Event has been rejected successfully'
+            'message' => 'Event has been rejected successfully'
         ]);
     }
 }

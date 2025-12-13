@@ -1,21 +1,13 @@
 // Get CSRF token
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-// Populate the select with unassigned desks
-document.querySelectorAll('.desk-select').forEach(select => {
-    Object.entries(window.desks).forEach(([id, name]) => {
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = name;
-        select.appendChild(option);
-    });
-
-    select.addEventListener('change', () => {
-        assignDesk(select);
-    });
+// Assign desk to user
+document.addEventListener('change', (e) => {
+  if (e.target.matches('.desk-select')) {
+    assignDesk(e.target);
+  }
 });
 
-// Assign desk to user
 async function assignDesk(select) 
 {
     const userId = select.dataset.userId
