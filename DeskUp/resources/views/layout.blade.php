@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sync-status.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
 </head>
 <body>
     @include('components.sidebar')
@@ -46,6 +47,7 @@
         @endif
 
     <script>window.isAdmin = {{ $isAdmin ? 'true' : 'false' }};</script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
     <script src="{{ asset('js/layout-drag-drop.js') }}"></script>
     <script src="{{ asset('js/layout-save-load.js') }}"></script>
 </body>

@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Health Insights — DeskUp</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
     <script src="{{ asset('js/health.js') }}" defer></script>
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -130,6 +133,14 @@
             <h2 id="recommendations-heading" class="section-title">Recommendations</h2>
 
             <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+
+            <!-- Notification History -->
+            <div class="card notification-history">
+                <h3>Notification History</h3>
+                <div id="notificationHistoryList" class="notification-list">
+                    <p class="loading-text">Loading notifications...</p>
+                </div>
+            </div>
 
             <aside class="aside-tips" aria-label="Quick tips">
                 <div class="card">

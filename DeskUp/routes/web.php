@@ -7,6 +7,7 @@ use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
 use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -66,6 +67,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
     Route::post('/event/{id}/approve', [AdminController::class, 'approveEvent']);
     Route::post('/event/{id}/reject', [AdminController::class, 'rejectEvent']);
+    
+    // Notification Management (Admin)
+    Route::get('/admin/notifications', [NotificationController::class, 'adminIndex'])->name('admin.notifications');
+    Route::post('/api/notifications/send-manual', [NotificationController::class, 'sendManual']);
+    Route::post('/api/notifications/settings', [NotificationController::class, 'updateSettings']);
+});
+
+// Notification routes for all authenticated users
+Route::middleware('auth')->group(function () {
+    Route::get('/api/notifications/history', [NotificationController::class, 'getUserNotifications']);
+    Route::get('/api/notifications/pending', [NotificationController::class, 'getPending']);
+    Route::post('/api/notifications/mark-read', [NotificationController::class, 'markAsRead']);
 });
 
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->middleware('auth');

@@ -54,6 +54,7 @@
             <a href="/layout">Office layout</a>
             <a href="/users-management">Users management</a>
             <a href="/admin-statistics">Admin statistics</a>
+            <a href="/admin/notifications">Notifications</a>
         </nav>
     @endif
 </aside>
