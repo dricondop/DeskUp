@@ -70,8 +70,19 @@ class User extends Authenticatable
     /**
      * Get the events created by the user.
      */
-    public function events()
+    public function eventsCreatedBy()
     {
         return $this->hasMany(Event::class, 'created_by');
+    }
+
+    // can be used to return all events a user is assigned to, or attach/detach users to events
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_users');
+    }
+
+    public function assignedEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_users');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIMethods;
 use App\Models\Desk;
 use App\Models\Event;
 use App\Models\User;
@@ -18,8 +19,11 @@ class DeskController extends Controller
         $desks = Desk::all();
     
         $user = Auth::user();
+        
+        // get all users for creating an event
+        $users = User::select('id', 'name')->orderBy('name')->get();
 
-        $pendingEvents = $user->events()
+        $pendingEvents = $user->eventsCreatedBy()
             ->pendingEvents()
             ->orderBy('scheduled_at', 'desc')
             ->get();
@@ -35,7 +39,8 @@ class DeskController extends Controller
             'desks' => $desks,
             'isAdmin' => $isAdmin,
             'isLoggedIn' => Auth::check(),
-            'pendingEvents' => $pendingEvents
+            'pendingEvents' => $pendingEvents,
+            'users' => $users,
         ]);
     }
 
@@ -45,9 +50,21 @@ class DeskController extends Controller
             'height' => 'required|integer'
         ]);
 
-        $desk = Desk::findOrFail($id);
+        // converts height from cm to mm
+        $height = $validated['height'] * 10;
 
-        $desk->updateHeight($validated['height']);
+        $desk = Desk::findOrFail($id);
+        
+        try {
+            APIMethods::raiseDesk($height, $desk->api_desk_id);
+            $desk->newUserStatsHistoryRecord($height);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update height',
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,
@@ -79,38 +96,4 @@ class DeskController extends Controller
         return response()->json(['desks' => $desks]);
     }
 
-    public function addEvent(Request $request)
-    {
-        $validated = $request->validate([
-            'event_type' => 'required|string|max:50',
-            'description' => 'nullable|string',
-            'scheduled_at' => 'required|date',
-            'scheduled_to' => 'required|date',
-            'desk_ids' => 'required|array|min:1',
-            'desk_ids.*' => 'exists:desks,id', // '.*' means it must apply to every element in an array
-        ]);
-
-        $user = Auth::user();
-        $status = $user && $user->isAdmin()
-            ? Event::STATUS_APPROVED
-            : Event::STATUS_PENDING;
-        
-
-        $event = Event::create([
-            'event_type' => $validated['event_type'],
-            'description' => $validated['description'],
-            'scheduled_at' => $validated['scheduled_at'],
-            'scheduled_to' => $validated['scheduled_to'],
-            'status' => $status,
-            'created_by' => $user->id
-        ]);
-
-        $event->desks()->attach($validated['desk_ids']);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Event added successfully',
-            'event' => $event
-        ]);
-    }
 }

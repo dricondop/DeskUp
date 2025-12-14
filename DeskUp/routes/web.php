@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/desks', [DeskController::class, 'index']);
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
-    Route::post('/api/user/addEvent', [DeskController::class, 'addEvent']);
+    Route::post('/api/user/addEvent', [EventController::class, 'addEvent']);
     
     // Health page view
     Route::get('/health', [HealthController::class, 'index'])->name('health');
@@ -51,7 +51,10 @@ Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     ->name('admin-statistics')
     ->middleware('auth');
 
-Route::get('/events', [EventController::class, 'index']);
+Route::get('/events', [EventController::class, 'index'])
+    ->name('events.index');
+Route::get('/event/{event}/availableUsers', [EventController::class, 'availableUsers'])->name('event.available.users');
+Route::post('/event/{event}/addUser', [EventController::class, 'addUserToEvent'])->name('event.add.users');
 
 
 

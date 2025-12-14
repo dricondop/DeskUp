@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/events.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
@@ -19,7 +20,7 @@
                 <div class="header-content">
                     <h1>Upcoming Events</h1>
                 </div>
-                <div id="event-tabs" style="display:flex; flex-direction:row; justify-content:space-between; align-items:center;">
+                <div id="event-tabs" class="horizontal-alignment">
                     <div>
                     <button class="event-tab active" data-target="upcoming">Upcoming</button>
                     <button class="event-tab" data-target="meetings">Meetings</button>
@@ -27,9 +28,20 @@
                     <button class="event-tab" data-target="cleaning">Cleaning</button>
                     <button class="event-tab" data-target="maintenance">Maintenance</button>
                     </div>
-                    <div style="display:flex; flex-direction:row;">
-                        <span class="my-event">My events</span>
-                        <span class="add-event">&#43;</span>
+                    <div class="horizontal-alignment">
+                         <!-- My events / all events button -->
+                        <span class="btn scheduleCleaning">Cleaning</span>
+
+                        <!-- My events / all events button -->
+                        <a href="{{ $myEventsButton 
+                                    ? route('events.index') 
+                                    : route('events.index', ['mine' => 1]) }}"
+                            class="my-event {{ $myEventsButton ? 'active' : '' }}">
+                            My events
+                        </a>
+                    
+                        <!-- Add event button -->
+                        <span class="btn add-event">&#43;</span>
                     </div>
                 </div>
                 <div class="horizontal-line"></div>
@@ -85,7 +97,9 @@
 
                 <!-- Desk control  -->
                 <div class="meeting-management hidden">
-                    <span class="btn close-panel"><i data-lucide="chevron-right"></i></span>
+                    <div class="meeting-management-header">
+                        <span class="btn close-panel"><i data-lucide="chevron-right"></i></span>
+                    </div>
 
                     <section class="desk-adjustment">
                         <h2>Desk Management</h2>
@@ -103,10 +117,26 @@
                             <button id="increment">+</button>
                         </div>
 
-                        <div class="meeting-attendees">
-                            <h3>Attendees</h3>
-                            <div id="included-users"></div>
+                        <div class="height-preset-btns">
+                            <button data-height="60">Sit</button>
+                            <button data-height="75">75</button>
+                            <button data-height="90">Stand</button>
+                        </div>
 
+                        <div class="meeting-attendees">
+                            <div class="horizontal-alignment">
+                                <h3>Attendees</h3>
+                                <div class="attendee-btn">
+                                    <select id="availableUsers" class="hidden-select">
+                                        <option value="">Select user</option>
+                                        <!-- Options added in javascript -->
+                                    </select>
+                                
+                                    <i data-lucide="user-round-plus"></i>
+                                </div>
+                            </div>
+                            
+                            <div id="included-users"></div>
                         </div>
 
                         <div class="meeting-desks">
@@ -118,8 +148,18 @@
             </main>
         </div>
     </div>
+    
+    <!-- Event Modal -->
+    @include('components.modals')
+
+    <script>
+        const loggedInUser = {{ auth()->user()->id }};      // used for adding user to event
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    </script>
 
     <script src="{{ asset('js/tab-switcher.js') }}"></script>
+    <script src="{{ asset('js/desk-control.js') }}"></script>
     <script src="{{ asset('js/events.js') }}"></script>
+    <script src="{{ asset('js/modals.js') }}"></script>
 </body>
 </html>

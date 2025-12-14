@@ -1,0 +1,333 @@
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    border-radius: 12px;
+    max-width: 600px;
+    height: 80vh;
+    max-height: 800px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease;
+}
+.cleaning-modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    border-radius: 12px;
+    max-width: 500px;
+    height: 35vh;
+    max-height: 400px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(169, 169, 169);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 90%;
+  overflow-y: scroll;
+}
+
+.formButton {
+  display: block;
+  margin: 1.5rem auto 0;
+  background: linear-gradient(125deg, #7eb5ef 0%, #88d3f1 40%, #abf4c9 100%);
+  padding:.55rem 1.1rem; 
+  font-size:.95rem;
+  border-radius:999px; 
+  border:0; 
+  
+
+  transition: background 0.4s ease;
+}
+
+.formButton:hover { 
+  background: linear-gradient(125deg, #4f81b7 0%, #58a1be 40%, #67b387 100%);
+  transform: translateY(-1px);
+}
+
+.closeModal {
+  color: #999;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.form-group {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 550;
+  color: #333;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-group select {
+  padding: 6px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+
+}
+
+.form-group textarea {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+} 
+
+
+.form-group input {
+  width: 100%;
+  padding: 6px 10px 6px 10px;
+
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.date-time {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.date-time > div {
+  flex: 1;
+}
+
+#userSelect option.userSelected  {
+  background: rgb(132, 132, 132);
+  color: rgb(0, 0, 0);
+}
+
+.mini-layout {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-image: linear-gradient(#ddd 1px, transparent 1px),
+                    linear-gradient(90deg, #ddd 1px, transparent 1px);
+  background-size: 20px 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 6px;
+  border: 1px solid rgb(166, 166, 166);
+}
+
+.mini-desk {
+  position: absolute;
+  width: 60px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mini-desk img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  margin: 0 auto;
+}
+
+.mini-desk span {
+  font-size: 12px;
+  margin-top: 2px;
+  display: block;
+}
+
+.mini-desk.selected img {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+.mini-desk.selected span {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+/* ----------- Cleaning Schedule Modal ------------- */
+
+.clockArea {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px;
+  border: 1px solid black;
+  background-color: #ddd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+
+}
+
+.clockArea > * { 
+    font-size: 28px;
+}
+
+.timePicker{
+  position:absolute;
+  z-index:1000;
+  width:70px;
+  max-height:180px;
+  overflow:auto;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:10px;
+  padding:6px;
+}
+
+.timeOption{
+  display:block;
+  width:100%;
+  border:none;
+  background:transparent;
+  padding:6px 8px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.timeOption:hover{
+  background:rgba(0,0,0,0.06);
+}
+
+.segment {
+    line-height: 50px;
+    text-align: center;
+    border-radius: 9px;
+    width: 45px;
+    border: none;
+    background-color: transparent;
+    caret-color: transparent;
+    -webkit-appearance: none;
+}
+.segment:focus {
+    outline: none;
+}
+
+.segment.active {
+    background-color: #ffb20b;
+}
+
+
+.scheduleDay {
+  width: 30px;
+  height: 36px;
+  border: none;
+  border-radius: 4px;
+}
+.scheduleDay.active {
+  background-color: #67b387;
+}
+
+.cleaningAllDays {
+    margin-bottom: 25px;
+}
+
+
+
+
+
+/* ----------- Desk Management: ------------- */
+
+
+/* Desk move speed */
+.height-adjustment-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid #f2f2f2;;
+}
+
+/* Height adjustment increase/decrease buttons */
+.input-group button {
+  flex: 1;
+  background: #f2f2f2;
+  border: 1px solid #f2f2f2;;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #333;
+  cursor: pointer;
+  padding: 10px 0;
+  transition: 0.2s ease;
+}
+
+.input-group > button:first-child:hover {
+  background: #b24d4d;
+}
+.input-group > button:last-child:hover {
+  background: #4db252;  
+}
+
+/* Height adjustment numerical value */
+.input-group .value {
+  flex: 2;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #111;
+  background: #fff;
+  padding: 10px 0;
+}
+
+
+/* Height preset buttons */
+.height-preset-btns { 
+  margin: .5rem 0 clamp(16px, 4vw, 28px); 
+  margin-bottom: 50px;
+  margin-top: 20px;
+}
+.height-preset-btns button {
+  background: linear-gradient(125deg, #7eb5ef 0%, #88d3f1 40%, #abf4c9 100%);
+  padding:.55rem 1.1rem; 
+  font-size:.95rem;
+  border-radius:999px; 
+  border:0; 
+  margin-right:.5rem;
+  transition: background 0.4s ease;
+}
+.height-preset-btns button:hover { 
+  background: linear-gradient(125deg, #4f81b7 0%, #58a1be 40%, #67b387 100%);
+  transform: translateY(-1px);
+}
+

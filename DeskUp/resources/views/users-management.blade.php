@@ -49,6 +49,9 @@
                                                  <p>— Assign Desk —</p>
                                             @endif
                                         </option>
+                                        @foreach ($unassignedDesks as $id => $name)
+                                            <option value="{{ $id }}">{{ $name }}</option>
+                                        @endforeach
                                     </select>
                                 </td>
                                 <td> 
@@ -178,7 +181,7 @@
 
     </div>
     <script>
-        window.desks = @json($desks);
+        window.desks = @json($unassignedDesks);
     </script>
 
     <script src='{{ asset('js/users-management.js') }}'></script>
