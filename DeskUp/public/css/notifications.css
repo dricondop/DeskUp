@@ -1,0 +1,150 @@
+/* Notification Container - Bottom Right */
+.notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+/* Individual Notification Popup */
+.notification-popup {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid #5BC0BE;
+    opacity: 0;
+    transform: translateX(120%);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: auto;
+    cursor: pointer;
+    min-width: 320px;
+    max-width: 400px;
+}
+
+.notification-popup.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-popup.hide {
+    opacity: 0;
+    transform: translateX(120%);
+}
+
+.notification-popup:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
+}
+
+/* Notification Icon */
+.notification-icon {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Notification Content */
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: #2D3748;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.notification-message {
+    font-size: 13px;
+    color: #4A5568;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: #A0AEC0;
+    font-style: italic;
+}
+
+/* Close Button */
+.notification-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #A0AEC0;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.notification-close:hover {
+    background-color: #EDF2F7;
+    color: #2D3748;
+}
+
+/* Animation for stacking multiple notifications */
+.notification-popup:nth-child(n+4) {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .notification-container {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-width: none;
+    }
+
+    .notification-popup {
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* Different colors for notification types */
+.notification-popup[data-type="automatic"] {
+    border-left-color: #5BC0BE;
+}
+
+.notification-popup[data-type="manual"] {
+    border-left-color: #3A506B;
+}
+
+/* Pulse animation for new notifications */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        box-shadow: 0 8px 24px rgba(91, 192, 190, 0.4);
+    }
+    100% {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.notification-popup.show {
+    animation: pulse 2s ease-in-out;
+}

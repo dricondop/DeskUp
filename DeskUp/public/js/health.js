@@ -340,3 +340,62 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+// Load notification history
+async function loadNotificationHistory() {
+    const listEl = document.getElementById('notificationHistoryList');
+    if (!listEl) return;
+
+    try {
+        const response = await fetch('/api/notifications/history');
+        const data = await response.json();
+
+        if (!data.notifications || data.notifications.length === 0) {
+            listEl.innerHTML = '<p class="empty-text">No notifications yet</p>';
+            return;
+        }
+
+        listEl.innerHTML = data.notifications.map(notification => {
+            const date = new Date(notification.created_at);
+            const timeAgo = getTimeAgo(date);
+            const unreadClass = notification.is_read ? '' : ' unread';
+            
+            return `
+                <div class="notification-item${unreadClass}">
+                    <div class="notification-item-header">
+                        <h4 class="notification-item-title">${escapeHtml(notification.title)}</h4>
+                        <span class="notification-item-badge ${notification.type}">${notification.type}</span>
+                    </div>
+                    <p class="notification-item-message">${escapeHtml(notification.message)}</p>
+                    <span class="notification-item-time">${timeAgo}</span>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading notification history:', error);
+        listEl.innerHTML = '<p class="empty-text">Failed to load notifications</p>';
+    }
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+    return date.toLocaleDateString();
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Load notification history on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadNotificationHistory);
+} else {
+    loadNotificationHistory();
+}
