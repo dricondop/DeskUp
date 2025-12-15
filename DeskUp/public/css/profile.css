@@ -522,6 +522,270 @@ html, body {
     transform: scale(1.05);
 }
 
+
+/* === LAYOUT GENERAL: equivalencia de alturas === */
+.profile-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Dos filas con la MISMA altura; la izquierda las ocupa ambas */
+    grid-auto-rows: 1fr;
+    gap: 25px;
+    align-items: stretch;   /* para que las celdas se estiren */
+}
+
+/* Personal Information ocupa 2 filas completas (columna izquierda) */
+.info-card:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    height: 100%;
+    align-self: stretch;
+}
+
+/* Health Insights arriba (columna derecha, fila 1) */
+.health-insights-card {
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ideal Height abajo (columna derecha, fila 2) */
+.ideal-height-card {
+    grid-column: 2;
+    grid-row: 2;
+    height: 100%;
+    align-self: stretch;
+    margin-top: 0; /* evita doble espaciado vertical */
+}
+
+/* === CONTENIDO INTERNO: evitar que empuje alturas === */
+.health-insights-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;         /* más compacto */
+    margin-top: 6px;
+    flex: 1;           /* llenar la tarjeta */
+    min-height: 0;     /* importante para que flex no fuerce crecimientos */
+}
+
+.health-metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* === ELIMINAR LIVE STATUS (sin tocar HTML si no quieres) === */
+.health-live-status-card { display: none !important; }
+
+/* === TARJETAS DE MÉTRICAS === */
+.health-metric-horizontal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    border-left: 4px solid;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* evita crecer por contenido */
+}
+
+.health-metric-horizontal.time-percentage-card { border-left-color: #3A506B; }
+.health-metric-horizontal.posture-score-card { border-left-color: #48BB78; }
+
+.health-metric-horizontal .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;         /* menos aire */
+}
+
+.health-metric-horizontal .health-metric-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3A506B;
+    margin: 0;
+}
+
+.health-metric-horizontal .health-metric-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.time-percentage-card .health-metric-badge {
+    background: rgba(58, 80, 107, 0.1);
+    color: #3A506B;
+}
+
+.posture-score-card .health-metric-badge {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48BB78;
+}
+
+/* === SIT/STAND RATIO === */
+/* Contenedor del gráfico con altura más contenida para ganar compacidad */
+.chart-container-horizontal {
+    position: relative;
+    width: 100%;
+    height: 88px;          /* menor que 100px para ahorrar alto */
+    margin: 4px 0 6px 0;
+    flex: 0 0 auto;        /* que no empuje la tarjeta */
+}
+
+/* Ocultamos las etiquetas redundantes y usamos pills */
+.chart-labels-horizontal { display: none; }
+
+.chart-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.pill-sit {
+    background: rgba(58, 80, 107, 0.1);
+    color: #3A506B;
+}
+
+.pill-stand {
+    background: rgba(0, 168, 168, 0.12);
+    color: #007f7f;
+}
+
+/* === POSTURE SCORE (valor único) === */
+.posture-score-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin: 6px 0 8px 0;
+    flex: 0 0 auto; /* evita que el contenido empuje verticalmente */
+}
+
+.posture-score-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2F855A; /* un pelín más oscuro para contraste */
+    line-height: 1;
+}
+
+/* Oculta '/100' sin tocar HTML */
+.posture-score-label { display: none !important; }
+
+.progress-wrap-horizontal {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 6px 0 6px 0;
+}
+
+.progress-wrap-horizontal .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #48BB78, #38A169);
+    transition: width 0.4s ease;
+}
+
+.score-scale {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 2px;
+}
+.score-scale .scale-min,
+.score-scale .scale-max {
+    font-size: 10px;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+/* === IDEAL HEIGHT: que rellene su fila sin empujar === */
+.ideal-height-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+}
+
+.height-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    margin: 10px 0 8px 0;
+}
+
+.height-value {
+    font-size: 34px;
+    font-weight: 800;
+    color: #07325F;
+    margin-right: 6px;
+}
+
+.height-unit {
+    font-size: 18px;
+    color: #718096;
+    font-weight: 500;
+}
+
+.height-description {
+    text-align: center;
+    color: #718096;
+    margin: 0 0 14px 0;
+    font-size: 14px;
+    line-height: 1.45;
+    padding: 0 8px;
+}
+
+.height-button {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1024px) {
+    .profile-content {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;  /* en móvil no forzamos equivalencia exacta */
+    }
+
+    .info-card:first-child { grid-row: 1; }
+    .health-insights-card { grid-row: 2; }
+    .ideal-height-card { grid-row: 3; }
+
+    .health-metrics-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .chart-container-horizontal { height: 84px; }
+}
+
+@media (max-width: 768px) {
+    .health-insights-horizontal { gap: 10px; }
+    .chart-container-horizontal { height: 78px; }
+}
+
+
 /* Responsive design */
 @media (max-width: 768px) {
     .profile-content {

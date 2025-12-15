@@ -121,3 +121,174 @@ if (typeof module !== 'undefined' && module.exports) {
         initializeProfilePage
     };
 }
+
+// Profile page health insights integration
+'use strict';
+
+// Health insights integration for profile page
+class ProfileHealthInsights {
+    constructor() {
+        this.chartInstance = null;
+        this.userId = document.querySelector('meta[name="user-id"]')?.getAttribute('content');
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        this.init();
+    }
+
+    async init() {
+        await this.fetchLiveStatus();
+        await this.fetchTodayStats();
+        this.createTimePercentageChart();
+        
+        // Refresh live status every 30 seconds
+        setInterval(() => this.fetchLiveStatus(), 30000);
+    }
+
+    async fetchLiveStatus() {
+        try {
+            const response = await fetch('/api/health-live-status', {
+                headers: {
+                    'X-CSRF-TOKEN': this.csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch live status');
+            
+            const data = await response.json();
+            
+            // Update live status elements
+            const modeEl = document.getElementById('profile-live-mode');
+            const heightEl = document.getElementById('profile-live-height');
+            const lastEl = document.getElementById('profile-last-adjusted');
+            
+            if (modeEl) modeEl.textContent = data.mode || 'Unknown';
+            if (heightEl) heightEl.textContent = `${data.height_cm || 0} cm`;
+            if (lastEl) lastEl.textContent = `Last adjusted: ${data.last_adjusted || 'Never'}`;
+            
+        } catch (error) {
+            console.error('Error fetching live status:', error);
+            this.updateStatusError();
+        }
+    }
+
+    async fetchTodayStats() {
+        try {
+            const response = await fetch('/api/health-stats?range=today', {
+                headers: {
+                    'X-CSRF-TOKEN': this.csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch stats');
+            
+            const data = await response.json();
+            this.updateStats(data);
+            this.updateChartData(data);
+            
+        } catch (error) {
+            console.error('Error fetching today stats:', error);
+            this.updateStatsWithDefaults();
+        }
+    }
+
+    updateStats(data) {
+        // Update posture score
+        const postureScore = Math.max(0, Math.min(100, data.standing_pct || 0));
+        const scoreEl = document.getElementById('profile-posture-score');
+        const bar = document.getElementById('profile-posture-score-bar');
+        
+        if (scoreEl) scoreEl.textContent = `${postureScore} / 100`;
+        if (bar) bar.style.width = `${postureScore}%`;
+        
+        // Update quick stats
+        const activeEl = document.getElementById('profile-active-hours');
+        const breaksEl = document.getElementById('profile-breaks');
+        const caloriesEl = document.getElementById('profile-calories');
+        
+        if (activeEl) activeEl.textContent = data.active_hours?.toFixed(1) || '0';
+        if (breaksEl) breaksEl.textContent = data.breaks_per_day || '0';
+        if (caloriesEl) caloriesEl.textContent = `${data.calories_per_day || '0'} kcal`;
+    }
+
+    updateChartData(data) {
+        if (this.chartInstance) {
+            this.chartInstance.data.datasets[0].data = [
+                data.sitting_pct || 65,
+                data.standing_pct || 35
+            ];
+            this.chartInstance.update();
+        }
+    }
+
+    createTimePercentageChart() {
+        const ctx = document.getElementById('timePercentageChartProfile')?.getContext('2d');
+        if (!ctx) return;
+        
+        const palette = { 
+            primary: '#3A506B', 
+            accent: '#00A8A8' 
+        };
+        
+        this.chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sitting', 'Standing'],
+                datasets: [{
+                    data: [65, 35], // Default values
+                    backgroundColor: [palette.primary, palette.accent],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    updateStatusError() {
+        const modeEl = document.getElementById('profile-live-mode');
+        const heightEl = document.getElementById('profile-live-height');
+        const lastEl = document.getElementById('profile-last-adjusted');
+        
+        if (modeEl) modeEl.textContent = 'Error';
+        if (heightEl) heightEl.textContent = '— cm';
+        if (lastEl) lastEl.textContent = 'Failed to load';
+    }
+
+    updateStatsWithDefaults() {
+        const scoreEl = document.getElementById('profile-posture-score');
+        const bar = document.getElementById('profile-posture-score-bar');
+        
+        if (scoreEl) scoreEl.textContent = '— / 100';
+        if (bar) bar.style.width = '0%';
+        
+        const activeEl = document.getElementById('profile-active-hours');
+        const breaksEl = document.getElementById('profile-breaks');
+        const caloriesEl = document.getElementById('profile-calories');
+        
+        if (activeEl) activeEl.textContent = '—';
+        if (breaksEl) breaksEl.textContent = '—';
+        if (caloriesEl) caloriesEl.textContent = '— kcal';
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ProfileHealthInsights();
+});

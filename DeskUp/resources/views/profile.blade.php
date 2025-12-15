@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/profile.js') }}" defer></script>
 </head>
 <body>
     @include('components.sidebar')
@@ -125,48 +127,81 @@
                 </div>
             </div>
 
-            <!-- Health Stats Insights -->
-            <div class="info-card combined-card">
-                <div class="health-section">
-                    <div class="card-header">
-                        <h2 class="card-title">Health Score</h2>
+            <!-- Health Insights Dashboard - HORIZONTAL LAYOUT -->
+            <div class="info-card health-insights-card">
+                <div class="card-header">
+                    <h2 class="card-title">Health Insights</h2>
+                    <a href="{{ route('health') }}" class="edit-btn">
+                        View Details
+                    </a>
+                </div>
+            <div class="health-insights-horizontal">
+                <!-- Horizontal Metrics Container (sin Live Status) -->
+                <div class="health-metrics-row">
+                
+                <!-- Sit/Stand Ratio -->
+                <div class="health-metric-horizontal time-percentage-card">
+                    <div class="health-metric">
+                    <div class="metric-header">
+                        <h3 class="health-metric-title">Sit/Stand Ratio</h3>
+                        <span class="health-metric-badge">Today</span>
                     </div>
-                    <div class="health-score-container">
-                        <div class="score-display">
-                            <div class="score-item">
-                                <div class="score-circle" style="background: conic-gradient(#57C785 0% 65%, #eaeaea 65% 100%);">
-                                    <span class="score-value">65%</span>
-                                </div>
-                                <span class="score-label">Sitting Time</span>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-circle" style="background: conic-gradient(#2A7B9B 0% 35%, #eaeaea 35% 100%);">
-                                    <span class="score-value">35%</span>
-                                </div>
-                                <span class="score-label">Standing Time</span>
-                            </div>
-                        </div>
-                        <button class="stats-button">View Complete Statistics</button>
+
+                    <div class="chart-container-horizontal">
+                        <canvas id="timePercentageChartProfile"></canvas>
+                    </div>
+
+                    <!-- Etiquetas compactas (sin títulos redundantes) -->
+                    <div class="chart-pills">
+                        <span class="pill pill-sit" id="sitting-percentage">65% Sit</span>
+                        <span class="pill pill-stand" id="standing-percentage">35% Stand</span>
+                    </div>
                     </div>
                 </div>
-                
-                <div class="divider"></div>
-                
-                    <div class="height-section">
-                        <div class="card-header">
-                            <h2 class="card-title">Ideal Height</h2>
-                        </div>
-                        <div class="ideal-height-container">
-                            <div class="height-display">
-                                <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
-                                <span class="height-unit">cm</span>
-                            </div>
-                            <p class="height-description">
-                                Your personalized ideal desk height for optimal ergonomics
-                            </p>
-                            <a href="{{ route('ideal.height') }}" class="height-button">Configure Ideal Height</a>
-                        </div>
+
+                <!-- Posture Score (solo valor, sin /100) -->
+                <div class="health-metric-horizontal posture-score-card">
+                    <div class="health-metric">
+                    <div class="metric-header">
+                        <h3 class="health-metric-title">Posture Score</h3>
+                        <span class="health-metric-badge">Today</span>
                     </div>
+
+                    <div class="posture-score-display">
+                        <p class="posture-score-value" id="profile-posture-score">65</p>
+                        <!-- Eliminado: <span class="posture-score-label">/100</span> -->
+                    </div>
+
+                    <!-- Mantener barra de progreso (opcional) -->
+                    <div class="progress-wrap-horizontal" aria-label="Posture score progression">
+                        <div class="progress-bar" id="profile-posture-score-bar" style="width:65%"></div>
+                    </div>
+
+                    <!-- Etiquetas de rango (opcionales, compactas) -->
+                    <div class="score-scale">
+                        <span class="scale-min">Poor</span>
+                        <span class="scale-max">Excellent</span>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Ideal Height Card -->
+            <div class="info-card ideal-height-card">
+                <div class="card-header">
+                    <h2 class="card-title">Ideal Height</h2>
+                </div>
+                <div class="ideal-height-container">
+                    <div class="height-display">
+                        <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
+                        <span class="height-unit">cm</span>
+                    </div>
+                    <p class="height-description">
+                        Your personalized ideal desk height for optimal ergonomics
+                    </p>
+                    <a href="{{ route('ideal.height') }}" class="height-button">Configure Ideal Height</a>
                 </div>
             </div>
         </div>
@@ -176,6 +211,8 @@
     @include('components.footer')
     </div>
 
-    <script src="{{ asset('js/profile.js') }}"></script>
+    <!-- Hidden data for API calls -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-id" content="{{ Auth::id() }}">
 </body>
 </html>
