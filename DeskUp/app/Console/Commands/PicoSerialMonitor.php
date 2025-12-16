@@ -10,7 +10,7 @@ class PicoSerialMonitor extends Command {
 
     /* This $signature thing is to create the command php artisan pico:monitor, without it and $description it
     will not be able to run the command and the OLED screen in the picoboard will not work */
-    protected $signature = 'pico:monitor {port=COM3}';
+    protected $signature = 'pico:monitor {port=COM4}';
     protected $description = 'Monitor user sessions and send height data to Pico via USB serial';
     
     //These variables are here to avoid making unnecessary requests if height/user did not change
@@ -34,7 +34,8 @@ class PicoSerialMonitor extends Command {
          sent to the hardware. The @ symbol at the beginning is an error suppression operator, It silences
          any warnings or errors that fopen() might throw if the port doesn't exist or can't be opened, to
          later check it properly avoiding ugly error messages */
-        $this->serialPort = @fopen($port . ':', 'w+b');
+        exec("mode {$port}: BAUD=115200 PARITY=N DATA=8 STOP=1");
+        $this->serialPort = fopen('\\\\.\\' . $port, 'r+b');
     
             if (!$this->serialPort) {
             $this->error("Couldn't open port: {$port}");
