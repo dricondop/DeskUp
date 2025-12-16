@@ -130,27 +130,31 @@
         </section>
 
         <section id="recommendations" class="recommendations" aria-labelledby="recommendations-heading">
-            <h2 id="recommendations-heading" class="section-title">Recommendations</h2>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Notification History</h1>
+                    <p class="subtitle">View your recent desk activity notifications</p>
+                </header>
 
-            <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
-
-            <!-- Notification History -->
-            <div class="card notification-history">
-                <h3>Notification History</h3>
-                <div id="notificationHistoryList" class="notification-list">
-                    <p class="loading-text">Loading notifications...</p>
-                </div>
+                <section class="card notification-history">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Recent Notifications</h2>
+                    <div id="notificationHistoryList" class="notification-list">
+                        <p class="loading-text">Loading notifications...</p>
+                    </div>
+                </section>
             </div>
 
-            <aside class="aside-tips" aria-label="Quick tips">
-                <div class="card">
-                    <h3>Quick Tips</h3>
-                    <ul>
-                        <li>Try the 50/10 rule: 50 minutes sitting, 10 standing or moving.</li>
-                        <li>Set gentle reminders to stand or stretch every hour.</li>
-                    </ul>
-                </div>
-            </aside>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Health Recommendations</h1>
+                    <p class="subtitle">Personalized insights based on your activity</p>
+                </header>
+
+                <section class="card recommendations-card">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Insights & Tips</h2>
+                    <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+                </section>
+            </div>
         </section>
     </main>
 

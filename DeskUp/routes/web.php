@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
     Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
     Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
+    // Combined endpoint for instant page load
+    Route::get('/api/health-data', [HealthController::class, 'getAllData'])->name('api.health.all');
 });
 
 Route::get('/signin', function () {

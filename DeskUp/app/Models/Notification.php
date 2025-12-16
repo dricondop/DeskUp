@@ -17,11 +17,13 @@ class Notification extends Model
         'type',
         'is_read',
         'read_at',
+        'sent_at',
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
         'read_at' => 'datetime',
+        'sent_at' => 'datetime',
     ];
 
     /**

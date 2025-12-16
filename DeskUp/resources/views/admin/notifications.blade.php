@@ -73,6 +73,44 @@
                     </div>
                     <div class="notification-form">
                         <div class="form-field">
+                            <label class="field-label">Recipients</label>
+                            <div class="recipient-options">
+                                <label class="radio-option">
+                                    <input type="radio" name="recipient-type" value="all" checked onchange="toggleUserSelection()">
+                                    <span>All Users</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="recipient-type" value="specific" onchange="toggleUserSelection()">
+                                    <span>Specific Users</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-field" id="user-selection" style="display: none;">
+                            <label class="field-label">Select Users</label>
+                            <div class="user-select-container">
+                                <div class="user-select-header">
+                                    <input type="text" id="user-search" class="field-input" placeholder="Search users...">
+                                    <label class="select-all-label">
+                                        <input type="checkbox" id="select-all" onchange="toggleAllUsers()">
+                                        <span>Select All</span>
+                                    </label>
+                                </div>
+                                <div class="user-list" id="user-list">
+                                    @foreach($users as $user)
+                                    <label class="user-item" data-name="{{ strtolower($user->name) }}" data-email="{{ strtolower($user->email) }}">
+                                        <input type="checkbox" class="user-checkbox" value="{{ $user->id }}">
+                                        <div class="user-info">
+                                            <span class="user-name">{{ $user->name }}</span>
+                                            <span class="user-email">{{ $user->email }}</span>
+                                        </div>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
                             <label class="field-label" for="notif-title">Title</label>
                             <input type="text" id="notif-title" class="field-input" maxlength="255" placeholder="Enter notification title">
                             <span class="char-count"><span id="title-count">0</span>/255</span>
@@ -88,7 +126,7 @@
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                             </svg>
-                            Send to All Users
+                            <span id="send-btn-text">Send to All Users</span>
                         </button>
                     </div>
                 </div>

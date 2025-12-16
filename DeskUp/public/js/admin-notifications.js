@@ -23,6 +23,69 @@ autoToggle?.addEventListener('change', () => {
     toggleStatus.textContent = autoToggle.checked ? 'Enabled' : 'Disabled';
 });
 
+// User selection toggle
+function toggleUserSelection() {
+    const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
+    const userSelection = document.getElementById('user-selection');
+    const sendBtnText = document.getElementById('send-btn-text');
+    
+    if (recipientType === 'specific') {
+        userSelection.style.display = 'flex';
+        updateSendButtonText();
+    } else {
+        userSelection.style.display = 'none';
+        sendBtnText.textContent = 'Send to All Users';
+    }
+}
+
+// Update send button text based on selection
+function updateSendButtonText() {
+    const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
+    const sendBtnText = document.getElementById('send-btn-text');
+    
+    if (recipientType === 'all') {
+        sendBtnText.textContent = 'Send to All Users';
+    } else {
+        const selectedCount = document.querySelectorAll('.user-checkbox:checked').length;
+        sendBtnText.textContent = selectedCount > 0 
+            ? `Send to ${selectedCount} User${selectedCount !== 1 ? 's' : ''}`
+            : 'Select Users';
+    }
+}
+
+// Listen to checkbox changes
+document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('user-checkbox')) {
+        updateSendButtonText();
+    }
+});
+
+// Toggle all users
+function toggleAllUsers() {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    const visibleCheckboxes = Array.from(checkboxes).filter(cb => 
+        cb.closest('.user-item').style.display !== 'none'
+    );
+    
+    visibleCheckboxes.forEach(cb => cb.checked = selectAll.checked);
+    updateSendButtonText();
+}
+
+// User search
+const userSearch = document.getElementById('user-search');
+userSearch?.addEventListener('input', () => {
+    const searchTerm = userSearch.value.toLowerCase();
+    const userItems = document.querySelectorAll('.user-item');
+    
+    userItems.forEach(item => {
+        const name = item.dataset.name;
+        const email = item.dataset.email;
+        const matches = name.includes(searchTerm) || email.includes(searchTerm);
+        item.style.display = matches ? 'flex' : 'none';
+    });
+});
+
 // Save settings
 async function saveSettings() {
     const enabled = document.getElementById('auto-enabled').checked;
@@ -63,10 +126,29 @@ async function saveSettings() {
 async function sendNotification() {
     const title = document.getElementById('notif-title').value.trim();
     const message = document.getElementById('notif-message').value.trim();
+    const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
 
     if (!title || !message) {
         showToast('Please fill in both title and message', 'error');
         return;
+    }
+
+    const payload = {
+        title,
+        message,
+        send_to_all: recipientType === 'all'
+    };
+
+    if (recipientType === 'specific') {
+        const selectedUsers = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+            .map(cb => parseInt(cb.value));
+        
+        if (selectedUsers.length === 0) {
+            showToast('Please select at least one user', 'error');
+            return;
+        }
+        
+        payload.user_ids = selectedUsers;
     }
 
     try {
@@ -76,7 +158,7 @@ async function sendNotification() {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ title, message })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
@@ -88,6 +170,9 @@ async function sendNotification() {
             document.getElementById('notif-message').value = '';
             titleCount.textContent = '0';
             messageCount.textContent = '0';
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('select-all').checked = false;
+            updateSendButtonText();
         } else {
             showToast('Failed to send notification', 'error');
         }

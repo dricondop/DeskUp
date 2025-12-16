@@ -19,7 +19,8 @@ class NotificationController extends Controller
     public function adminIndex()
     {
         $settings = NotificationSettings::get();
-        return view('admin.notifications', compact('settings'));
+        $users = \App\Models\User::where('is_admin', false)->get(['id', 'name', 'email']);
+        return view('admin.notifications', compact('settings', 'users'));
     }
 
     public function updateSettings(Request $request)
@@ -39,11 +40,17 @@ class NotificationController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string|max:1000',
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'exists:users,id',
+            'send_to_all' => 'boolean',
         ]);
+
+        $userIds = ($validated['send_to_all'] ?? false) ? null : ($validated['user_ids'] ?? null);
 
         $count = $this->notificationService->sendManualNotification(
             $validated['title'],
-            $validated['message']
+            $validated['message'],
+            $userIds
         );
 
         return response()->json(['success' => true, 'message' => "Sent to {$count} users"]);
@@ -55,9 +62,26 @@ class NotificationController extends Controller
         return response()->json(['notifications' => $notifications]);
     }
 
-    public function markAsRead($id)
+    public function getUserNotifications(Request $request)
     {
-        $this->notificationService->markAsRead($id);
+        $limit = $request->query('limit', 50);
+        $notifications = $this->notificationService->getUserNotifications(Auth::id(), $limit);
+        return response()->json(['notifications' => $notifications]);
+    }
+
+    public function getPending()
+    {
+        $notifications = $this->notificationService->getUnreadNotifications(Auth::user());
+        return response()->json(['notifications' => $notifications]);
+    }
+
+    public function markAsRead(Request $request)
+    {
+        $validated = $request->validate([
+            'notification_id' => 'required|integer|exists:notifications,id',
+        ]);
+        
+        $this->notificationService->markAsRead($validated['notification_id']);
         return response()->json(['success' => true]);
     }
 }
