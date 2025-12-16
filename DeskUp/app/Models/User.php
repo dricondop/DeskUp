@@ -84,6 +84,7 @@ class User extends Authenticatable
     public function assignedEvents()
     {
         return $this->belongsToMany(Event::class, 'event_users');
+    }
     /**
      * Get the notifications for the user.
      */
