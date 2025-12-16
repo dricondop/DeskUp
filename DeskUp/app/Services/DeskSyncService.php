@@ -366,4 +366,22 @@ class DeskSyncService
             ];
         }
     }
+
+    /**
+     * Check if the external desk API is online and accessible
+     * 
+     * @return bool True if API is healthy, false otherwise
+     */
+    public function checkApiHealth(): bool
+    {
+        try {
+            $apiDesks = APIMethods::getAllDesks();
+            
+            // If we get a response (even if empty array), API is online
+            return is_array($apiDesks);
+        } catch (\Exception $e) {
+            Log::warning('API health check failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -35,6 +35,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/user/addEvent', [EventController::class, 'addEvent']);
     
+    // API Status Check
+    Route::get('/api/check-status', function () {
+        $deskSyncService = new \App\Services\DeskSyncService();
+        try {
+            $isOnline = $deskSyncService->checkApiHealth();
+            return response()->json([
+                'status' => $isOnline ? 'online' : 'offline',
+                'message' => $isOnline ? 'API is online and ready' : 'API is offline or unreachable'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'offline',
+                'message' => 'API connection failed: ' . $e->getMessage()
+            ], 503);
+        }
+    });
+    
     // Health page view
     Route::get('/health', [HealthController::class, 'index'])->name('health');
     // Health stats API endpoint
