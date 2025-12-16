@@ -2,34 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class NotificationSettings extends Model
+class NotificationSettings
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'auto_notifications_enabled',
-        'sitting_time_threshold',
-    ];
-
-    protected $casts = [
-        'auto_notifications_enabled' => 'boolean',
-        'sitting_time_threshold' => 'integer',
-    ];
+    /**
+     * Get settings from config file.
+     */
+    public static function get()
+    {
+        return (object) [
+            'automatic_notifications_enabled' => config('notifications.automatic_notifications_enabled', true),
+            'sitting_time_threshold_minutes' => config('notifications.sitting_time_threshold_minutes', 50),
+        ];
+    }
 
     /**
-     * Get the singleton instance.
+     * Update settings in config cache.
      */
-    public static function getInstance()
+    public static function update(array $data)
     {
-        return self::firstOrCreate(
-            ['id' => 1],
-            [
-                'auto_notifications_enabled' => true,
-                'sitting_time_threshold' => 30,
-            ]
-        );
+        if (isset($data['automatic_notifications_enabled'])) {
+            config(['notifications.automatic_notifications_enabled' => $data['automatic_notifications_enabled']]);
+        }
+        
+        if (isset($data['sitting_time_threshold_minutes'])) {
+            config(['notifications.sitting_time_threshold_minutes' => $data['sitting_time_threshold_minutes']]);
+        }
     }
 }

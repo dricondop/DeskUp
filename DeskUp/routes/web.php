@@ -35,12 +35,31 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/user/addEvent', [EventController::class, 'addEvent']);
     
+    // API Status Check
+    Route::get('/api/check-status', function () {
+        $deskSyncService = new \App\Services\DeskSyncService();
+        try {
+            $isOnline = $deskSyncService->checkApiHealth();
+            return response()->json([
+                'status' => $isOnline ? 'online' : 'offline',
+                'message' => $isOnline ? 'API is online and ready' : 'API is offline or unreachable'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'offline',
+                'message' => 'API connection failed: ' . $e->getMessage()
+            ], 503);
+        }
+    });
+    
     // Health page view
     Route::get('/health', [HealthController::class, 'index'])->name('health');
     // Health stats API endpoint
     Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
     Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
     Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
+    // Combined endpoint for instant page load
+    Route::get('/api/health-data', [HealthController::class, 'getAllData'])->name('api.health.all');
 });
 
 Route::get('/signin', function () {

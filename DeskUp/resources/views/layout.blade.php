@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sync-status.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
 </head>
 <body>
     @include('components.sidebar')
@@ -25,9 +24,7 @@
         <div id="hoverTooltip" class="hover-tooltip"></div>
 
         <main id="canvas" data-is-admin="{{ $isAdmin ? 'true' : 'false' }}"></main>
-        
 
-        
         @if($isAdmin)
         <nav class="toolbar">   
             <div class="toggle-container">
@@ -37,8 +34,6 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <button id="addDesk" class="toolbar-btn">Add Desk</button>
-            <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
             <button id="downloadJSON" class="toolbar-btn">Download JSON</button>
             <button id="uploadJSON" class="toolbar-btn">Upload JSON</button>
@@ -47,7 +42,7 @@
         @endif
 
     <script>window.isAdmin = {{ $isAdmin ? 'true' : 'false' }};</script>
-    <script src="{{ asset('js/notifications.js') }}"></script>
+    <script src="{{ asset('js/api-status.js') }}"></script>
     <script src="{{ asset('js/layout-drag-drop.js') }}"></script>
     <script src="{{ asset('js/layout-save-load.js') }}"></script>
 </body>
