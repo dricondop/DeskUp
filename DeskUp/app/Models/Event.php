@@ -12,6 +12,7 @@ class Event extends Model
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_REJECTED = 'rejected';
+    const STATUS_COMPLETED = 'completed';
 
     protected $fillable = [
         'event_type',
@@ -19,12 +20,16 @@ class Event extends Model
         'scheduled_at',
         'scheduled_to',
         'status',
-        'created_by'
+        'created_by',
+        'cleaning_time',
+        'cleaning_days',
+        'is_recurring'
     ];
 
     protected $casts = [
         'scheduled_at' => 'datetime',
-        'scheduled_to' => 'datetime'
+        'scheduled_to' => 'datetime',
+        'cleaning_days' => 'array'
     ];
 
     // can be used to return all desks from an event, or attach/detach desks to events

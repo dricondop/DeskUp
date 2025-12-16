@@ -105,7 +105,7 @@
     </div>
 
     <!-- Event Modal -->
-    @include('components.modals')
+    @include('components.modals', ['recurringCleaningDays' => []])
 
 
     <script>

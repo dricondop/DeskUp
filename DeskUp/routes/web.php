@@ -32,7 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/desks', [DeskController::class, 'index']);
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
-    Route::post('/api/user/addEvent', [EventController::class, 'addEvent']);
+    Route::post('/api/addEvent', [EventController::class, 'addEvent']);
+    Route::post('/api/addCleaningSchedule', [EventController::class, 'addCleaningSchedule']);
     
     // Health page view
     Route::get('/health', [HealthController::class, 'index'])->name('health');
@@ -295,3 +296,6 @@ Route::get('/api-desk-mapping', function () {
         ], 500);
     }
 });
+
+// run cleaning schedule (E.g. use UptimeRobot to run this endpoint every minute to check for cleaning time)
+Route::get('/run-cleaning-schedule', [EventController::class, 'runCleaningSchedule']);

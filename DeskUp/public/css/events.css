@@ -190,7 +190,8 @@ button:hover {
     justify-content: center;
     
     background: linear-gradient(180deg, #3e648bc7 0%, #339ac3c2 100%);
-    padding: 30px 10px;
+    height: 100px;
+    width: 90px;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
 }

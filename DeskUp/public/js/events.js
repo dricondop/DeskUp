@@ -172,7 +172,19 @@ async function addUserToEvent(userId, eventId)
             if (optionToRemove) {
                 optionToRemove.remove();
             }
-            
+
+            // update attendees count
+            const activeEventCard = document.querySelector('.event-container.active');
+            const attendeeCount = activeEventCard?.querySelector('.attendees-count');
+
+            if (attendeeCount) {
+                let currentCount = parseInt(attendeeCount.dataset.UserCount ?? attendeeCount.textContent, 10) || 0;
+                currentCount ++;
+
+                attendeeCount.dataset.UsersCount = String(currentCount);
+                attendeeCount.textContent = String(currentCount);
+
+            }
         }
 
     } catch (error) {
