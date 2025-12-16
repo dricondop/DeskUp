@@ -37,8 +37,6 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <button id="addDesk" class="toolbar-btn">Add Desk</button>
-            <button id="deleteSelected" class="toolbar-btn delete-btn">Delete Selected</button>
             <button id="saveLayout" class="toolbar-btn">Save Layout</button>
             <button id="downloadJSON" class="toolbar-btn">Download JSON</button>
             <button id="uploadJSON" class="toolbar-btn">Upload JSON</button>
