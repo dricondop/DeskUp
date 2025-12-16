@@ -5,8 +5,8 @@
     margin-top: auto;
     position: relative;
     z-index: 100;
-    margin-left: 15%;
-    width: 85%;
+    margin-left: var(--sidebar-w);
+    width: calc(100% - var(--sidebar-w));
 }
 
 .footer-content {
