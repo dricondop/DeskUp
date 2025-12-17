@@ -3,20 +3,26 @@ const cleaningModal = document.getElementById('cleaningModal');
 const modalContent = document.querySelector('.modal-content');
 
 // Open 'Add event' modal
-document.querySelector('.add-event').addEventListener('click', () => {
-    eventModal.style.display = 'block';
+const addEventBtn = document.querySelector('.add-event');
+if (addEventBtn && eventModal) {
+    addEventBtn.addEventListener('click', () => {
+        eventModal.style.display = 'block';
 
-    // load miniLayout
-    if (!miniLayout.dataset.initialized) {
-        loadMiniLayout();
-        miniLayout.dataset.initialized = '1';
-    }
-})
+        // load miniLayout
+        if (miniLayout && !miniLayout.dataset.initialized) {
+            loadMiniLayout();
+            miniLayout.dataset.initialized = '1';
+        }
+    })
+}
 
 // Open 'Cleaning Schedule' modal
-document.querySelector('.scheduleCleaning').addEventListener('click', () => {
-    cleaningModal.style.display = 'block';
-})
+const scheduleCleaningBtn = document.querySelector('.scheduleCleaning');
+if (scheduleCleaningBtn && cleaningModal) {
+    scheduleCleaningBtn.addEventListener('click', () => {
+        cleaningModal.style.display = 'block';
+    })
+}
 
 
 // close modal
@@ -43,10 +49,10 @@ document.querySelectorAll('.closeModal').forEach(button => {
 
 // Close 'Add event' modal if clicking outside the modal when open
 window.addEventListener('click', (event) => {
-    if (eventModal.style.display === 'block' && event.target === eventModal) {
+    if (eventModal && eventModal.style.display === 'block' && event.target === eventModal) {
         closeModal(eventModal);
     }
-    if (cleaningModal.style.display === 'block' && event.target === cleaningModal) {
+    if (cleaningModal && cleaningModal.style.display === 'block' && event.target === cleaningModal) {
         closeModal(cleaningModal);
     }
 })
@@ -56,7 +62,7 @@ const userSelect = document.getElementById('userSelect');
 const selectedUserIds = new Set();
 selectedUserIds.add(loggedInUser); // adds logged-in user by default
 
-userSelect.addEventListener('change', () => {
+if (userSelect) userSelect.addEventListener('change', () => {
     const value = userSelect.value;
     if (!value) return;
 
@@ -157,7 +163,7 @@ async function loadMiniLayout() {
 // Create event
 const eventForm = document.getElementById('eventForm');
 
-eventForm.addEventListener('submit', async (event) => {
+if (eventForm) eventForm.addEventListener('submit', async (event) => {
     event.preventDefault(); // this prevents normal form submit
 
     const eventType = document.getElementById('eventTypeSelect').value;
@@ -234,7 +240,7 @@ document.querySelectorAll('.scheduleDay').forEach(button => {
 
 // cleaning modal submission
 const cleaningForm = document.getElementById('cleaningForm');
-cleaningForm.addEventListener('submit', async (event) => {
+if (cleaningForm) cleaningForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const time = document.getElementById('cleaningTime').value;

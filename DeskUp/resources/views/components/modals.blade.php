@@ -94,7 +94,7 @@
                 
                     <!-- Choose days -->
                      <div class="cleaningAllDays">
-                        <label for="scheduleDays">Repeat:</label>
+                        <label>Repeat:</label>
 
                         @php 
                             $days = [
