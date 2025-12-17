@@ -8,18 +8,20 @@
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
-
 </head>
 <body>
     @include('components.sidebar')
     
     <div class="main-content">
         <main class="desk-view">
+            <!-- Left Column: Desk Control -->
             <section class="desk-control">
-                <h1>Desk Control</h1>
-                <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
+                <div class="desk-control-header">
+                    <h1>Desk Control</h1>
+                    <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
+                </div>
 
-            <img src="{{ asset('assets/desk.png') }}" alt="desk">
+                <img src="{{ asset('assets/desk.png') }}" alt="desk">
                 
                 <div class="desk-view-btns-container">
                     <button class="desk-view-btns sitting">Sitting</button>
@@ -27,20 +29,13 @@
                 </div>
             </section>
 
-            <div class="desk-management">
-                <div class="profile">
-                    @if($isLoggedIn)
-                        <div class="profile-pic"></div>
-                        <h2>{{ auth()->user()->name }}</h2>
-                    @else
-                        <div class="profile-pic"></div>
-                        <h2>Guest</h2>
-                    @endif
+            <!-- Right Column: Desk Management -->
+            <section class="desk-management">
+                <div class="desk-management-header">
+                    <h1>Desk Management</h1>
                 </div>
 
-                <section class="desk-adjustment">
-                    <h1>Desk Management</h1>
-
+                <div class="desk-management-content">
                     <h3 class="height-adjustment-line">
                         Height Adjustment
                         <span>
@@ -89,12 +84,9 @@
                                 <p>No pending events</p>
                             </div>
                         @endforelse
-
                     </div>
-
-                
-                </section>
-            </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -109,7 +101,7 @@
                 <form id="eventForm">
                     @csrf
                     
-                     <!-- Choose date -->
+                    <!-- Choose date -->
                     <div class="form-group">
                         <div>
                             <label for="meeting-date">Meeting date *</label>
@@ -148,8 +140,6 @@
         </div>
     </div>
 
-
-
     <script>
         const desk = {
             id: {{ $desk->id }},
@@ -160,14 +150,9 @@
 
         const userId = {{ auth()->user()->id }};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
     </script>
 
     <script src="{{ asset('js/desk-control.js') }}"></script>
     <script src="{{ asset('js/tab-switcher.js') }}"></script>
 </body>
 </html>
-
-
-
-
