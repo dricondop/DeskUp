@@ -58,10 +58,6 @@ html, body {
     gap: 1rem; /* Menor gap */
 }
 
-.sidebar-left {
-    /* Espacio mínimo para balance */
-}
-
 /* Sección Central - Cámara MÁS GRANDE */
 .camera-main-section {
     padding: 1rem; /* Reducido padding */
