@@ -57,7 +57,13 @@ class DeskController extends Controller
         
         try {
             APIMethods::raiseDesk($height, $desk->api_desk_id);
+            // Create new stats record with updated height
             $desk->newUserStatsHistoryRecord($height);
+            
+            // Refresh the desk model to load the new stats record
+            $desk->refresh();
+            $desk->load('latestStats');
+            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

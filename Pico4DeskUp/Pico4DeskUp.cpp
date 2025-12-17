@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <cstring>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/uart.h"
@@ -28,11 +29,14 @@ int main()
     api.init();
     
     printf("DeskUp Height Monitor Starting...\n");
-    display.displayText("DeskUp", 0);
-    display.displayText("Waiting...", 2);
+    display.displayText("DeskUp Monitor", 0);
+    display.displayText("Waiting for", 2);
+    display.displayText("user login...", 3);
     
     int lastHeight = -1;
+    int lastDesk = -1;
     bool wasLoggedIn = false;
+    char lastUserName[64] = "";
     
     while (true) {
         api.checkForUpdates();
@@ -41,25 +45,61 @@ int main()
         if (isLoggedIn != wasLoggedIn) {
             wasLoggedIn = isLoggedIn;
             display.clear();
-            display.displayText("DeskUp", 0);
             
             if (isLoggedIn) {
-                printf("User detected: %d\n", api.getCurrentUserId());
-                display.displayText("User Online", 1);
-                sleep_ms(1000);
+                const char* userName = api.getCurrentUserName();
+                printf("User detected: %s (ID: %d)\n", userName, api.getCurrentUserId());
+                
+                display.displayText("DeskUp Active", 0);
+                display.displayText("User:", 1);
+                display.displayText(userName, 2);
+                strcpy(lastUserName, userName);
+                sleep_ms(2000);
             } else {
                 printf("User logged out\n");
-                display.displayText("Waiting...", 2);
+                display.displayText("DeskUp Monitor", 0);
+                display.displayText("Waiting for", 2);
+                display.displayText("user login...", 3);
                 lastHeight = -1;
+                lastDesk = -1;
+                lastUserName[0] = '\0';
             }
         }
         
         if (isLoggedIn) {
             int currentHeight = api.getCurrentHeight();
-            if (currentHeight != lastHeight) {
-                printf("Height: %d cm\n", currentHeight);
-                display.displayHeight(currentHeight);
+            int currentDesk = api.getCurrentDeskNumber();
+            const char* userName = api.getCurrentUserName();
+            
+            // Update display if any value changed
+            if (currentHeight != lastHeight || currentDesk != lastDesk || strcmp(userName, lastUserName) != 0) {
+                printf("Updating display - Desk: %d, Height: %d cm, User: %s\n", currentDesk, currentHeight, userName);
+                
+                display.clear();
+                
+                // Line 0: Title
+                display.displayText("DeskUp Active", 0);
+                
+                // Line 1: User name
+                char userLine[32];
+                snprintf(userLine, sizeof(userLine), "User: %s", userName);
+                display.displayText(userLine, 1);
+                
+                // Line 2: Desk number
+                if (currentDesk > 0) {
+                    char deskLine[32];
+                    snprintf(deskLine, sizeof(deskLine), "Desk: %d", currentDesk);
+                    display.displayText(deskLine, 2);
+                }
+                
+                // Line 3: Current height
+                char heightLine[32];
+                snprintf(heightLine, sizeof(heightLine), "Height: %d cm", currentHeight);
+                display.displayText(heightLine, 3);
+                
                 lastHeight = currentHeight;
+                lastDesk = currentDesk;
+                strcpy(lastUserName, userName);
             }
         }
         

@@ -124,7 +124,12 @@ async function updateDesk()
             const data = await response.json(); 
 
             if (data.success) {
-                console.log(`Height updated successfully`);
+                console.log(`Height updated successfully to ${data.height} cm`);
+                // Update the display with the confirmed height from server
+                currentHeight = data.height;
+                display.textContent = currentHeight + " cm";
+            } else {
+                console.error(`Failed to update height: ${data.message}`);
             }
         } 
         catch (error) {

@@ -4,8 +4,10 @@
 #include <stdlib.h>
 
 DeskAPI::DeskAPI(uart_inst_t* uart_instance) 
-    : uart(uart_instance), currentUserId(0), currentHeight(110), bufferPos(0) {
+    : uart(uart_instance), currentUserId(0), currentHeight(110), currentDeskNumber(0), bufferPos(0) {
     memset(receiveBuffer, 0, sizeof(receiveBuffer));
+    memset(currentUserName, 0, sizeof(currentUserName));
+    strcpy(currentUserName, "None");
 }
 
 void DeskAPI::init() {
@@ -39,8 +41,17 @@ void DeskAPI::parseMessage(const char* message) {
         return;
     }
     
+    if (strncmp(message, "USER:", 5) == 0) {
+        strncpy(currentUserName, message + 5, sizeof(currentUserName) - 1);
+        currentUserName[sizeof(currentUserName) - 1] = '\0';
+        printf("User name: %s\n", currentUserName);
+        return;
+    }
+    
     if (strncmp(message, "LOGOUT", 6) == 0) {
         currentUserId = 0;
+        currentDeskNumber = 0;
+        strcpy(currentUserName, "None");
         printf("User logged out\n");
         return;
     }
@@ -48,6 +59,13 @@ void DeskAPI::parseMessage(const char* message) {
     if (strncmp(message, "HEIGHT:", 7) == 0) {
         currentHeight = atoi(message + 7);
         printf("Height updated: %d cm\n", currentHeight);
+        return;
+    }
+    
+    if (strncmp(message, "DESK:", 5) == 0) {
+        currentDeskNumber = atoi(message + 5);
+        printf("Desk number: %d\n", currentDeskNumber);
+        return;
     }
 }
 
@@ -65,6 +83,14 @@ int DeskAPI::getCurrentUserId() {
 
 int DeskAPI::getCurrentHeight() {
     return currentHeight;
+}
+
+int DeskAPI::getCurrentDeskNumber() {
+    return currentDeskNumber;
+}
+
+const char* DeskAPI::getCurrentUserName() {
+    return currentUserName;
 }
 
 bool DeskAPI::isUserLoggedIn() {

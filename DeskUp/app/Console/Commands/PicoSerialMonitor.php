@@ -64,28 +64,30 @@ class PicoSerialMonitor extends Command {
             ->first();
 
         if ($activeUser) {
-            // User logged 
+            // User logged in
             if ($this->lastUserId !== $activeUser->id) {
                 $this->sendMessage("LOGIN:{$activeUser->id}\n");
+                $this->sendMessage("USER:{$activeUser->name}\n");
                 $this->lastUserId = $activeUser->id;
-                $this->info("→ Connected user: {$activeUser->id}");
+                $this->info("→ User connected: {$activeUser->name} (ID: {$activeUser->id})");
             }
 
-            // Get the desk height from the user's assigned desk
+            // Get the desk from the user's assigned desk
             $desk = Desk::where('desk_number', $activeUser->assigned_desk_id)->first();
             if ($desk) {
-                $height = $desk->height; // en cm
+                $height = $desk->height; // in cm
                 if ($this->lastHeight !== $height) {
                     $this->sendMessage("HEIGHT:{$height}\n");
+                    $this->sendMessage("DESK:{$desk->desk_number}\n");
                     $this->lastHeight = $height;
-                    $this->info("→ Updated height: {$height} cm");
+                    $this->info("→ Desk {$desk->desk_number} height updated: {$height} cm");
                 }
             }
         } else {
             // No active user
             if ($this->lastUserId !== null) {
                 $this->sendMessage("LOGOUT\n");
-                $this->info("→ Disconnected user");
+                $this->info("→ User disconnected");
                 $this->lastUserId = null;
                 $this->lastHeight = null;
             }

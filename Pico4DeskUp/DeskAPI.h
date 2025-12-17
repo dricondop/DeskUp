@@ -9,6 +9,8 @@ private:
     uart_inst_t* uart;
     int currentUserId;
     int currentHeight;
+    int currentDeskNumber;
+    char currentUserName[64];
     char receiveBuffer[256];
     int bufferPos;
     
@@ -22,6 +24,8 @@ public:
     bool checkForUpdates();
     int getCurrentUserId();
     int getCurrentHeight();
+    int getCurrentDeskNumber();
+    const char* getCurrentUserName();
     bool isUserLoggedIn();
 };
 
