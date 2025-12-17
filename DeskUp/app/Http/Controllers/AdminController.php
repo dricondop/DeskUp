@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Desk;
 use App\Models\Event;
+use App\Models\NotificationSettings;
 
 class AdminController extends Controller
 {
@@ -15,11 +16,13 @@ class AdminController extends Controller
         $assignedDeskIds = User::pluck('assigned_desk_id')->filter();
         $unassignedDesks = Desk::whereNotIn('id', $assignedDeskIds)->pluck('name', 'id');
         $pendingEvents = Event::with(['creator', 'desks'])->where('status', 'pending')->get();
+        $settings = NotificationSettings::get();
 
         return view('users-management', [
             'users' => $users,
             'unassignedDesks' => $unassignedDesks,
-            'pendingEvents' => $pendingEvents
+            'pendingEvents' => $pendingEvents,
+            'settings' => $settings
         ]);
     }
 

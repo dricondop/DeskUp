@@ -144,6 +144,96 @@
             </section>
         </div>
 
+        <!-- Notification Management Section -->
+        <div class="admin-container">
+            <header class="page-header">
+                <h1>Notification Management</h1>
+                <p class="subtitle">Configure automatic notifications and send manual alerts</p>
+            </header>
+
+            <!-- Automatic Notification Settings Card -->
+            <section class="card">
+                <h2 style="margin-bottom: 1rem; color:#3A506B;">Automatic Notification Settings</h2>
+                
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Enable Automatic Notifications</h3>
+                            <p>Automatically remind users to stand up after prolonged sitting</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoNotificationsToggle" 
+                                {{ isset($settings) && $settings->automatic_notifications_enabled ? 'checked' : '' }}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Sitting Time Threshold</h3>
+                            <p>Minutes of continuous sitting before sending a notification</p>
+                        </div>
+                        <div class="threshold-control">
+                            <input type="number" id="sittingThreshold" 
+                                value="{{ isset($settings) ? $settings->sitting_time_threshold_minutes : 30 }}" 
+                                min="5" max="120" step="5">
+                            <span class="threshold-label">minutes</span>
+                        </div>
+                    </div>
+
+                    <button id="saveSettingsBtn" class="btn-action btn-save">Save Settings</button>
+                </div>
+
+                <div id="settingsMessage" class="message" style="display: none;"></div>
+            </section>
+
+            <!-- Manual Notification Card -->
+            <section class="card">
+                <h2 style="margin-bottom: 1rem; color:#3A506B;">Send Manual Notification</h2>
+                
+                <form id="manualNotificationForm">
+                    <div class="form-group">
+                        <label for="notificationTitle">Notification Title</label>
+                        <input type="text" id="notificationTitle" name="title" 
+                            placeholder="e.g., Reminder: Stand Up!" maxlength="255" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notificationMessage">Message</label>
+                        <textarea id="notificationMessage" name="message" rows="4" 
+                            placeholder="Enter your notification message here..." 
+                            maxlength="1000" required></textarea>
+                        <span class="char-count"><span id="charCount">0</span> / 1000</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sendToAll" name="send_to_all">
+                            <span>Send to all users</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group" id="userSelectGroup">
+                        <label for="userSelect">Select Users</label>
+                        <div class="user-select-container">
+                            @foreach($users as $user)
+                                <label class="user-checkbox-item">
+                                    <input type="checkbox" name="user_ids[]" value="{{ $user->id }}">
+                                    <span>{{ $user->name }} ({{ $user->email }})</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <button type="submit" id="sendNotificationBtn" class="btn-action btn-send">
+                        Send Notification
+                    </button>
+                </form>
+
+                <div id="notificationMessage" class="message" style="display: none;"></div>
+            </section>
+        </div>
+
 
 
     <!-- Description Modal -->
@@ -180,9 +270,6 @@
     </div>
 
     </div>
-    <script>
-        window.desks = @json($unassignedDesks);
-    </script>
 
     <script src='{{ asset('js/users-management.js') }}'></script>
 </body>
