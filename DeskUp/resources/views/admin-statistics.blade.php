@@ -59,13 +59,12 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <h2 id="usage-title" class="chart-title">User Desk Usage</h2>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <button class="btn-ghost" id="refreshDataBtn" title="Refresh">Refresh</button>
                             </div>
                         </div>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
                             <div style="min-height:180px;">
-                                <h4 style="margin:6px 0 8px 0; font-size:0.95rem; color:#3A506B;">Top Users (activities)</h4>
+                                <h4 style="margin:6px 0 8px 0; font-size:0.95rem; color:#3A506B;">Top Users (usage records)</h4>
                                 <div class="chart-container">
                                     <canvas id="topUsersChart" aria-label="Top users bar chart"></canvas>
                                 </div>
@@ -83,7 +82,7 @@
                     <section class="card" aria-labelledby="heatmap-title" style="margin-top:12px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 id="heatmap-title" class="chart-title">Occupancy Heatmap (hours × days)</h3>
-                            <p class="muted small" style="margin:0">Intensity = Number of scheduled activities</p>
+                            <p class="muted small" style="margin:0">Intensity = Number of usage records</p>
                         </div>
 
                         <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
@@ -146,10 +145,6 @@
                                 </li>
                             @endforeach
                         </ul>
-
-                        <div style="margin-top:12px; display:flex; justify-content:flex-end;">
-                            <button class="btn-ghost" id="addUser">Add user</button>
-                        </div>
                     </section>
                 </aside>
             </section>
@@ -174,7 +169,6 @@
     (function(){
         const palette = { primary: '#3A506B', accent: '#00A8A8', alt: '#9FB3C8', light: '#f1f3f5' };
 
-        
         const ctxTop = document.getElementById('topUsersChart').getContext('2d');
         const topLabels = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.name) : [];
         const topValues = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.count) : [];
@@ -183,12 +177,11 @@
             type: 'bar',
             data: {
                 labels: topLabels,
-                datasets: [{ label: 'Activities', data: topValues, backgroundColor: palette.primary, borderRadius: 6 }]
+                datasets: [{ label: 'Usage records', data: topValues, backgroundColor: palette.primary, borderRadius: 6 }]
             },
             options: { plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
         });
 
-        
         const ctxDonut = document.getElementById('desksDonut').getContext('2d');
         const desksDonut = new Chart(ctxDonut, {
             type: 'doughnut',
@@ -199,7 +192,6 @@
             options: { plugins:{legend:{position:'bottom'}} }
         });
 
-      
         const heatmapEl = document.getElementById('heatmap');
 
         function drawHeatmap(grid){
@@ -207,7 +199,6 @@
             const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
             const hours = 24;
 
-            
             let max = 0;
             for(let d=0; d<7; d++){
                 for(let h=0; h<hours; h++){
@@ -228,12 +219,11 @@
                     else if(t < 0.75) bg = '#00A8A8';
                     else bg = '#3A506B';
                     cell.style.background = bg;
-                    cell.title = `${days[d]} ${h}:00 — ${v} activities`;
+                    cell.title = `${days[d]} ${h}:00 — ${v} usage records`;
                     heatmapEl.appendChild(cell);
                 }
             }
 
-         
             const hoursRow = document.createElement('div');
             hoursRow.style.display = 'grid';
             hoursRow.style.gridAutoFlow = 'column';
@@ -256,19 +246,8 @@
 
         drawHeatmap(heatmapGrid);
 
-        
-        document.getElementById('refreshDataBtn').addEventListener('click', () => {
-          
-            location.reload();
-        });
-
         document.getElementById('exportBtn').addEventListener('click', () => {
             alert('Export — you can implement CSV/Excel export in a controller that returns a downloadable file.');
-        });
-
-        document.getElementById('addUser').addEventListener('click', () => {
-            
-           // Aquí le metemos funcionalidad?? 
         });
 
     })();

@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\RateLimiter;
 use App\Http\Controllers\AdminStatisticsController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
+use App\Models\UserStatsHistory;
+use App\Models\Desk;
+use App\Models\User;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +53,38 @@ Route::get('/signin', function () {
 Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     ->name('admin-statistics')
     ->middleware('auth');
+    $totalDesks = Desk::count();
+    $occupiedDesks = UserStatsHistory::distinct('desk_id')->count('desk_id');
+    $avgSession = UserStatsHistory::selectRaw(
+    'COUNT(*) * 60.0 / NULLIF(COUNT(DISTINCT user_id), 0) as avg_minutes'
+    )->value('avg_minutes') ?? 0;
+    $topUsers = UserStatsHistory::select('user_id')
+    ->selectRaw('COUNT(*) as count')
+    ->groupBy('user_id')
+    ->orderByDesc('count')
+    ->with('user:id,name')
+    ->limit(5)
+    ->get()
+    ->map(fn ($row) => [
+        'name' => $row->user->name ?? 'Unknown',
+        'count' => (int) $row->count,
+    ]);
+    $heatmapRaw = UserStatsHistory::selectRaw('
+        EXTRACT(DOW FROM recorded_at) as day,
+        EXTRACT(HOUR FROM recorded_at) as hour,
+        COUNT(*) as count
+    ')
+    ->groupBy('day', 'hour')
+    ->get();
+
+    $heatmapGrid = [];
+    foreach ($heatmapRaw as $row) {
+    $heatmapGrid[(int)$row->day][(int)$row->hour] = (int)$row->count;
+    }
+    $users = User::all();
+    $desks = Desk::all();
+
+
 
 Route::get('/events', [EventController::class, 'index']);
 
