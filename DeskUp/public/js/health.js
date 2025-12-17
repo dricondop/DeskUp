@@ -38,18 +38,30 @@ async function fetchStats(range = 'today') {
         const standEl = q('[data-key="periodStanding"]');
         if (standEl) standEl.textContent = `${data.standing_pct || 0}%`;
         
-        const breaksEl = q('[data-key="periodBreaks"]');
-        if (breaksEl) breaksEl.textContent = data.breaks_per_day || 0;
+        const transitionsEl = q('[data-key="periodBreaks"]');
+        if (transitionsEl) transitionsEl.textContent = data.position_changes || 0;
         
         const calEl = q('[data-key="periodCalories"]');
         if (calEl) calEl.textContent = `${data.calories_per_day || 0} kcal`;
         
-        // Update posture score
-        const score = Math.max(0, Math.min(100, data.standing_pct || 0));
+        // Update posture score with new comprehensive calculation
+        const score = data.posture_score || 50;
         const scoreEl = q('#posture-score-value');
         const bar = q('#posture-score-bar');
         if (scoreEl) scoreEl.textContent = `${score} / 100`;
-        if (bar) bar.style.width = `${score}%`;
+        if (bar) {
+            bar.style.width = `${score}%`;
+            // Color coding based on score
+            if (score >= 80) {
+                bar.style.backgroundColor = '#00A8A8'; // Excellent - teal
+            } else if (score >= 60) {
+                bar.style.backgroundColor = '#3A506B'; // Good - blue
+            } else if (score >= 40) {
+                bar.style.backgroundColor = '#F4A261'; // Fair - orange
+            } else {
+                bar.style.backgroundColor = '#E76F51'; // Poor - red
+            }
+        }
         
         // Update doughnut chart
         if (chartInstances.timePercentage) {
@@ -283,23 +295,43 @@ function generateInsights(data) {
     if (container) container.innerHTML = '';
 
     const sitting = data.sitting_pct || 65;
+    const standing = data.standing_pct || 35;
     const activeHours = data.active_hours || 0;
-    const breaks = data.breaks_per_day || 0;
+    const transitions = data.position_changes || 0;
+    const postureScore = data.posture_score || 50;
 
-    if (sitting > 60) {
-        showTip("Try standing a bit more to reach a balanced posture! Aim for short standing breaks every hour.", "Posture balance");
+    // Enhanced insights based on comprehensive score
+    if (postureScore >= 80) {
+        showTip("Excellent posture habits! You're maintaining a great balance.", "Outstanding");
+    } else if (postureScore >= 60) {
+        showTip("Good posture habits overall. Consider small adjustments for optimization.", "Good work");
+    } else if (postureScore >= 40) {
+        showTip("Room for improvement. Focus on regular breaks and ergonomic heights.", "Needs attention");
     } else {
-        showTip("Nice balance between sitting and standing — keep it up!", "Great posture");
+        showTip("Your posture habits need significant improvement. Consult the ergonomic guidelines.", "Action required");
     }
 
-    if (activeHours < 6) {
-        showTip("Your active hours are below 6h. Consider micro-activity breaks to raise daily activity.", "Increase activity");
-    } else {
-        showTip("You have a good amount of active desk time. Maintain regular breaks.", "Active time");
+    // Standing ratio feedback
+    if (standing < 30) {
+        showTip("Try standing more! Aim for 40-50% of your work time.", "Increase standing");
+    } else if (standing > 70) {
+        showTip("You're standing a lot. Balance it with more sitting breaks.", "Balance needed");
     }
 
-    if (breaks < 2) {
-        showTip("You might benefit from more short breaks — try 3–5 minute breaks each hour.", "Take breaks");
+    // Position changes feedback
+    if (transitions < 3) {
+        showTip("Try changing positions more often. Aim for 3-6 sit-stand transitions per workday.", "Increase transitions");
+    } else if (transitions > 8) {
+        showTip("You're switching positions very frequently. This might be disruptive.", "Reduce transitions");
+    }
+    
+    // Sitting duration feedback
+    const totalHours = (activeHours / 60) || 8;
+    const sittingHours = ((sitting / 100) * totalHours).toFixed(1);
+    if (sittingHours > 6) {
+        showTip("You're sitting for over 6 hours. Consider standing or moving for 5-10 minutes every hour.", "Long sitting hours");
+    } else if (sittingHours < 4) {
+        showTip("Good job on limiting sitting time! Ensure you have a comfortable setup.", "Short sitting hours");
     }
 }
 

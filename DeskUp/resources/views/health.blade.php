@@ -69,7 +69,7 @@
 
             <article class="card metric-card" aria-labelledby="breaks-label">
                 <div class="metric">
-                    <h3 id="breaks-label" class="metric-title">Breaks</h3>
+                    <h3 id="breaks-label" class="metric-title">Position Changes</h3>
                     <p class="metric-value" data-key="periodBreaks">—</p>
                 </div>
                 <span class="metric-badge">Period</span>
