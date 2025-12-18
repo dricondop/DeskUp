@@ -132,8 +132,11 @@ class DeskSyncService
     private function syncSingleDeskFromApi(string $apiDeskId): array
     {
         // Generate desk number and name from API ID
-        $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
-        $deskName = $this->extractDeskNameFromApiId($apiDeskId);
+        $deskInfo = $this->fetchDeskInfo($apiDeskId);
+
+        $deskNumber = $deskInfo['desk_number'] ?? $deskInfo['desk_number_fallback'];
+        $deskName = $deskInfo['desk_name'] ?? $deskInfo['desk_name_fallback'];
+        $apiDeskId = $apiDeskId;
         
         // Try to find existing desk by desk_number
         $desk = Desk::where('desk_number', $deskNumber)->first();
@@ -141,6 +144,7 @@ class DeskSyncService
         $deskData = [
             'name' => $deskName,
             'desk_number' => $deskNumber,
+            'api_desk_id' => $apiDeskId,
             'position_x' => null,
             'position_y' => null,
             'is_active' => true,
@@ -333,5 +337,33 @@ class DeskSyncService
         
         // Fallback: generate name from ID
         return "Desk " . substr($apiDeskId, 0, 8);
+    }
+
+
+     // Extract desk number and desk name from API desk ID
+    private function fetchDeskInfo(string $apiDeskId): array
+    {
+        try {
+            $deskData = APIMethods::getDeskData($apiDeskId);
+            $deskName = $deskData['config']['name'] ?? null;
+
+            $deskNumber = null;
+            // Try to extract number from desk name (e.g. "DESK 3677" -> 3677)
+            if ($deskName && preg_match('/(\d+)/', $deskName, $matches)) {
+                $deskNumber = (int) $matches[1];
+            }
+
+            return [
+                'desk_number' => $deskNumber,
+                'desk_name' => $deskNumber ? "Desk {$deskNumber}" : null,
+            ];
+        }
+        catch (\Exception $e) {
+            Log::warning("Could not fetch desk info for {$apiDeskId}: " . $e->getMessage());
+            return [
+                'desk_number_fallback' => abs(crc32($apiDeskId)) % 9999 + 1000,
+                'desk_name_fallback' => "Desk " . substr($apiDeskId, 0, 8),
+            ];
+        }
     }
 }
