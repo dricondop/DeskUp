@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insights — DeskUp</title>
+    <title>Health Insights | DeskUp</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
@@ -117,8 +117,8 @@
                     </div>
                 </figure>
 
-                <figure class="card chart-card" data-key="heightOverview" aria-label="Height overview">
-                    <h3 class="chart-title">Height Overview</h3>
+                <figure class="card chart-card" data-key="heightOverview" aria-label="Height average overview">
+                    <h3 class="chart-title">Height Average Overview</h3>
                     <div class="chart-container">
                         <canvas id="heightOverviewChart" role="img" aria-label="Line chart showing desk height with color-coded sitting and standing"></canvas>
                     </div>

@@ -50,195 +50,184 @@ class UserStatsHistorySeeder extends Seeder
         $currentDate = Carbon::now();
         $recordsCreated = 0;
         $baseActivationCount = 10;
-        $transitionCount = 0; // Track actual transitions
-        $previousMode = null; // Track previous sitting/standing mode
+        $transitionCount = 0;
+        $previousMode = null;
 
-        // ===== PART 1: Historical data - 11 months (7 records per month) =====
-        $startDate = $currentDate->copy()->subMonths(12);
+        // ===== PART 1: Yearly data (10 months, excluding July & August) =====
+        $yearStart = $currentDate->copy()->startOfYear();
         
-        for ($month = 0; $month < 11; $month++) {
-            $monthStart = $startDate->copy()->addMonths($month);
-            $daysInMonth = $monthStart->daysInMonth;
-            
-            // Distribute 7 records evenly across the month
-            $dayStep = floor($daysInMonth / 7);
-            
-            for ($dayIndex = 0; $dayIndex < 7; $dayIndex++) {
-                $dayOfMonth = min(($dayIndex * $dayStep) + 1, $daysInMonth);
-                $recordDate = $monthStart->copy()->day($dayOfMonth);
-                
-                // Skip future dates, past 4 weeks, and today
-                if ($recordDate->isAfter($currentDate) || 
-                    $recordDate->isAfter($currentDate->copy()->subWeeks(4)) ||
-                    $recordDate->isToday()) {
-                    continue;
-                }
-                
-                // Random hour between 8 AM - 5 PM
-                $hour = rand(8, 17);
-                $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
-                
-                // Randomized sitting vs standing with some variation
-                $sitProbability = rand(55, 70);
-                $isSitting = rand(1, 100) <= $sitProbability;
-                $baseHeight = $isSitting ? rand(600, 750) : rand(1200, 1400);
-                $height = $baseHeight + rand(-100, 100);
-                
-                // Determine current mode and check for transition
-                $currentMode = $height < 1000 ? 'sit' : 'stand';
-                if ($previousMode !== null && $previousMode !== $currentMode) {
-                    $transitionCount++;
-                }
-                $previousMode = $currentMode;
-                
-                // Occasional movement
-                $isMoving = rand(1, 12) == 1;
-                $speed = $isMoving ? (rand(0, 1) ? rand(28, 36) : rand(-36, -28)) : 0;
-                
-                // Occasional anomaly (1 in 50)
-                $isAnomaly = rand(1, 50) == 1;
-                $status = $isAnomaly ? 'Collision' : 'Normal';
-                
-                // Incrementally increase counts over time for realism
-                $activationCount = $baseActivationCount + $recordsCreated;
-                
-                UserStatsHistory::create([
-                    'user_id' => $user->id,
-                    'desk_id' => $desk->desk_number,
-                    'desk_height_mm' => $height,
-                    'desk_speed_mms' => $speed,
-                    'desk_status' => $status,
-                    'is_position_lost' => $isAnomaly && rand(0, 1) == 1,
-                    'is_overload_up' => false,
-                    'is_overload_down' => $isAnomaly && rand(0, 1) == 1,
-                    'is_anti_collision' => $isAnomaly && rand(0, 1) == 1,
-                    'activations_count' => $activationCount,
-                    'sit_stand_count' => $transitionCount,
-                    'recorded_at' => $recordTime,
-                ]);
-                
-                $recordsCreated++;
-            }
-        }
-
-        $historicalRecords = $recordsCreated;
-
-        // ===== PART 2: Create 7 entries for each of the past 4 weeks (excluding today) =====
-        for ($weeksAgo = 3; $weeksAgo >= 0; $weeksAgo--) {
-            $weekStart = $currentDate->copy()->subWeeks($weeksAgo)->startOfWeek();
-            
-            for ($dayIndex = 0; $dayIndex < 7; $dayIndex++) {
-                $recordDate = $weekStart->copy()->addDays($dayIndex);
-                
-                // Skip future dates and today
-                if ($recordDate->isAfter($currentDate) || $recordDate->isToday()) {
-                    continue;
-                }
-                
-                // Random hour between 8 AM - 5 PM
-                $hour = rand(8, 17);
-                $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
-                
-                // Randomized sitting vs standing (60% sitting, 40% standing)
-                $isSitting = rand(1, 100) <= 60;
-                $baseHeight = $isSitting ? rand(600, 750) : rand(1200, 1400);
-                $height = $baseHeight + rand(-50, 50);
-                
-                // Determine current mode and check for transition
-                $currentMode = $height < 1000 ? 'sit' : 'stand';
-                if ($previousMode !== null && $previousMode !== $currentMode) {
-                    $transitionCount++;
-                }
-                $previousMode = $currentMode;
-                
-                // Occasional movement
-                $isMoving = rand(1, 10) == 1;
-                $speed = $isMoving ? (rand(0, 1) ? rand(28, 36) : rand(-36, -28)) : 0;
-                
-                // Rare anomaly (1 in 30)
-                $isAnomaly = rand(1, 30) == 1;
-                $status = $isAnomaly ? 'Collision' : 'Normal';
-                
-                // Incrementally increase counts
-                $activationCount = $baseActivationCount + $recordsCreated;
-                
-                UserStatsHistory::create([
-                    'user_id' => $user->id,
-                    'desk_id' => $desk->desk_number,
-                    'desk_height_mm' => $height,
-                    'desk_speed_mms' => $speed,
-                    'desk_status' => $status,
-                    'is_position_lost' => $isAnomaly && rand(0, 1) == 1,
-                    'is_overload_up' => false,
-                    'is_overload_down' => $isAnomaly && rand(0, 1) == 1,
-                    'is_anti_collision' => $isAnomaly && rand(0, 1) == 1,
-                    'activations_count' => $activationCount,
-                    'sit_stand_count' => $transitionCount,
-                    'recorded_at' => $recordTime,
-                ]);
-                
-                $recordsCreated++;
-            }
-        }
-
-        $weeklyRecords = $recordsCreated - $historicalRecords;
-
-        // ===== PART 3: Create hourly entries for today (8 AM - 5 PM) =====
-        for ($hour = 8; $hour <= 17; $hour++) {
-            $recordTime = $currentDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
-            
-            // Only create entries for hours that have already passed or current hour
-            if ($recordTime->isFuture()) {
+        for ($month = 1; $month <= 12; $month++) {
+            // Skip July (7) and August (8)
+            if ($month === 7 || $month === 8) {
                 continue;
             }
             
-            // Randomized sitting vs standing (55% sitting, 45% standing)
-            $isSitting = rand(1, 100) <= 55;
-            $baseHeight = $isSitting ? rand(600, 750) : rand(1200, 1400);
-            $height = $baseHeight + rand(-30, 30);
+            $monthDate = $yearStart->copy()->month($month);
             
-            // Determine current mode and check for transition
-            $currentMode = $height < 1000 ? 'sit' : 'stand';
-            if ($previousMode !== null && $previousMode !== $currentMode) {
-                $transitionCount++;
+            // Skip future months
+            if ($monthDate->isAfter($currentDate)) {
+                continue;
             }
-            $previousMode = $currentMode;
             
-            // Occasional movement
-            $isMoving = rand(1, 8) == 1;
-            $speed = $isMoving ? (rand(0, 1) ? rand(28, 36) : rand(-36, -28)) : 0;
+            // Create 5-7 records per month for historical data
+            $recordsPerMonth = rand(5, 7);
+            $daysInMonth = $monthDate->daysInMonth;
             
-            // Very rare anomaly (1 in 20 for today's data)
-            $isAnomaly = rand(1, 20) == 1;
-            $status = $isAnomaly ? 'Collision' : 'Normal';
-            
-            // Incrementally increase counts
-            $activationCount = $baseActivationCount + $recordsCreated;
-            
-            UserStatsHistory::create([
-                'user_id' => $user->id,
-                'desk_id' => $desk->desk_number,
-                'desk_height_mm' => $height,
-                'desk_speed_mms' => $speed,
-                'desk_status' => $status,
-                'is_position_lost' => $isAnomaly && rand(0, 1) == 1,
-                'is_overload_up' => false,
-                'is_overload_down' => $isAnomaly && rand(0, 1) == 1,
-                'is_anti_collision' => $isAnomaly && rand(0, 1) == 1,
-                'activations_count' => $activationCount,
-                'sit_stand_count' => $transitionCount,
-                'recorded_at' => $recordTime,
-            ]);
-            
-            $recordsCreated++;
+            for ($i = 0; $i < $recordsPerMonth; $i++) {
+                $dayOfMonth = rand(1, min($daysInMonth, 28)); // Avoid edge dates
+                $recordDate = $monthDate->copy()->day($dayOfMonth);
+                
+                // Skip weekends
+                if ($recordDate->isWeekend()) {
+                    continue;
+                }
+                
+                // Skip dates in the last 4 weeks (covered by weekly data)
+                if ($recordDate->isAfter($currentDate->copy()->subWeeks(4))) {
+                    continue;
+                }
+                
+                // Skip today
+                if ($recordDate->isToday()) {
+                    continue;
+                }
+                
+                $hour = rand(8, 17);
+                $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
+                
+                $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                $recordsCreated++;
+            }
         }
 
-        $todayRecords = $recordsCreated - $weeklyRecords - $historicalRecords;
+        $yearlyRecords = $recordsCreated;
+
+        // ===== PART 2: Past 4 weeks (at least 3 weekdays per week) =====
+        for ($weekOffset = 0; $weekOffset < 4; $weekOffset++) {
+            $weekStart = $currentDate->copy()->subWeeks($weekOffset)->startOfWeek(); // Monday
+            
+            // Collect all weekdays for this week
+            $weekdays = [];
+            for ($dayOffset = 0; $dayOffset < 5; $dayOffset++) { // Monday to Friday
+                $date = $weekStart->copy()->addDays($dayOffset);
+                
+                // Skip today (covered by hourly data)
+                if ($date->isToday()) {
+                    continue;
+                }
+                
+                // Skip future dates
+                if ($date->isAfter($currentDate)) {
+                    continue;
+                }
+                
+                $weekdays[] = $date;
+            }
+            
+            // If we have no valid weekdays, skip this week
+            if (empty($weekdays)) {
+                continue;
+            }
+            
+            // Ensure at least 3 weekdays have data (or all available if less than 3)
+            $daysToUse = min(count($weekdays), max(3, count($weekdays)));
+            
+            // Shuffle and select days to ensure variety
+            shuffle($weekdays);
+            $selectedDays = array_slice($weekdays, 0, $daysToUse);
+            
+            // Create 2-3 records per selected day
+            foreach ($selectedDays as $recordDate) {
+                $recordsPerDay = rand(2, 3);
+                
+                for ($i = 0; $i < $recordsPerDay; $i++) {
+                    $hour = rand(8, 17);
+                    $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
+                    
+                    $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                    $recordsCreated++;
+                }
+            }
+        }
+
+        $weeklyRecords = $recordsCreated - $yearlyRecords;
+
+        // ===== PART 3: Today's hourly data (8 AM - 3 PM, 3 entries per hour) =====
+        $todayStart = 8;
+        $todayEnd = 15;
+        
+        for ($hour = $todayStart; $hour <= $todayEnd; $hour++) {
+            // Only create entries for hours that have passed
+            $hourTime = $currentDate->copy()->setHour($hour)->setMinute(0)->setSecond(0);
+            if ($hourTime->isFuture()) {
+                continue;
+            }
+            
+            // Create 3 records per hour, distributed throughout the hour
+            for ($entryNum = 0; $entryNum < 3; $entryNum++) {
+                $minute = rand(0 + ($entryNum * 20), 19 + ($entryNum * 20)); // Distribute: 0-19, 20-39, 40-59
+                $recordTime = $currentDate->copy()->setHour($hour)->setMinute($minute)->setSecond(rand(0, 59));
+                
+                // Only create if not in the future
+                if ($recordTime->isFuture()) {
+                    continue;
+                }
+                
+                $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                $recordsCreated++;
+            }
+        }
+
+        $todayRecords = $recordsCreated - $weeklyRecords - $yearlyRecords;
 
         $this->command->info("Created total of {$recordsCreated} user_stats_history records for User ID 2");
         $this->command->info("  - Total position transitions: {$transitionCount}");
-        $this->command->info("  - {$todayRecords} hourly records for today (8 AM - 5 PM)");
-        $this->command->info("  - {$weeklyRecords} records for the past 4 weeks");
-        $this->command->info("  - {$historicalRecords} historical records spanning 11 months");
+        $this->command->info("  - {$todayRecords} records for today (8 AM - 3 PM, 3/hour)");
+        $this->command->info("  - {$weeklyRecords} records for the past 4 weeks (at least 3 weekdays each)");
+        $this->command->info("  - {$yearlyRecords} records for the year (excluding July & August)");
+    }
+
+    /**
+     * Helper method to create a single record with realistic data
+     */
+    private function createRecord($user, $desk, $recordTime, $baseActivationCount, &$recordsCreated, &$transitionCount, &$previousMode)
+    {
+        // Randomized sitting vs standing (60% sitting, 40% standing)
+        $isSitting = rand(1, 100) <= 60;
+        $baseHeight = $isSitting ? rand(600, 750) : rand(1200, 1400);
+        $height = $baseHeight + rand(-50, 50);
+        
+        // Determine current mode and check for transition
+        $currentMode = $height < 1000 ? 'sit' : 'stand';
+        if ($previousMode !== null && $previousMode !== $currentMode) {
+            $transitionCount++;
+        }
+        $previousMode = $currentMode;
+        
+        // Occasional movement (10% chance)
+        $isMoving = rand(1, 10) == 1;
+        $speed = $isMoving ? (rand(0, 1) ? rand(28, 36) : rand(-36, -28)) : 0;
+        
+        // Rare anomaly (3% chance)
+        $isAnomaly = rand(1, 33) == 1;
+        $status = $isAnomaly ? 'Collision' : 'Normal';
+        
+        // Incrementally increase counts
+        $activationCount = $baseActivationCount + $recordsCreated;
+        
+        UserStatsHistory::create([
+            'user_id' => $user->id,
+            'desk_id' => $desk->desk_number,
+            'desk_height_mm' => $height,
+            'desk_speed_mms' => $speed,
+            'desk_status' => $status,
+            'is_position_lost' => $isAnomaly && rand(0, 1) == 1,
+            'is_overload_up' => false,
+            'is_overload_down' => $isAnomaly && rand(0, 1) == 1,
+            'is_anti_collision' => $isAnomaly && rand(0, 1) == 1,
+            'activations_count' => $activationCount,
+            'sit_stand_count' => $transitionCount,
+            'recorded_at' => $recordTime,
+        ]);
     }
 }
