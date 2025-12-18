@@ -16,7 +16,7 @@
         </div>
         <p>
             <i data-lucide="users" class="lucide-users"></i> 
-            {{ $event->users_count }} attendees
+            <span class="attendees-count" data-users-count="{{ $event->users_count }}" >{{ $event->users_count }} </span> attendees
         </p>
     </div>
 </div>

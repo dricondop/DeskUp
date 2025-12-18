@@ -3,20 +3,26 @@ const cleaningModal = document.getElementById('cleaningModal');
 const modalContent = document.querySelector('.modal-content');
 
 // Open 'Add event' modal
-document.querySelector('.add-event').addEventListener('click', () => {
-    eventModal.style.display = 'block';
+const addEventBtn = document.querySelector('.add-event');
+if (addEventBtn && eventModal) {
+    addEventBtn.addEventListener('click', () => {
+        eventModal.style.display = 'block';
 
-    // load miniLayout
-    if (!miniLayout.dataset.initialized) {
-        loadMiniLayout();
-        miniLayout.dataset.initialized = '1';
-    }
-})
+        // load miniLayout
+        if (miniLayout && !miniLayout.dataset.initialized) {
+            loadMiniLayout();
+            miniLayout.dataset.initialized = '1';
+        }
+    })
+}
 
 // Open 'Cleaning Schedule' modal
-document.querySelector('.scheduleCleaning').addEventListener('click', () => {
-    cleaningModal.style.display = 'block';
-})
+const scheduleCleaningBtn = document.querySelector('.scheduleCleaning');
+if (scheduleCleaningBtn && cleaningModal) {
+    scheduleCleaningBtn.addEventListener('click', () => {
+        cleaningModal.style.display = 'block';
+    })
+}
 
 
 // close modal
@@ -43,10 +49,10 @@ document.querySelectorAll('.closeModal').forEach(button => {
 
 // Close 'Add event' modal if clicking outside the modal when open
 window.addEventListener('click', (event) => {
-    if (eventModal.style.display === 'block' && event.target === eventModal) {
+    if (eventModal && eventModal.style.display === 'block' && event.target === eventModal) {
         closeModal(eventModal);
     }
-    if (cleaningModal.style.display === 'block' && event.target === cleaningModal) {
+    if (cleaningModal && cleaningModal.style.display === 'block' && event.target === cleaningModal) {
         closeModal(cleaningModal);
     }
 })
@@ -56,7 +62,7 @@ const userSelect = document.getElementById('userSelect');
 const selectedUserIds = new Set();
 selectedUserIds.add(loggedInUser); // adds logged-in user by default
 
-userSelect.addEventListener('change', () => {
+if (userSelect) userSelect.addEventListener('change', () => {
     const value = userSelect.value;
     if (!value) return;
 
@@ -157,7 +163,7 @@ async function loadMiniLayout() {
 // Create event
 const eventForm = document.getElementById('eventForm');
 
-eventForm.addEventListener('submit', async (event) => {
+if (eventForm) eventForm.addEventListener('submit', async (event) => {
     event.preventDefault(); // this prevents normal form submit
 
     const eventType = document.getElementById('eventTypeSelect').value;
@@ -189,7 +195,7 @@ eventForm.addEventListener('submit', async (event) => {
     };
    
     try {
-        const response = await fetch(`/api/user/addEvent`, {
+        const response = await fetch(`/api/addEvent`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -224,83 +230,58 @@ eventForm.addEventListener('submit', async (event) => {
 });
 
 
-// choose time for cleaning scheduling
-const hhBtn = document.getElementById('hhBtn');
-const mmBtn = document.getElementById('mmBtn');
-const picker = document.getElementById('timePicker');
-const cleaningTime = document.getElementById('cleaningTime');
-
-let openMinOrHour = null; // 'hh' or 'mm'
-
-function padNumber(n) { 
-    return String(n).padStart(2, '0'); 
-}
-
-function setTime(minOrHour, value) {
-  if (minOrHour === 'hh') hhBtn.textContent = padNumber(value);
-  else mmBtn.textContent = padNumber(value);
-
-  if (cleaningTime) cleaningTime.value = `${hhBtn.textContent}:${mmBtn.textContent}`;
-}
-
-function buildList(minOrHour) {
-  const max = minOrHour === 'hh' ? 23 : 59;
-  picker.innerHTML = '';
-  for (let i = 0; i <= max; i++) {
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'timeOption';
-    item.textContent = padNumber(i);
-    item.addEventListener('click', () => {
-      setTime(minOrHour, i);
-      closePicker();
-    });
-    picker.appendChild(item);
-  }
-}
-
-function openPicker(minOrHour, anchorEl) {
-  openMinOrHour = minOrHour;
-  buildList(minOrHour);
-  picker.hidden = false;
-
-  const r = anchorEl.getBoundingClientRect();
-  const pr = anchorEl.offsetParent.getBoundingClientRect();
-  picker.style.left = (r.left - pr.left) + 'px';
-  picker.style.top  = (r.bottom - pr.top + 6) + 'px';
-
-  hhBtn.classList.toggle('active', minOrHour === 'hh');
-  mmBtn.classList.toggle('active', minOrHour === 'mm');
-}
-
-function closePicker() {
-  openMinOrHour = null;
-  picker.hidden = true;
-  hhBtn.classList.remove('active');
-  mmBtn.classList.remove('active');
-}
-
-hhBtn.addEventListener('click', () => {
-  if (openMinOrHour === 'hh') closePicker();
-  else openPicker('hh', hhBtn);
-});
-
-mmBtn.addEventListener('click', () => {
-  if (openMinOrHour === 'mm') closePicker();
-  else openPicker('mm', mmBtn);
-});
-
-document.addEventListener('click', (e) => {
-  if (!picker.hidden && !picker.contains(e.target) && e.target !== hhBtn && e.target !== mmBtn) {
-    closePicker();
-  }
-});
-
-
-
 // choose days for cleaning
 document.querySelectorAll('.scheduleDay').forEach(button => {
     button.addEventListener('click', () => {
         button.classList.toggle('active');
     })
+})
+
+
+// cleaning modal submission
+const cleaningForm = document.getElementById('cleaningForm');
+if (cleaningForm) cleaningForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const time = document.getElementById('cleaningTime').value;
+    const activeDays = Array.from(document.querySelectorAll('.scheduleDay.active')).map(btn => btn.dataset.day);
+
+    if (activeDays.length === 0) {
+        console.log('Please select at least one day');
+        return;
+    }
+
+    const payload = {
+        cleaning_time: time,
+        cleaning_days: activeDays
+    }
+
+    try {
+        const response = await fetch('/api/addCleaningSchedule', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            const text = await response.text();
+            console.error(text);
+            return;
+        }
+
+        if (data.success) {
+            
+        }
+
+
+    } catch (error) {
+        console.error(`Failed to create a cleaning schedule`, error);
+    }
+
+    closeModal(cleaningModal);
 })

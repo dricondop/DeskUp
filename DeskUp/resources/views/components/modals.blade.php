@@ -82,35 +82,48 @@
             <span class="closeModal">&times;</span>
         </div>
         <div class="modal-body">
-            <div class="vertical-alignment">
+            <form id="cleaningForm">
+                <div class="vertical-alignment">
+                    @csrf
 
-                <!-- Choose time -->
-                <div class="clockArea" id="clock">
-                    <button type="button" class="segment segment-left" id="hhBtn">12</button>
-                    <span class="colon">:</span>
-                    <button type="button" class="segment segment-right" id="mmBtn">59</button>
+                    <!-- Choose time -->
+                        
+                    <div class="form-group cleaningTime">
+                        <input type="time" id="cleaningTime" name="cleaningTime" value="{{ now()->format('H:i') }}" required>
+                    </div>
+                
+                    <!-- Choose days -->
+                     <div class="cleaningAllDays">
+                        <label>Repeat:</label>
 
-                    <div class="timePicker" id="timePicker" hidden></div>
+                        @php 
+                            $days = [
+                                'MON' => 'M',
+                                'TUE' => 'T',
+                                'WED' => 'W',
+                                'THU' => 'T',
+                                'FRI' => 'F',
+                                'SAT' => 'S',
+                                'SUN' => 'S',
+                                ];
+                        @endphp
 
-                    <!-- IN-PROGRESS: hidden field to submit -->
-                    <input type="hidden" id="cleaningTime" name="cleaningTime" value="12:59">
+                        @foreach ($days as $day => $label)
+                            <button 
+                                type="button"
+                                class="btn scheduleDay {{ in_array($day, $recurringCleaningDays, true) ? 'active' : '' }}"
+                                data-day="{{ $day }}"> 
+                                    {{ $label }}
+                            </button>
+                        @endforeach
+                                
+                     </div>
+
+
+                    <!-- Submit/Finish button -->        
+                    <button type="submit" class="formButton">New Schedule</button>
                 </div>
-
-                <!-- Choose days -->
-                <div class="cleaningAllDays">
-                    <label for="scheduleDays">Repeat: </label>
-                    <button class="btn scheduleDay">M</button>
-                    <button class="btn scheduleDay">T</button>
-                    <button class="btn scheduleDay">W</button>
-                    <button class="btn scheduleDay">T</button>
-                    <button class="btn scheduleDay">F</button>
-                    <button class="btn scheduleDay">S</button>
-                    <button class="btn scheduleDay">S</button>
-                </div>
-
-                <!-- Submit/Finish button -->        
-                <button class="formButton">Finish</button>
-            </div>
+            </form>
         </div>
     </div>
 </div>

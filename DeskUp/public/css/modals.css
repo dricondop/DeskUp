@@ -28,7 +28,7 @@
     margin: 15% auto;
     border-radius: 12px;
     max-width: 500px;
-    height: 35vh;
+    max-height: 80vh;
     max-height: 400px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     animation: slideDown 0.3s ease;
@@ -179,63 +179,8 @@
 
 /* ----------- Cleaning Schedule Modal ------------- */
 
-.clockArea {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px;
-  border: 1px solid black;
-  background-color: #ddd;
-  border-radius: 10px;
-  margin-bottom: 20px;
-
-}
-
-.clockArea > * { 
-    font-size: 28px;
-}
-
-.timePicker{
-  position:absolute;
-  z-index:1000;
-  width:70px;
-  max-height:180px;
-  overflow:auto;
-  background:#fff;
-  border:1px solid #ccc;
-  border-radius:10px;
-  padding:6px;
-}
-
-.timeOption{
-  display:block;
-  width:100%;
-  border:none;
-  background:transparent;
-  padding:6px 8px;
-  text-align:center;
-  cursor:pointer;
-}
-
-.timeOption:hover{
-  background:rgba(0,0,0,0.06);
-}
-
-.segment {
-    line-height: 50px;
-    text-align: center;
-    border-radius: 9px;
-    width: 45px;
-    border: none;
-    background-color: transparent;
-    caret-color: transparent;
-    -webkit-appearance: none;
-}
-.segment:focus {
-    outline: none;
-}
-
-.segment.active {
-    background-color: #ffb20b;
+.cleaningTime input {
+  font-size: 1.5rem;
 }
 
 

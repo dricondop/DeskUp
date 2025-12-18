@@ -8,5 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Schedule automatic notifications every 5 minutes
-Schedule::command('notifications:send-auto')->everyFiveMinutes();
+
+Schedule::command('cleaning:run')->everyMinute();
+Schedule::command('events:complete-expired')->everyFiveMinutes();

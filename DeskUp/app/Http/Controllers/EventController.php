@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\Desk;
 use App\Models\User;
+use App\Helpers\APIMethods;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 
 class EventController extends Controller
@@ -17,34 +21,35 @@ class EventController extends Controller
 
         $myEventsButton = $request->boolean('mine');
 
-        if ($myEventsButton) {
-            $baseQuery = Auth::user()
-                ->assignedEvents()
-                ->with(['desks', 'users'])                  // eager load relations
-                ->withCount('users')                        // make users_count available
-                ->where('status', Event::STATUS_APPROVED);
-        } else {
-            $baseQuery = Event::with(['desks', 'users'])    // same as above
-                ->withCount('users')
-                ->where('status', Event::STATUS_APPROVED);
-        }
+        $baseQuery = $myEventsButton
+            ? Auth::user()->assignedEvents()
+            : Event::query();
 
-        $allEvents = $baseQuery->orderBy('scheduled_at', 'asc')->get();
-    
+        $allEvents = $baseQuery
+            ->where('event_type', '!=', 'cleaning')
+            ->where('status', Event::STATUS_APPROVED)
+            ->withCount('users')                                                // make users_count available
+            ->with(['desks', 'users'])                                          // eager load relations
+            ->orderBy('scheduled_at', 'asc')
+            ->get();                                          
+        
+        $recurringCleaningDays = Event::where('event_type', 'cleaning')
+            ->where('status', Event::STATUS_APPROVED)
+            ->value('cleaning_days');
+
         
         $meetings   = $allEvents->where('event_type', 'meeting');
         $events     = $allEvents->where('event_type', 'event');
-        $cleanings     = $allEvents->where('event_type', 'cleaning');
         $maintenances     = $allEvents->where('event_type', 'maintenance');
 
         return view('events', [
             'upcomingEvents' => $allEvents,
             'meetings' => $meetings,
             'events' => $events,
-            'cleanings' => $cleanings,
             'maintenances' => $maintenances,
             'myEventsButton' => $myEventsButton,
             'users' => $users,
+            'recurringCleaningDays' => $recurringCleaningDays
         ]);
     }
 
@@ -83,6 +88,40 @@ class EventController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Event added successfully',
+            'event' => $event
+        ]);
+    }
+
+    public function addCleaningSchedule(Request $request) 
+    {
+        $validated =   $request->validate([
+            'cleaning_time' => 'required|date_format:H:i',
+            'cleaning_days' => 'required|array|min:1',
+            'cleaning_days.*' => 'required|string|in:MON,TUE,WED,THU,FRI,SAT,SUN',
+        ]);
+
+        $user = Auth::user();
+
+        // change last cleaning schedule to 'completed'
+        Event::where('event_type', 'cleaning')
+            ->where('status', 'approved')
+            ->update(['status' => Event::STATUS_COMPLETED]);
+        
+        
+        
+        $event = Event::create([
+            'event_type' => 'cleaning',
+            'description' => 'recurring office cleaning',
+            'cleaning_time' => $validated['cleaning_time'],
+            'cleaning_days' => $validated['cleaning_days'],
+            'is_recurring' => true,
+            'status' => $user->isAdmin() ? Event::STATUS_APPROVED : Event::STATUS_PENDING,
+            'created_by' => $user->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cleaning Schedule added successfully',
             'event' => $event
         ]);
     }

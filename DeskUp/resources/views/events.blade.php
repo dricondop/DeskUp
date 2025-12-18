@@ -25,7 +25,6 @@
                     <button class="event-tab active" data-target="upcoming">Upcoming</button>
                     <button class="event-tab" data-target="meetings">Meetings</button>
                     <button class="event-tab" data-target="events">Events</button>
-                    <button class="event-tab" data-target="cleaning">Cleaning</button>
                     <button class="event-tab" data-target="maintenance">Maintenance</button>
                     </div>
                     <div class="horizontal-alignment">
@@ -73,15 +72,6 @@
                             @include('components.event-card', ['event' => $event])
                         @empty
                             <p>There are no events scheduled</p>
-                        @endforelse
-                    </div>
-
-                    <!-- Show all cleanings only together -->
-                    <div id="cleaning" class="event-panel hidden">
-                        @forelse ($cleanings as $event)
-                            @include('components.event-card', ['event' => $event])
-                        @empty
-                            <p>There are no cleanings scheduled</p>
                         @endforelse
                     </div>
 
@@ -149,8 +139,8 @@
         </div>
     </div>
     
-    <!-- Event Modal -->
-    @include('components.modals')
+    <!-- Event and Cleaning modals -->
+    @include('components.modals', ['recurringCleaningDays' => $recurringCleaningDays ?? collect()])
 
     <script>
         const loggedInUser = {{ auth()->user()->id }};      // used for adding user to event
