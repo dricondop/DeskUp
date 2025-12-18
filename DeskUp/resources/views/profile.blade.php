@@ -127,7 +127,7 @@
                 </div>
             </div>
 
-            <!-- Health Insights Dashboard - HORIZONTAL LAYOUT -->
+            <!-- Health Insights Dashboard -->
             <div class="info-card health-insights-card">
                 <div class="card-header">
                     <h2 class="card-title">Health Insights</h2>
@@ -136,7 +136,7 @@
                     </a>
                 </div>
             <div class="health-insights-horizontal">
-                <!-- Horizontal Metrics Container (sin Live Status) -->
+                <!-- Horizontal Metrics Container -->
                 <div class="health-metrics-row">
                 
                 <!-- Sit/Stand Ratio -->
@@ -151,7 +151,6 @@
                         <canvas id="timePercentageChartProfile"></canvas>
                     </div>
 
-                    <!-- Etiquetas compactas (sin títulos redundantes) -->
                     <div class="chart-pills">
                         <span class="pill pill-sit" id="sitting-percentage">65% Sit</span>
                         <span class="pill pill-stand" id="standing-percentage">35% Stand</span>
@@ -159,7 +158,6 @@
                     </div>
                 </div>
 
-                <!-- Posture Score (solo valor, sin /100) -->
                 <div class="health-metric-horizontal posture-score-card">
                     <div class="health-metric">
                     <div class="metric-header">
@@ -169,15 +167,12 @@
 
                     <div class="posture-score-display">
                         <p class="posture-score-value" id="profile-posture-score">65</p>
-                        <!-- Eliminado: <span class="posture-score-label">/100</span> -->
                     </div>
 
-                    <!-- Mantener barra de progreso (opcional) -->
                     <div class="progress-wrap-horizontal" aria-label="Posture score progression">
                         <div class="progress-bar" id="profile-posture-score-bar" style="width:65%"></div>
                     </div>
 
-                    <!-- Etiquetas de rango (opcionales, compactas) -->
                     <div class="score-scale">
                         <span class="scale-min">Poor</span>
                         <span class="scale-max">Excellent</span>
