@@ -278,6 +278,34 @@ function createCharts() {
     }
 }
 
+function setupPDFExport() {
+    const exportBtn = document.getElementById('export-pdf-btn');
+    if (!exportBtn) return;
+    
+    exportBtn.addEventListener('click', async () => {
+        const activeRangeBtn = document.querySelector('.range-btn.active');
+        const range = activeRangeBtn ? activeRangeBtn.dataset.range : 'today';
+        
+        // Mostrar indicador de carga
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<span>Exporting...</span>';
+        exportBtn.disabled = true;
+        
+        try {
+            // Llamar al endpoint de exportación
+            const url = `/health/export/pdf?range=${range}`;
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Export error:', error);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            // Restaurar botón
+            exportBtn.innerHTML = originalText;
+            exportBtn.disabled = false;
+        }
+    });
+}
+
 function generateInsights(data) {
     const container = q('.insights');
     if (container) container.innerHTML = '';
@@ -322,7 +350,7 @@ async function init() {
     await fetchLiveStatus();
     await fetchStats('today');
     await fetchChartData('today');
-
+    
     qq('.range-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             qq('.range-btn').forEach(b => b.classList.remove('active'));
@@ -330,7 +358,13 @@ async function init() {
             updateRange(btn.dataset.range || 'today');
         });
     });
-
+    
+    // Configurar exportación PDF
+    setupPDFExport();
+    
+    // Opcional: usar modal en lugar de exportación directa
+    // exportBtn.addEventListener('click', showExportModal);
+    
     // Refresh live status every 30 seconds
     setInterval(fetchLiveStatus, 30000);
 }

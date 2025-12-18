@@ -7,6 +7,7 @@ use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
 use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\PDFExportController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -40,6 +41,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
     Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
     Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
+
+    // PDF Export routes
+    Route::get('/health/export/pdf', [PDFExportController::class, 'exportHealthPDF'])->name('health.export.pdf');
+    Route::get('/health/export/preview', [PDFExportController::class, 'previewHealthPDF'])->name('health.export.preview');
 });
 
 Route::get('/signin', function () {
