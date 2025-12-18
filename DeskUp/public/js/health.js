@@ -408,7 +408,7 @@ async function loadNotificationHistory() {
         }
 
         listEl.innerHTML = data.notifications.map(notification => {
-            const date = new Date(notification.created_at);
+            const date = new Date(notification.sent_at || notification.created_at);
             const timeAgo = getTimeAgo(date);
             const unreadClass = notification.is_read ? '' : ' unread';
             

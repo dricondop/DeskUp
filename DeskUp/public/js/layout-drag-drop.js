@@ -1,5 +1,4 @@
 const canvas = document.getElementById('canvas');
-const MAX_DESKS = 50;
 const isAdmin = window.isAdmin || false;
 const tooltip = document.getElementById('hoverTooltip');
 
@@ -49,12 +48,6 @@ function updateDeskCount() {
 }
 
 function addDesk(x, y, name = null, deskId = null) {
-    const currentCount = document.querySelectorAll('.desk').length;
-    if (currentCount >= MAX_DESKS) {
-        if (isAdmin) alert(`Maximum of ${MAX_DESKS} desks reached!`);
-        return;
-    }
-
     const desk = document.createElement('div');
     desk.className = 'desk';
     desk.style.left = `${x}px`;

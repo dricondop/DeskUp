@@ -111,7 +111,7 @@ class NotificationService
         // Check cooldown period to avoid spamming notifications
         $cooldown = config('notifications.notification_cooldown_minutes');
         $hasRecent = Notification::where('user_id', $user->id)
-            ->where('type', 'sitting_reminder')
+            ->where('type', 'automatic')
             ->where('sent_at', '>', now()->subMinutes($cooldown))
             ->exists();
 
@@ -127,7 +127,7 @@ class NotificationService
             'user_id' => $user->id,
             'title' => 'Time to Stand Up!',
             'message' => "Take a 5-minute break to stretch and improve your posture.",
-            'type' => 'sitting_reminder',
+            'type' => 'automatic',
             'is_read' => false,
             'sent_at' => now(),
         ]);

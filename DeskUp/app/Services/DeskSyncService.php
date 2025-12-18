@@ -141,12 +141,16 @@ class DeskSyncService
         // Try to find existing desk by desk_number
         $desk = Desk::where('desk_number', $deskNumber)->first();
         
+        // Generate random coordinates for new desks to avoid stacking in corner
+        $randomX = rand(100, 700);
+        $randomY = rand(100, 500);
+        
         $deskData = [
             'name' => $deskName,
             'desk_number' => $deskNumber,
             'api_desk_id' => $apiDeskId,
-            'position_x' => null,
-            'position_y' => null,
+            'position_x' => $desk ? $desk->position_x : $randomX,
+            'position_y' => $desk ? $desk->position_y : $randomY,
             'is_active' => true,
             'user_id' => null,
         ];
