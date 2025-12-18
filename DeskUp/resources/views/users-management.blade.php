@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Control | DeskUp</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/user-management.css') }}">
 </head>
@@ -23,7 +23,18 @@
             </header>
 
             <section class="card">
-                <h2 style="margin-bottom: 1rem; color:#3A506B;">User Desk Overview</h2>
+                <div class="card-header">
+                    <h2>User Desk Overview</h2>
+                    <button id="createUserBtn" class="btn-create">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" y1="8" x2="19" y2="14"></line>
+                            <line x1="22" y1="11" x2="16" y2="11"></line>
+                        </svg>
+                        Create New User
+                    </button>
+                </div>
                 <table id="userTable">
                     <thead>
                         <tr>
@@ -265,6 +276,57 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-closeModal closeModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div id="createUserModal" class="modal">
+        <div class="modal-content create-user-modal">
+            <div class="modal-header create-user-header">
+                <div class="modal-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                    <h3 style="color: white;">Create New User</h3>
+                </div>
+                <span class="close closeModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="createUserForm">
+                    <div class="form-group">
+                        <label for="userName">Full Name</label>
+                        <input type="text" id="userName" name="name" placeholder="Enter user's full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email Address</label>
+                        <input type="email" id="userEmail" name="email" placeholder="user@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPassword">Password</label>
+                        <input type="password" id="userPassword" name="password" placeholder="Minimum 8 characters" required minlength="8">
+                        <small class="input-hint">Must be at least 8 characters long</small>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label-custom">
+                            <input type="checkbox" id="isAdmin" name="is_admin">
+                            <span class="checkbox-custom"></span>
+                            <span class="checkbox-text">Grant administrator privileges</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer create-user-footer">
+                <button class="btn-modal-cancel closeModal">Cancel</button>
+                <button class="btn-modal-submit" id="submitCreateUser">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Create User
+                </button>
             </div>
         </div>
     </div>

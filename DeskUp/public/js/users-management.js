@@ -287,6 +287,7 @@ document.querySelectorAll('.closeModal').forEach(button => {
     button.addEventListener('click', () => {
         document.getElementById('descriptionModal').style.display = 'none';
         document.getElementById('desksModal').style.display = 'none';
+        document.getElementById('createUserModal').style.display = 'none';
     })
 });
 
@@ -294,6 +295,7 @@ document.querySelectorAll('.closeModal').forEach(button => {
 window.onclick = function(event) {
     const descriptionModal = document.getElementById('descriptionModal');
     const desksModal = document.getElementById('desksModal');
+    const createUserModal = document.getElementById('createUserModal');
 
     if (event.target === descriptionModal) {
         document.getElementById('descriptionModal').style.display = 'none';
@@ -303,5 +305,63 @@ window.onclick = function(event) {
         document.getElementById('desksModal').style.display = 'none';
     }
 
+    if (event.target === createUserModal) {
+        document.getElementById('createUserModal').style.display = 'none';
+    }
+}
+
+// Create User Modal
+const createUserBtn = document.getElementById('createUserBtn');
+const createUserModal = document.getElementById('createUserModal');
+const submitCreateUserBtn = document.getElementById('submitCreateUser');
+const createUserForm = document.getElementById('createUserForm');
+
+if (createUserBtn) {
+    createUserBtn.addEventListener('click', () => {
+        createUserModal.style.display = 'block';
+        createUserForm.reset();
+    });
+}
+
+if (submitCreateUserBtn) {
+    submitCreateUserBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(createUserForm);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            is_admin: document.getElementById('isAdmin').checked
+        };
+
+        try {
+            const response = await fetch('/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('User created successfully!');
+                createUserModal.style.display = 'none';
+                location.reload();
+            } else {
+                let errorMsg = result.message || 'Failed to create user';
+                if (result.errors) {
+                    errorMsg += '\n' + Object.values(result.errors).flat().join('\n');
+                }
+                alert(errorMsg);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Network error: ' + error.message);
+        }
+    });
 }
 

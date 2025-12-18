@@ -67,6 +67,42 @@ class AdminController extends Controller
         ]);
     }
 
+    public function createUser(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8',
+                'is_admin' => 'nullable|boolean'
+            ]);
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+                'is_admin' => $validated['is_admin'] ?? false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully',
+                'user' => $user
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function approveEvent($id)
     {
         $event = Event::findOrFail($id);

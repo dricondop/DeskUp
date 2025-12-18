@@ -81,6 +81,7 @@ Route::post('/event/{event}/addUser', [EventController::class, 'addUserToEvent']
 // Users Mannagement view
 Route::middleware('auth')->group(function () {
     Route::get('/users-management', [AdminController::class, 'index'])->middleware('sync.desks');
+    Route::post('/user/create', [AdminController::class, 'createUser']);
     Route::post('/user/{id}/assign-desk-id', [AdminController::class, 'assignDesk']);
     Route::post('/user/{id}/unassign-desk-id', [AdminController::class, 'unassignDesk']);
     Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
