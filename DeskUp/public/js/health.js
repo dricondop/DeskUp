@@ -286,13 +286,11 @@ function setupPDFExport() {
         const activeRangeBtn = document.querySelector('.range-btn.active');
         const range = activeRangeBtn ? activeRangeBtn.dataset.range : 'today';
         
-        // Mostrar indicador de carga
         const originalText = exportBtn.innerHTML;
         exportBtn.innerHTML = '<span>Exporting...</span>';
         exportBtn.disabled = true;
         
         try {
-            // Llamar al endpoint de exportación
             const url = `/health/export/pdf?range=${range}`;
             window.open(url, '_blank');
         } catch (error) {
@@ -359,11 +357,7 @@ async function init() {
         });
     });
     
-    // Configurar exportación PDF
     setupPDFExport();
-    
-    // Opcional: usar modal en lugar de exportación directa
-    // exportBtn.addEventListener('click', showExportModal);
     
     // Refresh live status every 30 seconds
     setInterval(fetchLiveStatus, 30000);

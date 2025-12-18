@@ -156,6 +156,19 @@ Route::post('/logout', function (Request $request) {
     return redirect('/signin');
 })->name('logout');
 
+// Landing page routes
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy.policy');
+
+Route::get('/terms-conditions', function () {
+    return view('terms-conditions');
+})->name('terms.conditions');
+
+Route::get('/contact-us', function () {
+    return view('contact-us');
+})->name('contact.us');
+
 //API TESTING ROUTES
 Route::get('/apitest', function () {
     $height = 790.0;

@@ -29,7 +29,7 @@ class PDFExportController extends Controller
      */
     public function exportHealthPDF(Request $request)
     {
-        // Limitar el tiempo de ejecución
+        // Time limit
         set_time_limit(120);
         ini_set('memory_limit', '256M');
         
@@ -37,32 +37,29 @@ class PDFExportController extends Controller
             $userId = Auth::id();
             $range = $request->input('range', 'today');
             $date = now()->format('Y-m-d');
-            
-            // Obtener datos
+
             $allData = $this->getAllHealthData($userId, $range);
             
             if (is_null($allData)) {
                 $data = $this->getEmptyData($range);
             } else {
                 $data = $allData;
-                
-                // Generar gráficos como imágenes base64
                 $data['charts'] = $this->generateCharts($data['stats'], $data['chartData'], $range);
             }
             
-            // Generar PDF
+            // Generate PDF
             $pdf = Pdf::loadView('pdf.health-report', $data);
             
-            // Configurar opciones del PDF
+            // PDF settings
             $pdf->setPaper('A4', 'portrait');
             $pdf->setOptions([
                 'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true, // Habilitado para imágenes base64
+                'isRemoteEnabled' => true, 
                 'defaultFont' => 'sans-serif',
                 'compress' => true,
             ]);
             
-            // Descargar el PDF
+            // Download
             return $pdf->download("health-report-{$range}-{$date}.pdf");
             
         } catch (\Exception $e) {
@@ -74,22 +71,19 @@ class PDFExportController extends Controller
     }
     
     /**
-     * Vista previa del PDF
+     * Preview
      */
     public function previewHealthPDF(Request $request)
     {
         try {
             $userId = Auth::id();
             $range = $request->input('range', 'today');
-            
-            // Obtener datos
             $allData = $this->getAllHealthData($userId, $range);
             
             if (is_null($allData)) {
                 $data = $this->getEmptyData($range);
             } else {
                 $data = $allData;
-                // Generar gráficos para preview
                 $data['charts'] = $this->generateCharts($data['stats'], $data['chartData'], $range);
             }
             
@@ -104,14 +98,14 @@ class PDFExportController extends Controller
     }
     
     /**
-     * Generar gráficos como imágenes base64 usando QuickChart.io
+     * Generate base64 iamges using QuickChart.io
      */
     private function generateCharts($stats, $chartData, $range)
     {
         $charts = [];
         
         try {
-            // 1. Gráfico de dona (Sitting vs Standing)
+            // 1. Sitting vs Standing
             $charts['timeDistribution'] = $this->generateDoughnutChart(
                 ['Sitting', 'Standing'],
                 [$stats['sitting_pct'] ?? 65, $stats['standing_pct'] ?? 35],
@@ -119,7 +113,7 @@ class PDFExportController extends Controller
                 'Time Distribution (%)'
             );
             
-            // 2. Gráfico de barras (Horas absolutas)
+            // 2. Absolute Hours
             $charts['timeAbsolute'] = $this->generateBarChart(
                 ['Sitting', 'Standing'],
                 [$stats['sitting_hours'] ?? 0, $stats['standing_hours'] ?? 0],
@@ -127,7 +121,7 @@ class PDFExportController extends Controller
                 'Absolute Time (hours)'
             );
             
-            // 3. Gráfico de línea (Posture Score)
+            // 3. Posture Score
             if (!empty($chartData['labels']) && !empty($chartData['posture_scores'])) {
                 $charts['postureScore'] = $this->generateLineChart(
                     $chartData['labels'],
@@ -138,7 +132,7 @@ class PDFExportController extends Controller
                 );
             }
             
-            // 4. Gráfico de altura promedio
+            // 4. Average Height
             if (!empty($chartData['labels']) && !empty($chartData['avg_sit_heights']) && !empty($chartData['avg_stand_heights'])) {
                 $charts['heightAverage'] = $this->generateMultiLineChart(
                     $chartData['labels'],
@@ -153,15 +147,11 @@ class PDFExportController extends Controller
             
         } catch (\Exception $e) {
             Log::warning('Chart generation failed: ' . $e->getMessage());
-            // En caso de error, no incluir gráficos
         }
         
         return $charts;
     }
     
-    /**
-     * Generar gráfico de dona
-     */
     private function generateDoughnutChart($labels, $data, $colors, $title)
     {
         $chartConfig = [
@@ -203,9 +193,6 @@ class PDFExportController extends Controller
         return $this->getChartImage($chartConfig, 400, 300);
     }
     
-    /**
-     * Generar gráfico de barras
-     */
     private function generateBarChart($labels, $data, $colors, $title)
     {
         $chartConfig = [
@@ -260,9 +247,6 @@ class PDFExportController extends Controller
         return $this->getChartImage($chartConfig, 400, 250);
     }
     
-    /**
-     * Generar gráfico de línea simple
-     */
     private function generateLineChart($labels, $data, $color, $title, $yAxisLabel)
     {
         $chartConfig = [
@@ -329,10 +313,7 @@ class PDFExportController extends Controller
         
         return $this->getChartImage($chartConfig, 400, 250);
     }
-    
-    /**
-     * Generar gráfico de líneas múltiples
-     */
+
     private function generateMultiLineChart($labels, $datasets, $title, $yAxisLabel)
     {
         $chartDatasets = [];
@@ -413,15 +394,14 @@ class PDFExportController extends Controller
     }
     
     /**
-     * Obtener imagen del gráfico desde QuickChart.io
+     * Get QuickChart.io ghaph image
      */
     private function getChartImage($config, $width = 400, $height = 300)
     {
         try {
-            // URL de QuickChart.io
             $url = 'https://quickchart.io/chart';
             
-            // Parámetros para la imagen
+            // Image settings
             $params = [
                 'c' => json_encode($config),
                 'width' => $width,
@@ -431,11 +411,9 @@ class PDFExportController extends Controller
                 'devicePixelRatio' => 1.0
             ];
             
-            // Hacer la solicitud
             $response = Http::timeout(30)->get($url, $params);
             
             if ($response->successful()) {
-                // Convertir a base64
                 $imageData = $response->body();
                 return 'data:image/png;base64,' . base64_encode($imageData);
             }
@@ -444,12 +422,11 @@ class PDFExportController extends Controller
             Log::warning('QuickChart request failed: ' . $e->getMessage());
         }
         
-        // En caso de fallo, retornar null
         return null;
     }
     
     /**
-     * Convertir HEX a RGBA
+     * Convert HEX to RGBA
      */
     private function hexToRgba($hex, $alpha = 1.0)
     {
@@ -469,7 +446,7 @@ class PDFExportController extends Controller
     }
     
     /**
-     * Obtener todos los datos de salud
+     * Get health data
      */
     private function getAllHealthData($userId, $range)
     {
@@ -508,7 +485,7 @@ class PDFExportController extends Controller
     }
     
     /**
-     * Datos para cuando no hay información
+     * Mock data
      */
     private function getEmptyData($range)
     {
