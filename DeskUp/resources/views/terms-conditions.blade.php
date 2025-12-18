@@ -8,21 +8,8 @@
     <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container header-inner">
-            <div class="brand"> 
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    <div class="logo">DeskUp</div>
-                    <div class="tag">Smart sit‑stand ergonomics</div>
-                </a>
-            </div>
-            <nav class="actions">
-                <a class="btn btn-ghost" href="/signin">Login</a>
-                <a class="btn btn-primary" href="/signup">Sign Up</a>
-            </nav>
-        </div>
-    </header>
-
+    <x-landing-header />
+    
     <main class="container terms-container">
         <h1>Terms & Conditions</h1>
         <div class="terms-content">
@@ -71,15 +58,6 @@
         </div>
     </main>
 
-    <footer class="site-footer">    
-        <div class="container footer-inner">
-            <div class="copyright">© {{ date('Y') }} DeskUp</div>
-            <nav class="footer-links">
-                <a href="{{ route('privacy.policy') }}">Privacy</a>
-                <a href="{{ route('terms.conditions') }}">Terms</a>
-                <a href="{{ route('contact.us') }}">Contact</a>
-            </nav>
-        </div>
-    </footer>
+    <x-landing-footer />
 </body>
 </html>
