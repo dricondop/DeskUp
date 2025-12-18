@@ -21,11 +21,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/desk-control/{id}', [DeskController::class, 'show'])->name('desk.control');
+Route::get('/desk-control/{id}', [DeskController::class, 'show'])->middleware('sync.desks')->name('desk.control');
 Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight'])->middleware('auth');
 Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus'])->middleware('auth');
 
-Route::get('/layout', [LayoutController::class, 'index'])->middleware('auth')->name('layout');
+Route::get('/layout', [LayoutController::class, 'index'])->middleware(['auth', 'sync.desks'])->name('layout');
 Route::post('/layout/save', [LayoutController::class, 'save'])->middleware('auth');
 Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth');
 
@@ -80,7 +80,7 @@ Route::post('/event/{event}/addUser', [EventController::class, 'addUserToEvent']
 
 // Users Mannagement view
 Route::middleware('auth')->group(function () {
-    Route::get('/users-management', [AdminController::class, 'index']);
+    Route::get('/users-management', [AdminController::class, 'index'])->middleware('sync.desks');
     Route::post('/user/{id}/assign-desk-id', [AdminController::class, 'assignDesk']);
     Route::post('/user/{id}/unassign-desk-id', [AdminController::class, 'unassignDesk']);
     Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
@@ -221,14 +221,24 @@ Route::get('/apitest4', function () {
 });
 
 // Populates the desk table in the database with all the desks available from the simulator
+// Also REMOVES desks that no longer exist in the API
 Route::get('/sync-desks-from-api', function () {
+    // Increase execution time for this operation
+    set_time_limit(120); // 2 minutes
+    
     $deskSyncService = new \App\Services\DeskSyncService();
     $results = $deskSyncService->syncDesksFromApi();
     
     return response()->json([
         'success' => true,
-        'message' => 'Desk sync completed',
+        'message' => 'Desk sync completed - database now matches API',
         'results' => $results,
+        'summary' => [
+            'created' => $results['created'],
+            'updated' => $results['updated'],
+            'deleted' => $results['deleted'],
+            'errors' => count($results['errors'])
+        ],
         'total_desks_in_db' => \App\Models\Desk::count()
     ]);
 });
@@ -254,58 +264,34 @@ Route::get('/sync-desk-data/{apiDeskId}', function ($apiDeskId) {
     return response()->json($result);
 });
 
-// Get all desks from the API with some info (for debugging)
-Route::get('/api-desk-mapping', function () {
-    $deskSyncService = new \App\Services\DeskSyncService();
-    
+// Debug route: Compare API desks vs Database desks
+Route::get('/debug-desks-comparison', function () {
     try {
-        $mapping = $deskSyncService->getApiDeskMapping();
+        $apiDesks = \App\Helpers\APIMethods::getAllDesks();
+        $dbDesks = \App\Models\Desk::all();
         
         return response()->json([
             'success' => true,
-            'mapping' => $mapping
-        ]);
+            'api_desks_count' => count($apiDesks),
+            'api_desks' => $apiDesks,
+            'db_desks_count' => $dbDesks->count(),
+            'db_desks' => $dbDesks->map(function($desk) {
+                return [
+                    'id' => $desk->id,
+                    'name' => $desk->name,
+                    'desk_number' => $desk->desk_number,
+                    'api_desk_id' => $desk->api_desk_id,
+                ];
+            }),
+            'api_desk_ids_not_in_db' => array_diff($apiDesks, $dbDesks->pluck('api_desk_id')->toArray()),
+            'db_desk_ids_not_in_api' => $dbDesks->pluck('api_desk_id')->diff($apiDesks)->values()
+        ], 200, [], JSON_PRETTY_PRINT);
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Failed to get mapping: ' . $e->getMessage(),
             'error' => $e->getMessage()
         ], 500);
     }
-});
-
-// Populates the desk table in the database with all the desks available from the simulator
-Route::get('/sync-desks-from-api', function () {
-    $deskSyncService = new \App\Services\DeskSyncService();
-    $results = $deskSyncService->syncDesksFromApi();
-    
-    return response()->json([
-        'success' => true,
-        'message' => 'Desk sync completed',
-        'results' => $results,
-        'total_desks_in_db' => \App\Models\Desk::count()
-    ]);
-});
-
-// Sync current API data for ALL available desks (should be periodically loaded)
-Route::get('/sync-all-desks-data', function () {
-    $deskSyncService = new \App\Services\DeskSyncService();
-    $results = $deskSyncService->syncAllDesksData();
-    
-    return response()->json([
-        'success' => true,
-        'message' => 'All desks data synced',
-        'results' => $results,
-        'total_records' => \App\Models\UserStatsHistory::count()
-    ]);
-});
-
-// Sync current API data for a specific desk
-Route::get('/sync-desk-data/{apiDeskId}', function ($apiDeskId) {
-    $deskSyncService = new \App\Services\DeskSyncService();
-    $result = $deskSyncService->syncSingleDeskData($apiDeskId);
-    
-    return response()->json($result);
 });
 
 // Get all desks from the API with some info (for debugging)

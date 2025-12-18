@@ -56,8 +56,10 @@ class DeskController extends Controller
         $desk = Desk::findOrFail($id);
         
         try {
+            // Send command to physical desk
             APIMethods::raiseDesk($height, $desk->api_desk_id);
-            // Create new stats record with updated height
+            
+            // Update database immediately with target height (don't wait for physical movement)
             $desk->newUserStatsHistoryRecord($height);
             
             // Refresh the desk model to load the new stats record
@@ -75,7 +77,7 @@ class DeskController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Height updated successfully',
-            'height' => $desk->height // This will now get the value from latest stats
+            'height' => $desk->height // Returns the target height from database
         ]);
         
     }
