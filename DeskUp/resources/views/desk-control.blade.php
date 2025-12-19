@@ -8,23 +8,18 @@
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
-
 </head>
 <body>
     @include('components.sidebar')
     
     <div class="main-content">
         <main class="desk-view">
+            <!-- Left Column: Desk Control -->
             <section class="desk-control">
-                <h1>Desk Control</h1>
-                <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
-
-                <p id="clock"
-                aria-label="Current time"
-                style="margin-top:4px; font-size:0.9rem; color:#3A506B; font-weight:500; letter-spacing:0.03em;">
-                    --:--:--
-                </p>
+                <div class="desk-control-header">
+                    <h1>Desk Control</h1>
+                    <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
+                </div>
 
                 <img src="{{ asset('assets/desk.png') }}" alt="desk">
                 
@@ -33,20 +28,14 @@
                     <button class="desk-view-btns add-event">Add Event</button>
                 </div>
             </section>
-            <div class="desk-management">
-                <div class="profile">
-                    @if($isLoggedIn)
-                        <div class="profile-pic"></div>
-                        <h2>{{ auth()->user()->name }}</h2>
-                    @else
-                        <div class="profile-pic"></div>
-                        <h2>Guest</h2>
-                    @endif
+
+            <!-- Right Column: Desk Management -->
+            <section class="desk-management">
+                <div class="desk-management-header">
+                    <h1>Desk Management</h1>
                 </div>
 
-                <section class="desk-adjustment">
-                    <h1>Desk Management</h1>
-
+                <div class="desk-management-content">
                     <h3 class="height-adjustment-line">
                         Height Adjustment
                         <span>
@@ -95,12 +84,9 @@
                                 <p>No pending events</p>
                             </div>
                         @endforelse
-
                     </div>
-
-                
-                </section>
-            </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -156,8 +142,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-

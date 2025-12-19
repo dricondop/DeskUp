@@ -529,6 +529,30 @@ function clearMetrics() {
 function clearRecommendations() {
     const container = q('.insights');
     if (container) container.innerHTML = '';
+function setupPDFExport() {
+    const exportBtn = document.getElementById('export-pdf-btn');
+    if (!exportBtn) return;
+    
+    exportBtn.addEventListener('click', async () => {
+        const activeRangeBtn = document.querySelector('.range-btn.active');
+        const range = activeRangeBtn ? activeRangeBtn.dataset.range : 'today';
+        
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<span>Exporting...</span>';
+        exportBtn.disabled = true;
+        
+        try {
+            const url = `/health/export/pdf?range=${range}`;
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Export error:', error);
+            alert('Failed to generate PDF. Please try again.');
+        } finally {
+            // Restaurar botón
+            exportBtn.innerHTML = originalText;
+            exportBtn.disabled = false;
+        }
+    });
 }
 
 function generateInsights(data) {
@@ -609,6 +633,10 @@ function showTip(message, title = 'Suggestion', type = 'default') {
 
 async function init() {
     createCharts();
+    await fetchLiveStatus();
+    await fetchStats('today');
+    await fetchChartData('today');
+    
     
     // Load all data in parallel for faster page load
     await Promise.all([
@@ -623,7 +651,10 @@ async function init() {
             updateRange(btn.dataset.range || 'today');
         });
     });
-
+    
+    setupPDFExport();
+    
+    // Refresh live status every 30 seconds
     setInterval(fetchLiveStatus, 30000);
     
     // Refresh notifications every 2 minutes
