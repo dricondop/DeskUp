@@ -73,8 +73,11 @@ class PicoSerialMonitor extends Command {
             }
 
             // Get the desk from the user's assigned desk (assigned_desk_id is the desk ID, not desk_number)
+            // Use fresh() to force a completely new query with fresh relationship data
             $desk = Desk::find($activeUser->assigned_desk_id);
             if ($desk) {
+                // Force reload the latest stats to get the newest height record
+                $desk = $desk->fresh(['latestStats']);
                 $height = $desk->height; // in cm (from latestStats accessor)
                 $deskNumber = $desk->desk_number;
                 
