@@ -72,16 +72,20 @@ class PicoSerialMonitor extends Command {
                 $this->info("→ User connected: {$activeUser->name} (ID: {$activeUser->id})");
             }
 
-            // Get the desk from the user's assigned desk
-            $desk = Desk::where('desk_number', $activeUser->assigned_desk_id)->first();
+            // Get the desk from the user's assigned desk (assigned_desk_id is the desk ID, not desk_number)
+            $desk = Desk::find($activeUser->assigned_desk_id);
             if ($desk) {
-                $height = $desk->height; // in cm
+                $height = $desk->height; // in cm (from latestStats accessor)
+                $deskNumber = $desk->desk_number;
+                
                 if ($this->lastHeight !== $height) {
                     $this->sendMessage("HEIGHT:{$height}\n");
-                    $this->sendMessage("DESK:{$desk->desk_number}\n");
+                    $this->sendMessage("DESK:{$deskNumber}\n");
                     $this->lastHeight = $height;
-                    $this->info("→ Desk {$desk->desk_number} height updated: {$height} cm");
+                    $this->info("→ Desk {$deskNumber} (ID: {$desk->id}) height updated: {$height} cm");
                 }
+            } else {
+                $this->warn("→ User {$activeUser->name} has assigned_desk_id={$activeUser->assigned_desk_id} but desk not found in database");
             }
         } else {
             // No active user
