@@ -106,7 +106,7 @@ class ProfileHealthInsights {
         await this.fetchTodayStats();
         await this.createTimePercentageChart(); 
         
-        setInterval(() => this.fetchTodayStats(), 5000);
+        setInterval(() => this.fetchTodayStats(), 1000);
     }
 
     async fetchTodayStats() {
