@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insights — DeskUp</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Health Insights | DeskUp</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
     <script src="{{ asset('js/health.js') }}" defer></script>
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -135,19 +138,31 @@
         </section>
 
         <section id="recommendations" class="recommendations" aria-labelledby="recommendations-heading">
-            <h2 id="recommendations-heading" class="section-title">Recommendations</h2>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Notification History</h1>
+                    <p class="subtitle">View your recent desk activity notifications</p>
+                </header>
 
-            <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+                <section class="card notification-history">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Recent Notifications</h2>
+                    <div id="notificationHistoryList" class="notification-list">
+                        <p class="loading-text">Loading notifications...</p>
+                    </div>
+                </section>
+            </div>
 
-            <aside class="aside-tips" aria-label="Quick tips">
-                <div class="card">
-                    <h3>Quick Tips</h3>
-                    <ul>
-                        <li>Try the 50/10 rule: 50 minutes sitting, 10 standing or moving.</li>
-                        <li>Set gentle reminders to stand or stretch every hour.</li>
-                    </ul>
-                </div>
-            </aside>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Health Recommendations</h1>
+                    <p class="subtitle">Personalized insights based on your activity</p>
+                </header>
+
+                <section class="card recommendations-card">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Insights & Tips</h2>
+                    <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+                </section>
+            </div>
         </section>
     </main>
 

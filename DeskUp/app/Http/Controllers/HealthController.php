@@ -81,4 +81,31 @@ class HealthController extends Controller
             return response()->json(['error' => 'Failed to fetch live status', 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Combined API endpoint to fetch all health data at once for instant page load.
+     * Returns stats, chart data, and live status in a single response.
+     */
+    public function getAllData(Request $request)
+    {
+        $userId = Auth::id();
+        $range = $request->query('range', 'today');
+
+        try {
+            $data = [
+                'stats' => $this->healthService->getAggregatedStats($userId, $range),
+                'chartData' => $this->healthService->getChartData($userId, $range),
+                'liveStatus' => $this->healthService->getLiveStatus($userId),
+            ];
+            
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error('Health all data error: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'range' => $range,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Failed to fetch health data', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

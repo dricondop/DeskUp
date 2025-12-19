@@ -1,0 +1,170 @@
+# ninja log v6
+78	499	7874137835788491	pico-sdk/src/rp2040/boot_stage2/CMakeFiles/bs2_default.dir/compile_time_choice.S.obj	46ab2ad9d2b69e03
+2438	4783	7874137859398492	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_sync/sync.c.obj	ac134180558a7913
+502	1226	7874137845738471	pico-sdk/src/rp2040/boot_stage2/bs2_default.elf	980620e71f838b23
+502	1226	7874137845738471	pico-sdk/src/rp2040/boot_stage2/bs2_default.dis	980620e71f838b23
+2212	4037	7874137857138515	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_platform_common/common.c.obj	c1bf21f95f44ac84
+1226	1399	7874137847958491	pico-sdk/src/rp2040/boot_stage2/bs2_default.bin	c8f08e909fe09f95
+502	1226	7874137845738471	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default.dis	980620e71f838b23
+1399	1879	7874137852658498	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default_padded_checksummed.S	34cdd8ea3cf83f11
+1226	1399	7874137847958491	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default.bin	c8f08e909fe09f95
+3826	5583	7874137873268474	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/critical_section.c.obj	2ed998ad94dbdbef
+1399	1879	7874137852658498	pico-sdk/src/rp2040/boot_stage2/bs2_default_padded_checksummed.S	34cdd8ea3cf83f11
+2023	3273	7874137855248489	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdlib/stdlib.c.obj	d1a88816908a2ac5
+5380	7556	7874137888815396	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_ticks/ticks.c.obj	de5bda2f4f8b65da
+10563	12267	7874137940645420	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_i2c/i2c.c.obj	58c6a6f0be0f1734
+7609	9870	7874137911105417	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_init_rom_rp2040.c.obj	99ed138c325532f
+5040	7406	7874137885485428	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_vreg/vreg.c.obj	6acbd6c74de190a3
+2150	3628	7874137856518520	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2040/pico_platform/platform.c.obj	31494dba54da8a73
+8882	10841	7874137923835408	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S.obj	1456f52af0f21d31
+131	780	7874200261701642	CMakeFiles/Pico4DeskUp.dir/Pico4DeskUp.cpp.obj	3f154f432b0e6b53
+10787	12214	7874137942885400	pico-sdk/src/rp2040/boot_stage2/CMakeFiles/bs2_default_library.dir/bs2_default_padded_checksummed.S.obj	fba65acba4cf06e0
+4343	6680	7874137878445406	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/datetime.c.obj	a230cc9c00631824
+9451	11729	7874137929525427	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.obj	25dc1d0b0bea2e9a
+1926	4137	7874137854268507	CMakeFiles/Pico4DeskUp.dir/OLEDDisplay.cpp.obj	87e894cb6eeae7c8
+2082	4294	7874137855838474	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_gpio/gpio.c.obj	8cb2e08d7749a54
+8185	10080	7874137916865403	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_v1_rom_shim_rp2040.S.obj	b6230fbc3ecac36a
+160	825	7874200261991637	CMakeFiles/Pico4DeskUp.dir/DeskAPI.cpp.obj	9441ce57f82912f7
+2360	4389	7874137858618497	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/hardware_claim/claim.c.obj	9b4dc473c036ea44
+5139	7608	7874137886395387	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_watchdog/watchdog.c.obj	f9163050be9a9c8f
+6840	9035	7874137903475435	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init.c.obj	d1727e5ec7d42ec6
+2654	4547	7874137861548513	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_irq/irq_handler_chain.S.obj	cb82fa6ef769828
+2285	4654	7874137857868869	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_platform_panic/panic.c.obj	f646ead2503ed1
+7777	10236	7874137912785427	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_math.c.obj	8d023530472b5394
+2525	5001	7874137860268501	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.obj	2109437fc38ba563
+2728	5040	7874137862298484	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/sem.c.obj	410e9243498b604b
+2594	5138	7874137860948486	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_irq/irq.c.obj	1aa0dddb627d6998
+3275	5379	7874137867768504	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/lock_core.c.obj	97d89b91165f5097
+10288	12119	7874137937895431	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj	be733c47a428db0b
+5001	7197	7874137885015422	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_pll/pll.c.obj	21dc4997aa348336
+3628	5989	7874137871288509	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/mutex.c.obj	17600a4c338c33e2
+4390	6740	7874137878915414	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/pheap.c.obj	e5712cd5c4543af0
+4138	6228	7874137876388517	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_time/timeout_helper.c.obj	439626d1e8fa0d60
+4037	6375	7874137875388500	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_time/time.c.obj	74f7c4298cd8b758
+4548	6947	7874137880485441	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/queue.c.obj	2c9e94fdfa136960
+4295	6479	7874137877965427	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_timer/timer.c.obj	f5a424303de77400
+9181	11293	7874137926825416	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj	b833799db5a78619
+4654	6839	7874137881555428	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_uart/uart.c.obj	5a47862bd63c09a7
+8587	10787	7874137920885417	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_init_rom_rp2040.c.obj	b4d293c3b3eb4174
+4783	7148	7874137882845418	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_clocks/clocks.c.obj	19e90200cf681805
+5583	7776	7874137890845415	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bootrom/bootrom.c.obj	2fe04bcbd8aa7717
+7197	9234	7874137906985418	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S.obj	34bd137b7fcae7f
+5989	8185	7874137894905446	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bootrom/bootrom_lock.c.obj	f3dbd4f8214477bd
+6228	8292	7874137897295437	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_boot_lock/boot_lock.c.obj	61a29f95d1b34d06
+6376	8489	7874137898775430	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_flash/flash.c.obj	675305dd7e710dfe
+6479	8587	7874137899805428	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_xosc/xosc.c.obj	400a5eda92304459
+8780	11197	7874137922805422	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_math.c.obj	731e7bfea7579714
+6681	8779	7874137901815408	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_divider/divider.S.obj	4a459d768cc8463a
+6740	8882	7874137902415425	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime/runtime.c.obj	49eb3ae6c0b13896
+6948	9181	7874137904495425	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.obj	2c5e04044dec0261
+7149	9341	7874137906495423	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init_stack_guard.c.obj	2c163003cc48349e
+7407	9451	7874137909085421	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_divider/divider_hardware.S.obj	c614a96d2f9a9723
+9234	11636	7874137927355414	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_atomic/atomic.c.obj	cc2e083e9785030d
+826	1848	7874200277521624	Pico4DeskUp.bin	d0e4182c8bc21797
+7556	9759	7874137910575430	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_aeabi_rp2040.S.obj	355c8f77f61fa592
+8292	10288	7874137917935430	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S.obj	f05297673e033eba
+9870	11777	7874137933715479	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_crt0/crt0.S.obj	1d77af7f298f5792
+8489	10563	7874137919915410	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_aeabi_rp2040.S.obj	18a44e7700948a7f
+9036	11062	7874137925365427	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_malloc/malloc.c.obj	3e4ba8cf39ea0281
+9342	11496	7874137928425424	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_cxx_options/new_delete.cpp.obj	1a566906ce0cef2f
+9760	11970	7874137932615431	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_printf/printf.c.obj	c52ccf346929fbf2
+10081	12066	7874137935825413	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_clib_interface/newlib_interface.c.obj	87487d13bc7ecff5
+10236	12166	7874137937375412	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdio/stdio.c.obj	6739a00795eae1d0
+826	1848	7874200277521624	Pico4DeskUp.elf	d0e4182c8bc21797
+826	1848	7874200277521624	Pico4DeskUp.dis	d0e4182c8bc21797
+826	1848	7874200277521624	Pico4DeskUp.hex	d0e4182c8bc21797
+826	1848	7874200277521624	Pico4DeskUp.uf2	d0e4182c8bc21797
+826	1848	7874200277521624	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.dis	d0e4182c8bc21797
+826	1848	7874200277521624	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.hex	d0e4182c8bc21797
+826	1848	7874200277521624	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.bin	d0e4182c8bc21797
+826	1848	7874200277521624	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.uf2	d0e4182c8bc21797
+37	269	7876700907935058	pico-sdk/src/rp2040/boot_stage2/CMakeFiles/bs2_default.dir/compile_time_choice.S.obj	46ab2ad9d2b69e03
+269	667	7876700913891763	pico-sdk/src/rp2040/boot_stage2/bs2_default.elf	980620e71f838b23
+269	667	7876700913891763	pico-sdk/src/rp2040/boot_stage2/bs2_default.dis	980620e71f838b23
+269	667	7876700913891763	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default.dis	980620e71f838b23
+667	785	7876700915177042	pico-sdk/src/rp2040/boot_stage2/bs2_default.bin	c8f08e909fe09f95
+667	785	7876700915177042	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default.bin	c8f08e909fe09f95
+785	1023	7876700917521069	pico-sdk/src/rp2040/boot_stage2/bs2_default_padded_checksummed.S	34cdd8ea3cf83f11
+785	1023	7876700917521069	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/pico-sdk/src/rp2040/boot_stage2/bs2_default_padded_checksummed.S	34cdd8ea3cf83f11
+1071	1642	7876700918272661	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdlib/stdlib.c.obj	d1a88816908a2ac5
+1151	1715	7876700919074387	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2040/pico_platform/platform.c.obj	31494dba54da8a73
+1183	1809	7876700919394457	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_platform_common/common.c.obj	c1bf21f95f44ac84
+1262	1885	7876700920189584	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/hardware_claim/claim.c.obj	9b4dc473c036ea44
+1310	1937	7876700920664794	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_sync/sync.c.obj	ac134180558a7913
+1368	1982	7876700921254767	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c.obj	2109437fc38ba563
+1478	2036	7876700922339997	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_irq/irq_handler_chain.S.obj	cb82fa6ef769828
+1118	2106	7876700918744413	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_gpio/gpio.c.obj	8cb2e08d7749a54
+1038	2175	7876700917952675	CMakeFiles/Pico4DeskUp.dir/OLEDDisplay.cpp.obj	87e894cb6eeae7c8
+1054	2232	7876700918102674	CMakeFiles/Pico4DeskUp.dir/DeskAPI.cpp.obj	9441ce57f82912f7
+1219	2290	7876700919759546	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_platform_panic/panic.c.obj	f646ead2503ed1
+1420	2355	7876700921770038	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_irq/irq.c.obj	1aa0dddb627d6998
+1578	2441	7876700923345291	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/sem.c.obj	410e9243498b604b
+1643	2490	7876700923990527	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/lock_core.c.obj	97d89b91165f5097
+1809	2580	7876700925661018	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/critical_section.c.obj	2ed998ad94dbdbef
+1716	2660	7876700924725819	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_sync/mutex.c.obj	17600a4c338c33e2
+1937	2753	7876700926936259	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_time/timeout_helper.c.obj	439626d1e8fa0d60
+1982	2850	7876700927386229	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_timer/timer.c.obj	f5a424303de77400
+1886	2936	7876700926421109	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_time/time.c.obj	74f7c4298cd8b758
+2107	3017	7876700928636872	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/pheap.c.obj	e5712cd5c4543af0
+2036	3079	7876700927931585	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/datetime.c.obj	a230cc9c00631824
+2175	3139	7876700929316829	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/common/pico_util/queue.c.obj	2c9e94fdfa136960
+2232	3195	7876700929892083	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_uart/uart.c.obj	5a47862bd63c09a7
+2355	3261	7876700931117370	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_pll/pll.c.obj	21dc4997aa348336
+2441	3319	7876700931972644	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_vreg/vreg.c.obj	6acbd6c74de190a3
+2291	3376	7876700930472142	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_clocks/clocks.c.obj	19e90200cf681805
+3079	3448	7876700938361382	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_divider/divider.S.obj	4a459d768cc8463a
+2581	3499	7876700933377915	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_ticks/ticks.c.obj	de5bda2f4f8b65da
+2490	3562	7876700932472756	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_watchdog/watchdog.c.obj	f9163050be9a9c8f
+2753	3615	7876700935098446	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bootrom/bootrom_lock.c.obj	f3dbd4f8214477bd
+2660	3668	7876700934163220	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bootrom/bootrom.c.obj	2fe04bcbd8aa7717
+2850	3747	7876700936070923	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_boot_lock/boot_lock.c.obj	61a29f95d1b34d06
+3377	3829	7876700941327023	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S.obj	34bd137b7fcae7f
+2936	3834	7876700936926154	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_flash/flash.c.obj	675305dd7e710dfe
+3017	3838	7876700937731440	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_xosc/xosc.c.obj	400a5eda92304459
+3139	3844	7876700938956663	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime/runtime.c.obj	49eb3ae6c0b13896
+3195	3848	7876700939516723	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init.c.obj	d1727e5ec7d42ec6
+3261	3853	7876700940181859	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init_clocks.c.obj	2c5e04044dec0261
+3319	3857	7876700940757066	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_runtime_init/runtime_init_stack_guard.c.obj	2c163003cc48349e
+3448	3860	7876700942042313	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_divider/divider_hardware.S.obj	c614a96d2f9a9723
+3499	3877	7876700942562389	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_aeabi_rp2040.S.obj	355c8f77f61fa592
+3668	4033	7876700944252885	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_v1_rom_shim_rp2040.S.obj	b6230fbc3ecac36a
+3748	4042	7876700945043756	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S.obj	f05297673e033eba
+3562	4055	7876700943187521	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_init_rom_rp2040.c.obj	99ed138c325532f
+3616	4260	7876700943722890	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_double/double_math.c.obj	8d023530472b5394
+41	675	7876701646183323	CMakeFiles/Pico4DeskUp.dir/Pico4DeskUp.cpp.obj	3f154f432b0e6b53
+57	739	7876701646363292	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_aeabi_rp2040.S.obj	18a44e7700948a7f
+75	809	7876701646533278	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_init_rom_rp2040.c.obj	b4d293c3b3eb4174
+93	863	7876701646705455	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_math.c.obj	731e7bfea7579714
+142	864	7876701647195484	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_float/float_v1_rom_shim_rp2040.S.obj	1456f52af0f21d31
+177	865	7876701647545835	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_malloc/malloc.c.obj	3e4ba8cf39ea0281
+212	866	7876701647900775	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S.obj	b833799db5a78619
+384	867	7876701649616041	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_standard_binary_info/standard_binary_info.c.obj	25dc1d0b0bea2e9a
+330	899	7876701649076000	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_cxx_options/new_delete.cpp.obj	1a566906ce0cef2f
+487	912	7876701650651269	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_crt0/crt0.S.obj	1d77af7f298f5792
+274	998	7876701648520758	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_atomic/atomic.c.obj	cc2e083e9785030d
+809	1064	7876701653871234	pico-sdk/src/rp2040/boot_stage2/CMakeFiles/bs2_default_library.dir/bs2_default_padded_checksummed.S.obj	fba65acba4cf06e0
+428	1185	7876701650061247	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_printf/printf.c.obj	c52ccf346929fbf2
+546	1226	7876701651236484	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_clib_interface/newlib_interface.c.obj	87487d13bc7ecff5
+606	1245	7876701651841694	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdio/stdio.c.obj	6739a00795eae1d0
+676	1254	7876701652541777	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/pico_stdio_uart/stdio_uart.c.obj	be733c47a428db0b
+739	1279	7876701653176977	CMakeFiles/Pico4DeskUp.dir/C_/Users/downy/.pico-sdk/sdk/2.2.0/src/rp2_common/hardware_i2c/i2c.c.obj	58c6a6f0be0f1734
+1279	1904	7876701664449741	Pico4DeskUp.elf	d0e4182c8bc21797
+1279	1904	7876701664449741	Pico4DeskUp.dis	d0e4182c8bc21797
+1279	1904	7876701664449741	Pico4DeskUp.hex	d0e4182c8bc21797
+1279	1904	7876701664449741	Pico4DeskUp.bin	d0e4182c8bc21797
+1279	1904	7876701664449741	Pico4DeskUp.uf2	d0e4182c8bc21797
+1279	1904	7876701664449741	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.dis	d0e4182c8bc21797
+1279	1904	7876701664449741	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.hex	d0e4182c8bc21797
+1279	1904	7876701664449741	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.bin	d0e4182c8bc21797
+1279	1904	7876701664449741	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.uf2	d0e4182c8bc21797
+80	508	7876705608667717	CMakeFiles/Pico4DeskUp.dir/Pico4DeskUp.cpp.obj	3f154f432b0e6b53
+105	534	7876705608917680	CMakeFiles/Pico4DeskUp.dir/DeskAPI.cpp.obj	9441ce57f82912f7
+534	1140	7876705618927672	Pico4DeskUp.elf	d0e4182c8bc21797
+534	1140	7876705618927672	Pico4DeskUp.dis	d0e4182c8bc21797
+534	1140	7876705618927672	Pico4DeskUp.hex	d0e4182c8bc21797
+534	1140	7876705618927672	Pico4DeskUp.bin	d0e4182c8bc21797
+534	1140	7876705618927672	Pico4DeskUp.uf2	d0e4182c8bc21797
+534	1140	7876705618927672	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.dis	d0e4182c8bc21797
+534	1140	7876705618927672	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.hex	d0e4182c8bc21797
+534	1140	7876705618927672	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.bin	d0e4182c8bc21797
+534	1140	7876705618927672	C:/Users/downy/Documents/SDU/SEMS3/semester project/repository/Pico4DeskUp/build/Pico4DeskUp.uf2	d0e4182c8bc21797
