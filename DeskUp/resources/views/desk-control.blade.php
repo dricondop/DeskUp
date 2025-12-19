@@ -8,6 +8,11 @@
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
+    
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
 </head>
 <body>
     @include('components.sidebar')
@@ -21,7 +26,13 @@
                     <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
                 </div>
 
-                <img src="{{ asset('assets/desk.png') }}" alt="desk">
+                <!-- 3D Canvas -->
+                <div class="desk-3d-container">
+                    <div id="desk-3d-viewer"></div>
+                    <div class="height-indicator-3d">
+                        <span id="current-height-3d">{{ $desk->height }} cm</span>
+                    </div>
+                </div>
                 
                 <div class="desk-view-btns-container">
                     <button class="desk-view-btns sitting">Sitting</button>
@@ -93,23 +104,51 @@
     <!-- Event Modal -->
     @include('components.modals', ['recurringCleaningDays' => []])
 
-
     <script>
+        // 3D viewer data
+        const deskData = {
+            id: {{ $desk->id }},
+            currentHeight: {{ $desk->height }},
+            minHeight: 68,
+            maxHeight: 132,
+            modelPath: "{{ asset('models/adjustable-desk/desk.glb') }}",
+            apiUrl: "/api/desks/{{ $desk->id }}/height" 
+        };
+
+        const loggedInUser = {{ auth()->user()->id }};
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        
+        // Desk control
         const desk = {
             id: {{ $desk->id }},
             height: {{ $desk->height }},
             speed: {{ $desk->speed }},
         };
-
-        const loggedInUser = {{ auth()->user()->id }};
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     </script>
 
+    <!-- Scripts -->
+    <script src="{{ asset('js/desk-3d-viewer.js') }}"></script>
     <script src="{{ asset('js/desk-control.js') }}"></script>
     <script src="{{ asset('js/tab-switcher.js') }}"></script>
     <script src="{{ asset('js/modals.js') }}"></script>
 
     <script>
+        // Initialize the 3D viewer after the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Desk3DViewer) {
+                window.desk3DViewer = new Desk3DViewer(deskData);
+            }
+            
+            // Initialize desk controls
+            if (typeof addAllDesks === 'function') {
+                addAllDesks([desk.id], desk.height);
+                isEvent = false;
+            }
+            
+            // Update clock
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
         
         function updateClock() {
             const clockEl = document.getElementById('clock');
@@ -131,14 +170,6 @@
 
             clockEl.textContent = `${datePart} ${timePart}`;
         }
-
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
-    <script>
-        // add desk to desk array
-        addAllDesks([desk.id], desk.height);
-        isEvent = false;
     </script>
 </body>
 </html>
