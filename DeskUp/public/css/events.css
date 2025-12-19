@@ -4,7 +4,7 @@ html, body {
   margin: 0; 
 }
 
-p, h1, h2, h3, span { 
+p, h1, h2, h3, span, label, a { 
   font-family: 'Inter', sans-serif; 
 }
 
@@ -34,6 +34,20 @@ button:hover {
     cursor: pointer;
 }
 
+.horizontal-alignment {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-between; 
+    align-items: center;
+}
+
+.vertical-alignment {
+    display: flex; 
+    flex-direction: column; 
+    justify-content:center; 
+    align-items:center;
+}
+
 /* ---- <Main> content layout (contains everything) ---- */
 .all-content {
   padding: 0 30px 30px 30px;
@@ -46,6 +60,28 @@ button:hover {
     margin: 40px 20px 0 50px;
 }
 
+
+/* Schedule Cleaning button */
+.scheduleCleaning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(228, 228, 228);;
+  border: 1.5px solid rgb(166, 166, 166);
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.scheduleCleaning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(66, 127, 189, 0.2);
+}
+
+
+/* Add event button button */
 .add-event {
     font-size: 1.5rem;
     width: 2rem;
@@ -56,16 +92,44 @@ button:hover {
     border: 1px solid black;
     border-radius: 50%;
     margin-right: 20px;
+    padding-bottom: 2px;
+    background: linear-gradient(180deg, #3e648b86 0%, #339ac36a 100%);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.add-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(66, 127, 189, 0.2);
 }
 
+/* Toggle 'My Events' button button */
 .my-event {
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: rgb(228, 228, 228);;
+  border: 1.5px solid rgb(166, 166, 166);
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.my-event.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #3e648b86 0%, #339ac36a 100%);
   border: 1px solid black;
   border-radius: 15px;
   padding: 5px 10px;
   margin-right: 10px;
+  text-decoration: none;
+  color: black;
+}
+.my-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(79, 79, 79, 0.2);
 }
 
 #event-tabs {
@@ -126,7 +190,8 @@ button:hover {
     justify-content: center;
     
     background: linear-gradient(180deg, #3e648bc7 0%, #339ac3c2 100%);
-    padding: 30px 10px;
+    height: 100px;
+    width: 90px;
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
 }
@@ -185,69 +250,31 @@ button:hover {
 .meeting-management-header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
 }
 
 .close-panel {
-  display: flex;
-  justify-content: flex-end;
-  padding: 20px 15px 0 0;
+  padding: 20px 15px 0 20px;
 }
 
 
 
-/* Desk move speed */
-.height-adjustment-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
 
-.input-group {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  border-radius: 15px;
-  overflow: hidden;
-  border: 1px solid #f2f2f2;;
-}
-
-/* Height adjustment increase/decrease buttons */
-.input-group button {
-  flex: 1;
-  background: #f2f2f2;
-  border: 1px solid #f2f2f2;;
-  font-size: 1.5rem;
-  font-weight: 400;
-  color: #333;
-  cursor: pointer;
-  padding: 10px 0;
-  transition: 0.2s ease;
-}
-
-.input-group > button:first-child:hover {
-  background: var(--red);
-}
-.input-group > button:last-child:hover {
-  background: var(--green);
-}
-
-/* Height adjustment numerical value */
-.input-group .value {
-  flex: 2;
-  text-align: center;
-  font-size: 1.6rem;
-  font-weight: 500;
-  color: #111;
-  background: #fff;
-  padding: 10px 0;
-}
 
 .meeting-attendees {
-  margin: 40px 0 0 0;
+  margin: 20px 0 0 0;
+}
+
+.attendee-btn {
+  position: relative;
+  display: inline-block;
+}
+
+.attendee-btn select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .meeting-desks {
