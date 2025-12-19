@@ -7,6 +7,7 @@ use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
 use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\PDFExportController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -59,6 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/health-stats', [HealthController::class, 'getStats'])->name('api.health.stats');
     Route::get('/api/health-chart-data', [HealthController::class, 'getChartData'])->name('api.health.chart');
     Route::get('/api/health-live-status', [HealthController::class, 'getLiveStatus'])->name('api.health.live');
+
+    // PDF Export routes
+    Route::get('/health/export/pdf', [PDFExportController::class, 'exportHealthPDF'])->name('health.export.pdf');
+    Route::get('/health/export/preview', [PDFExportController::class, 'previewHealthPDF'])->name('health.export.preview');
     // Combined endpoint for instant page load
     Route::get('/api/health-data', [HealthController::class, 'getAllData'])->name('api.health.all');
 });
@@ -187,6 +192,19 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/signin');
 })->name('logout');
+
+// Landing page routes
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy.policy');
+
+Route::get('/terms-conditions', function () {
+    return view('terms-conditions');
+})->name('terms.conditions');
+
+Route::get('/contact-us', function () {
+    return view('contact-us');
+})->name('contact.us');
 
 //API TESTING ROUTES
 Route::get('/apitest', function () {

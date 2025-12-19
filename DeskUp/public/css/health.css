@@ -47,6 +47,118 @@ body{
 .header-left h1{margin:0;font-size:1.4rem;font-weight:700;color:var(--text)}
 .subtitle{margin:0 0 0.25rem 0;font-size:0.95rem;color:var(--muted)}
 
+/* Export button */
+.export-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.export-btn:hover {
+    background: #009494;
+}
+
+.export-btn:active {
+    transform: translateY(1px);
+}
+
+/* Modal para opciones de exportación */
+.export-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.export-modal-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.export-modal h3 {
+    margin-top: 0;
+    color: var(--text);
+}
+
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.export-option {
+    padding: 10px;
+    border: 1px solid rgba(58,80,107,0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.export-option:hover {
+    background: rgba(0,168,168,0.05);
+    border-color: var(--accent);
+}
+
+.export-option.active {
+    background: rgba(0,168,168,0.1);
+    border-color: var(--accent);
+}
+
+.export-option-title {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.export-option-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.export-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.modal-btn.primary {
+    background: var(--accent);
+    color: white;
+}
+
+.modal-btn.secondary {
+    background: var(--glass);
+    color: var(--text);
+}
+
 /* Grid layout for main dashboard */
 .dashboard{
   display:grid;

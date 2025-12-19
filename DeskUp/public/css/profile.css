@@ -103,16 +103,44 @@ html, body {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Profile content layout - Default for profile page */
+/* Profile content layout */
 .profile-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
     gap: 25px;
+    align-items: stretch;
 }
 
-/* Full width layout for edit page */
 .profile-content.full-width {
     grid-template-columns: 1fr;
+}
+
+/* Personal Information card takes full left column */
+.info-card:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    height: 100%;
+    align-self: stretch;
+}
+
+/* Health Insights card */
+.health-insights-card {
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ideal Height card */
+.ideal-height-card {
+    grid-column: 2;
+    grid-row: 2;
+    height: 100%;
+    align-self: stretch;
+    margin-top: 0;
 }
 
 /* Info cards */
@@ -317,32 +345,235 @@ html, body {
 .ideal-height-container {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    min-height: 0;
 }
 
 .height-display {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 15px 0;
+    margin: 10px 0 8px 0;
 }
 
 .height-value {
-    font-size: 36px;
-    font-weight: 700;
+    font-size: 34px;
+    font-weight: 800;
     color: #07325F;
-    margin-right: 8px;
+    margin-right: 6px;
 }
 
 .height-unit {
-    font-size: 20px;
-    color: #666;
+    font-size: 18px;
+    color: #718096;
+    font-weight: 500;
 }
 
 .height-description {
     text-align: center;
-    color: #666;
-    margin: 0 0 15px 0;
+    color: #718096;
+    margin: 0 0 14px 0;
     font-size: 14px;
+    line-height: 1.45;
+    padding: 0 8px;
+}
+
+/* Health Insights - Horizontal Layout */
+.health-insights-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+    flex: 1;
+    min-height: 0;
+}
+
+.health-metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+}
+
+.health-metric-horizontal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px;
+    border-left: 4px solid;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.health-metric-horizontal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.health-metric-horizontal.time-percentage-card {
+    border-left-color: #3A506B;
+}
+
+.health-metric-horizontal.posture-score-card {
+    border-left-color: #48BB78;
+}
+
+.health-metric-horizontal .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.health-metric-horizontal .health-metric-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3A506B;
+    margin: 0;
+}
+
+.health-metric-horizontal .health-metric-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.time-percentage-card .health-metric-badge {
+    background: rgba(58, 80, 107, 0.1);
+    color: #3A506B;
+}
+
+.posture-score-card .health-metric-badge {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48BB78;
+}
+
+/* Sit/Stand Ratio Chart */
+.chart-container-horizontal {
+    position: relative;
+    width: 100%;
+    height: 88px;
+    margin: 4px 0 6px 0;
+    flex: 0 0 auto;
+}
+
+.chart-labels-horizontal {
+    display: none;
+}
+
+.chart-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.pill {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.pill-sit {
+    background: rgba(58, 80, 107, 0.1);
+    color: #3A506B;
+}
+
+.pill-stand {
+    background: rgba(0, 168, 168, 0.12);
+    color: #007f7f;
+}
+
+/* Posture Score Display - Modified to support dynamic colors */
+.posture-score-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin: 6px 0 8px 0;
+    flex: 0 0 auto;
+}
+
+.posture-score-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #2F855A; 
+    line-height: 1;
+}
+
+/* Update progress bar colors based on score */
+.progress-wrap-horizontal .progress-bar.value-poor {
+    background: linear-gradient(90deg, #FF4444, #FF8888);
+}
+
+.progress-wrap-horizontal .progress-bar.value-fair {
+    background: linear-gradient(90deg, #FFAA00, #FFCC66);
+}
+
+.progress-wrap-horizontal .progress-bar.value-good {
+    background: linear-gradient(90deg, #66BB6A, #81C784);
+}
+
+.progress-wrap-horizontal .progress-bar.value-excellent {
+    background: linear-gradient(90deg, #4CAF50, #66BB6A);
+}
+
+/* Update border colors for posture score card based on value */
+.posture-score-card.value-poor {
+    border-left-color: #FF4444;
+}
+
+.posture-score-card.value-fair {
+    border-left-color: #FFAA00;
+}
+
+.posture-score-card.value-good {
+    border-left-color: #66BB6A;
+}
+
+.posture-score-card.value-excellent {
+    border-left-color: #4CAF50;
+}
+
+.posture-score-label {
+    display: none !important;
+}
+
+.progress-wrap-horizontal {
+    width: 100%;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 6px 0 6px 0;
+}
+
+.progress-wrap-horizontal .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #48BB78, #38A169);
+    transition: width 0.4s ease;
+}
+
+.score-scale {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.score-scale .scale-min,
+.score-scale .scale-max {
+    font-size: 10px;
+    color: #9CA3AF;
+    font-weight: 500;
 }
 
 /* Edit form styles */
@@ -451,6 +682,11 @@ html, body {
     object-fit: cover;
     border: 3px solid #FFFFFF;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.current-picture img:hover {
+    transform: scale(1.05);
 }
 
 .remove-picture-btn {
@@ -513,16 +749,52 @@ html, body {
     line-height: 1.4;
 }
 
-/* Image Preview Animation */
-.current-picture img {
-    transition: transform 0.3s ease;
-}
-
-.current-picture img:hover {
-    transform: scale(1.05);
-}
-
 /* Responsive design */
+@media (max-width: 1024px) {
+    .profile-content {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+    }
+
+    .info-card:first-child {
+        grid-row: 1;
+    }
+    
+    .health-insights-card {
+        grid-row: 2;
+    }
+    
+    .ideal-height-card {
+        grid-row: 3;
+    }
+
+    .health-metrics-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .chart-container-horizontal {
+        height: 84px;
+    }
+}
+
+/* Add these value color classes */
+.value-poor {
+    color: #FF4444 !important;
+}
+
+.value-fair {
+    color: #FFAA00 !important;
+}
+
+.value-good {
+    color: #66BB6A !important;
+}
+
+.value-excellent {
+    color: #4CAF50 !important;
+}
+
 @media (max-width: 768px) {
     .profile-content {
         grid-template-columns: 1fr;
@@ -550,5 +822,25 @@ html, body {
     
     .header-actions {
         align-self: flex-end;
+    }
+    
+    .health-insights-horizontal {
+        gap: 10px;
+    }
+    
+    .chart-container-horizontal {
+        height: 78px;
+    }
+    
+    .posture-score-value {
+        font-size: 28px;
+    }
+    
+    .height-value {
+        font-size: 28px;
+    }
+    
+    .height-unit {
+        font-size: 16px;
     }
 }
