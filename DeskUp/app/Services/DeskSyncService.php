@@ -13,11 +13,13 @@ use Illuminate\Support\Facades\Log;
 class DeskSyncService
 {
     // Sync all desks (Ids & names) from the API endpoint into the database (desks table)
+    // This will create, update, and DELETE desks to match the API exactly
     public function syncDesksFromApi(): array
     {
         $syncResults = [
             'created' => 0,
             'updated' => 0,
+            'deleted' => 0,
             'errors' => []
         ];
 
@@ -29,9 +31,30 @@ class DeskSyncService
                 return $syncResults;
             }
 
+            // Track which API desk IDs we've seen
+            $apiDeskIds = [];
+            
+            // Pre-fetch all desk data in parallel to reduce API calls
+            $deskDataCache = [];
             foreach ($apiDesks as $apiDeskId) {
                 try {
-                    $result = $this->syncSingleDeskFromApi($apiDeskId);
+                    $deskDataCache[$apiDeskId] = $this->fetchDeskInfo($apiDeskId);
+                    $apiDeskIds[] = $apiDeskId;
+                } catch (\Exception $e) {
+                    Log::warning("Failed to fetch info for desk {$apiDeskId}: " . $e->getMessage());
+                    // Generate fallback data
+                    $deskDataCache[$apiDeskId] = [
+                        'desk_number_fallback' => abs(crc32($apiDeskId)) % 9999 + 1000,
+                        'desk_name_fallback' => "Desk " . substr($apiDeskId, 0, 8),
+                    ];
+                    $apiDeskIds[] = $apiDeskId;
+                }
+            }
+
+            // Create or update desks from API using cached data
+            foreach ($apiDesks as $apiDeskId) {
+                try {
+                    $result = $this->syncSingleDeskFromApi($apiDeskId, $deskDataCache[$apiDeskId]);
                     if ($result['created']) {
                         $syncResults['created']++;
                     } elseif ($result['updated']) {
@@ -39,6 +62,39 @@ class DeskSyncService
                     }
                 } catch (\Exception $e) {
                     $error = "Error syncing desk {$apiDeskId}: " . $e->getMessage();
+                    Log::error($error);
+                    $syncResults['errors'][] = $error;
+                }
+            }
+
+            // Delete desks that no longer exist in the API
+            // This includes desks with null api_desk_id OR desks whose api_desk_id is not in the current API list
+            $desksToDelete = Desk::where(function($query) use ($apiDeskIds) {
+                $query->whereNull('api_desk_id')
+                      ->orWhereNotIn('api_desk_id', $apiDeskIds);
+            })->get();
+            
+            Log::info('Deletion check', [
+                'api_desk_ids_count' => count($apiDeskIds),
+                'api_desk_ids_sample' => array_slice($apiDeskIds, 0, 3),
+                'total_desks_in_db' => Desk::count(),
+                'desks_to_delete_count' => $desksToDelete->count(),
+                'desks_to_delete_sample' => $desksToDelete->take(3)->pluck('api_desk_id')->toArray(),
+                'desks_with_null_api_id' => Desk::whereNull('api_desk_id')->count()
+            ]);
+            
+            foreach ($desksToDelete as $desk) {
+                try {
+                    Log::info("Deleting desk {$desk->name} (API ID: {$desk->api_desk_id}) - no longer in API");
+                    
+                    // Remove assigned users first
+                    User::where('assigned_desk_id', $desk->desk_number)->update(['assigned_desk_id' => null]);
+                    
+                    // Delete the desk
+                    $desk->delete();
+                    $syncResults['deleted']++;
+                } catch (\Exception $e) {
+                    $error = "Error deleting desk {$desk->api_desk_id}: " . $e->getMessage();
                     Log::error($error);
                     $syncResults['errors'][] = $error;
                 }
@@ -129,10 +185,11 @@ class DeskSyncService
     }
 
     // Used in syncDesksFromApi for creating/updating one desk at a time
-    private function syncSingleDeskFromApi(string $apiDeskId): array
+    // Accepts optional pre-fetched desk data to avoid redundant API calls
+    private function syncSingleDeskFromApi(string $apiDeskId, ?array $deskDataCache = null): array
     {
-        // Generate desk number and name from API ID
-        $deskInfo = $this->fetchDeskInfo($apiDeskId);
+        // Use cached data if provided, otherwise fetch from API
+        $deskInfo = $deskDataCache ?? $this->fetchDeskInfo($apiDeskId);
 
         $deskNumber = $deskInfo['desk_number'] ?? $deskInfo['desk_number_fallback'];
         $deskName = $deskInfo['desk_name'] ?? $deskInfo['desk_name_fallback'];
@@ -141,12 +198,16 @@ class DeskSyncService
         // Try to find existing desk by desk_number
         $desk = Desk::where('desk_number', $deskNumber)->first();
         
+        // Generate random coordinates for new desks to avoid stacking in corner
+        $randomX = rand(100, 700);
+        $randomY = rand(100, 500);
+        
         $deskData = [
             'name' => $deskName,
             'desk_number' => $deskNumber,
             'api_desk_id' => $apiDeskId,
-            'position_x' => null,
-            'position_y' => null,
+            'position_x' => $desk ? $desk->position_x : $randomX,
+            'position_y' => $desk ? $desk->position_y : $randomY,
             'is_active' => true,
             'user_id' => null,
         ];
@@ -364,6 +425,24 @@ class DeskSyncService
                 'desk_number_fallback' => abs(crc32($apiDeskId)) % 9999 + 1000,
                 'desk_name_fallback' => "Desk " . substr($apiDeskId, 0, 8),
             ];
+        }
+    }
+
+    /**
+     * Check if the external desk API is online and accessible
+     * 
+     * @return bool True if API is healthy, false otherwise
+     */
+    public function checkApiHealth(): bool
+    {
+        try {
+            $apiDesks = APIMethods::getAllDesks();
+            
+            // If we get a response (even if empty array), API is online
+            return is_array($apiDesks);
+        } catch (\Exception $e) {
+            Log::warning('API health check failed: ' . $e->getMessage());
+            return false;
         }
     }
 }

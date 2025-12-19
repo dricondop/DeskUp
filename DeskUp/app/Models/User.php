@@ -85,4 +85,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Event::class, 'event_users');
     }
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Get the active sessions for the user.
+     */
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
+    }
 }

@@ -102,7 +102,7 @@ body {
 
 .toolbar {
     position: fixed;
-    top: 80px;
+    top: 20px;
     right: 20px;
     background: white;
     padding: 15px;
