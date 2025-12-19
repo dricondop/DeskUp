@@ -7,6 +7,7 @@ use App\Http\Controllers\DeskController;
 use App\Http\Controllers\ProfileController; 
 use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\PDFExportController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -84,7 +85,9 @@ Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     $users = User::all();
     $desks = Desk::all();
 
-
+    // Admin Statistics PDF Export routes
+    Route::get('/admin/statistics/export/pdf', [PDFExportController::class, 'exportAdminStatsPDF'])->name('admin.statistics.export.pdf');
+    Route::get('/admin/statistics/export/preview', [PDFExportController::class, 'previewAdminStatsPDF'])->name('admin.statistics.export.preview');
 
 Route::get('/events', [EventController::class, 'index']);
 
