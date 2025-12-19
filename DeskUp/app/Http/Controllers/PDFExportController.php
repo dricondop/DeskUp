@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\HealthStatsService;
+use App\Models\Desk;
+use App\Models\User;
+use App\Models\UserStatsHistory;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -582,5 +585,337 @@ class PDFExportController extends Controller
             case 'yearly': return 'Last Year';
             default: return ucfirst($range);
         }
+    }
+
+
+    /**
+     * Export admin statistics to PDF
+     */
+    public function exportAdminStatsPDF(Request $request)
+    {
+        // Time limit
+        set_time_limit(120);
+        ini_set('memory_limit', '256M');
+        
+        try {
+            $date = now()->format('Y-m-d');
+            
+            // Get admin statistics data
+            $data = $this->getAdminStatsData();
+            
+            // Generate charts
+            $data['charts'] = $this->generateAdminCharts($data);
+            
+            // Generate PDF
+            $pdf = Pdf::loadView('pdf.admin-statistics-report', $data);
+            
+            // PDF settings
+            $pdf->setPaper('A4', 'portrait');
+            $pdf->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true, 
+                'defaultFont' => 'sans-serif',
+                'compress' => true,
+            ]);
+            
+            // Download
+            return $pdf->download("admin-statistics-report-{$date}.pdf");
+            
+        } catch (\Exception $e) {
+            Log::error('Admin Stats PDF Generation Error: ' . $e->getMessage());
+            return response()->view('pdf.error', [
+                'message' => 'Failed to generate PDF. Please try again.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Preview admin statistics PDF
+     */
+    public function previewAdminStatsPDF(Request $request)
+    {
+        try {
+            // Get admin statistics data
+            $data = $this->getAdminStatsData();
+            
+            // Generate charts
+            $data['charts'] = $this->generateAdminCharts($data);
+            
+            return view('pdf.admin-statistics-report', $data);
+            
+        } catch (\Exception $e) {
+            Log::error('Admin Stats PDF Preview Error: ' . $e->getMessage());
+            return view('pdf.error', [
+                'message' => 'Failed to load preview. Please try again.'
+            ]);
+        }
+    }
+
+    /**
+     * Get admin statistics data
+     */
+    private function getAdminStatsData()
+    {
+        // Replicate logic from AdminStatisticsController
+        $desks = Desk::with('latestStats')->orderBy('desk_number')->get();
+        $totalDesks = $desks->count();
+        
+        // Occupied by status
+        $occupiedByStatus = $desks->filter(fn (Desk $desk) => $desk->status !== 'OK')->count();
+        
+        // Occupied by recent usage
+        $occupiedByRecentActivity = UserStatsHistory::where('recorded_at', '>=', now()->subHour())
+            ->distinct('desk_id')
+            ->count('desk_id');
+        
+        $occupiedDesks = max($occupiedByStatus, $occupiedByRecentActivity);
+        
+        // Average active time
+        $days = 7;
+        $since = now()->subDays($days);
+        
+        $totalRecords = UserStatsHistory::where('recorded_at', '>=', $since)->count();
+        $distinctUsers = UserStatsHistory::where('recorded_at', '>=', $since)->distinct('user_id')->count('user_id');
+        
+        $avgSession = $distinctUsers > 0
+            ? ($totalRecords * 60.0) / $distinctUsers / $days
+            : 0;
+        
+        // Top users
+        $topUsers = UserStatsHistory::select('users.name')
+            ->join('users', 'users.id', '=', 'user_stats_history.user_id')
+            ->where('user_stats_history.recorded_at', '>=', $since)
+            ->selectRaw('users.name, COUNT(*) as usage_count')
+            ->groupBy('users.name')
+            ->orderByDesc('usage_count')
+            ->limit(5)
+            ->get()
+            ->map(fn ($r) => ['name' => $r->name, 'count' => (int) $r->usage_count])
+            ->toArray();
+        
+        // Users list
+        $users = User::orderBy('name')->get();
+        
+        // Heatmap data
+        $grid = array_fill(0, 7, array_fill(0, 24, 0));
+        
+        $heatRows = UserStatsHistory::where('recorded_at', '>=', $since)
+            ->selectRaw('EXTRACT(DOW FROM recorded_at) as dow, EXTRACT(HOUR FROM recorded_at) as hr, COUNT(*) as c')
+            ->groupBy('dow', 'hr')
+            ->get();
+        
+        foreach ($heatRows as $row) {
+            $dow = (int) $row->dow;
+            $hr  = (int) $row->hr;
+            $mapped = ($dow === 0) ? 6 : ($dow - 1);
+            $grid[$mapped][$hr] = (int) $row->c;
+        }
+        
+        return [
+            'totalDesks' => $totalDesks,
+            'occupiedDesks' => $occupiedDesks,
+            'availableDesks' => $totalDesks - $occupiedDesks,
+            'avgSession' => round($avgSession),
+            'topUsers' => $topUsers,
+            'desks' => $desks,
+            'users' => $users,
+            'heatmapGrid' => $grid,
+            'exportDate' => now()->format('d/m/Y H:i'),
+            'daysAnalyzed' => $days,
+            'sinceDate' => $since->format('d/m/Y'),
+            'totalRecords' => $totalRecords,
+            'distinctUsers' => $distinctUsers,
+            'hasData' => $totalRecords > 0,
+        ];
+    }
+
+    /**
+     * Generate admin statistics charts
+     */
+    private function generateAdminCharts($data)
+    {
+        $charts = [];
+        
+        try {
+            // 1. Top Users Chart
+            if (!empty($data['topUsers'])) {
+                $topUserLabels = array_column($data['topUsers'], 'name');
+                $topUserValues = array_column($data['topUsers'], 'count');
+                
+                $charts['topUsers'] = $this->generateAdminBarChart(
+                    $topUserLabels,
+                    $topUserValues,
+                    'Top Users by Usage Records'
+                );
+            }
+            
+            // 2. Desk Occupancy Doughnut
+            $charts['deskOccupancy'] = $this->generateDoughnutChart(
+                ['Occupied', 'Available'],
+                [$data['occupiedDesks'], $data['availableDesks']],
+                [$this->chartColors['primary'], $this->chartColors['accent']],
+                'Desk Occupancy'
+            );
+            
+            // 3. Session Time Distribution (if we have desk data)
+            if ($data['desks']->count() > 0) {
+                $deskLabels = [];
+                $deskTimes = [];
+                
+                foreach ($data['desks'] as $desk) {
+                    $deskLabels[] = $desk->name;
+                    $deskTimes[] = $desk->height ?? 0; // Using height as session time for now
+                }
+                
+                // Limit to top 10 for readability
+                if (count($deskLabels) > 10) {
+                    $deskLabels = array_slice($deskLabels, 0, 10);
+                    $deskTimes = array_slice($deskTimes, 0, 10);
+                }
+                
+                $charts['deskSessionTimes'] = $this->generateHorizontalBarChart(
+                    $deskLabels,
+                    $deskTimes,
+                    'Average Session Time per Desk (minutes)',
+                    'Minutes'
+                );
+            }
+            
+        } catch (\Exception $e) {
+            Log::warning('Admin charts generation failed: ' . $e->getMessage());
+        }
+        
+        return $charts;
+    }
+
+    /**
+     * Generate bar chart for admin statistics
+     */
+    private function generateAdminBarChart($labels, $data, $title)
+    {
+        $chartConfig = [
+            'type' => 'bar',
+            'data' => [
+                'labels' => $labels,
+                'datasets' => [[
+                    'data' => $data,
+                    'backgroundColor' => $this->chartColors['primary'],
+                    'borderRadius' => 4,
+                    'borderWidth' => 0
+                ]]
+            ],
+            'options' => [
+                'plugins' => [
+                    'legend' => [
+                        'display' => false
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => $title,
+                        'font' => [
+                            'size' => 12,
+                            'family' => 'Arial'
+                        ]
+                    ]
+                ],
+                'scales' => [
+                    'y' => [
+                        'beginAtZero' => true,
+                        'title' => [
+                            'display' => true,
+                            'text' => 'Usage Records',
+                            'font' => [
+                                'size' => 10,
+                                'family' => 'Arial'
+                            ]
+                        ],
+                        'ticks' => [
+                            'font' => [
+                                'size' => 9,
+                                'family' => 'Arial'
+                            ]
+                        ]
+                    ],
+                    'x' => [
+                        'ticks' => [
+                            'font' => [
+                                'size' => 9,
+                                'family' => 'Arial'
+                            ]
+                        ]
+                    ]
+                ],
+                'responsive' => true,
+                'maintainAspectRatio' => false
+            ]
+        ];
+        
+        return $this->getChartImage($chartConfig, 400, 250);
+    }
+
+    /**
+     * Generate horizontal bar chart
+     */
+    private function generateHorizontalBarChart($labels, $data, $title, $xAxisLabel)
+    {
+        $chartConfig = [
+            'type' => 'bar',
+            'data' => [
+                'labels' => $labels,
+                'datasets' => [[
+                    'data' => $data,
+                    'backgroundColor' => $this->chartColors['accent'],
+                    'borderRadius' => 4,
+                    'borderWidth' => 0
+                ]]
+            ],
+            'options' => [
+                'indexAxis' => 'y',
+                'plugins' => [
+                    'legend' => [
+                        'display' => false
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => $title,
+                        'font' => [
+                            'size' => 12,
+                            'family' => 'Arial'
+                        ]
+                    ]
+                ],
+                'scales' => [
+                    'x' => [
+                        'beginAtZero' => true,
+                        'title' => [
+                            'display' => true,
+                            'text' => $xAxisLabel,
+                            'font' => [
+                                'size' => 10,
+                                'family' => 'Arial'
+                            ]
+                        ],
+                        'ticks' => [
+                            'font' => [
+                                'size' => 9,
+                                'family' => 'Arial'
+                            ]
+                        ]
+                    ],
+                    'y' => [
+                        'ticks' => [
+                            'font' => [
+                                'size' => 9,
+                                'family' => 'Arial'
+                            ]
+                        ]
+                    ]
+                ],
+                'responsive' => true,
+                'maintainAspectRatio' => false
+            ]
+        ];
+        
+        return $this->getChartImage($chartConfig, 400, 300);
     }
 }
