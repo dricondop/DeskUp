@@ -2,7 +2,9 @@
 
 <aside class="sidebar">
     <header>
-        <img class="sidebar-logo" src="{{ asset('assets/logo.png') }}" alt="Logo">
+        <a href="{{ url('/') }}">
+            <img class="sidebar-logo" src="{{ asset('assets/logo.png') }}" alt="Logo">
+        </a>
     </header>
 
     @if (Auth::check())
