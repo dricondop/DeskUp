@@ -8,6 +8,7 @@
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/desk-control.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
 
 </head>
 <body>
@@ -19,14 +20,19 @@
                 <h1>Desk Control</h1>
                 <h3>{{ $desk->name }} &vert; Status: <span id="deskStatus">{{ $desk->status }}</span></h3>
 
-            <img src="{{ asset('assets/desk.png') }}" alt="desk">
+                <p id="clock"
+                aria-label="Current time"
+                style="margin-top:4px; font-size:0.9rem; color:#3A506B; font-weight:500; letter-spacing:0.03em;">
+                    --:--:--
+                </p>
+
+                <img src="{{ asset('assets/desk.png') }}" alt="desk">
                 
                 <div class="desk-view-btns-container">
                     <button class="desk-view-btns sitting">Sitting</button>
-                    <button class="desk-view-btns error-log" onclick="openModal()">Add Event</button>
+                    <button class="desk-view-btns add-event">Add Event</button>
                 </div>
             </section>
-
             <div class="desk-management">
                 <div class="profile">
                     @if($isLoggedIn)
@@ -55,9 +61,9 @@
                     </div>
 
                     <div class="height-preset-btns">
-                        <button data-height="75">Sit</button>
-                        <button data-height="100">75</button>
-                        <button data-height="120">Stand</button>
+                        <button data-height="70">Sit</button>
+                        <button data-height="90">90</button>
+                        <button data-height="110">Stand</button>
                     </div>
 
                     <div class="event-header">
@@ -99,55 +105,7 @@
     </div>
 
     <!-- Event Modal -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Create Event</h2>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="eventForm">
-                    @csrf
-                    
-                     <!-- Choose date -->
-                    <div class="form-group">
-                        <div>
-                            <label for="meeting-date">Meeting date *</label>
-                            <input type="date" id="meeting-date" name="meeting-date" required>
-                        </div>
-                    </div>
-
-                    <!-- Choose time -->
-                    <div class="form-group date-time ">
-                        <div>
-                            <label for="meeting-time-from">Time from *</label>
-                            <input type="time" id="meeting-time-from" name="meeting-time-from" required>
-                        </div>
-                        <div>
-                            <label for="meeting-time-to">Time to *</label>
-                            <input type="time" id="meeting-time-to" name="meeting-time-to" required>
-                        </div>
-                    </div>
-
-                    <!-- Choose desks -->
-                    <div class="form-group">
-                        <label for="miniLayout">Select desks for the meeting</label>
-                        <div id="miniLayout" class="mini-layout"></div>
-                        <div id="selectedDesksInputs"></div>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label for="eventFormDescription">Description *</label>
-                        <textarea id="eventFormDescription" name="eventFormDescription" rows="5" placeholder="Describe the purpose of the meeting" required></textarea>
-                    </div>
-
-                    <button type="submit">Send request</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    @include('components.modals', ['recurringCleaningDays' => []])
 
 
     <script>
@@ -155,18 +113,50 @@
             id: {{ $desk->id }},
             height: {{ $desk->height }},
             speed: {{ $desk->speed }},
-            url: "/api/desks",
         };
 
-        const userId = {{ auth()->user()->id }};
+        const loggedInUser = {{ auth()->user()->id }};
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
     </script>
 
     <script src="{{ asset('js/desk-control.js') }}"></script>
     <script src="{{ asset('js/tab-switcher.js') }}"></script>
+    <script src="{{ asset('js/modals.js') }}"></script>
+
+    <script>
+        
+        function updateClock() {
+            const clockEl = document.getElementById('clock');
+            if (!clockEl) return;
+
+            const now = new Date();
+
+            const datePart = now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            const timePart = now.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            clockEl.textContent = `${datePart} ${timePart}`;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+    <script>
+        // add desk to desk array
+        addAllDesks([desk.id], desk.height);
+        isEvent = false;
+    </script>
 </body>
 </html>
+
 
 
 

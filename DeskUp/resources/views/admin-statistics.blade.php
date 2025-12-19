@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Admin Statistics — DeskUp</title>
+    <title>Admin Statistics | DeskUp</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-stats.css') }}">
@@ -180,6 +180,32 @@
     (function(){
         const palette = { primary: '#3A506B', accent: '#00A8A8', alt: '#9FB3C8', light: '#f1f3f5' };
 
+        function updateClock() {
+            const clockEl = document.getElementById('clock');
+            if (!clockEl) return;
+
+            const now = new Date();
+
+            const datePart = now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            const timePart = now.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            clockEl.textContent = `${datePart} ${timePart}`;
+        }
+
+        updateClock();      
+        setInterval(updateClock, 1000); 
+
+
+        
         const ctxTop = document.getElementById('topUsersChart').getContext('2d');
         const topLabels = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.name) : [];
         const topValues = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.count) : [];

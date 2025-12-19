@@ -1,5 +1,4 @@
 const canvas = document.getElementById('canvas');
-const MAX_DESKS = 50;
 const isAdmin = window.isAdmin || false;
 const tooltip = document.getElementById('hoverTooltip');
 
@@ -26,7 +25,23 @@ async function loadDefaultLayout() {
         const response = await fetch('/layout/load');
         const data = await response.json();
         if (data.desks && data.desks.length > 0) {
-            data.desks.forEach(d => addDesk(d.x, d.y, d.name, d.id));
+            // Auto-position desks that don't have valid positions
+            data.desks.forEach((d, index) => {
+                let x = d.x;
+                let y = d.y;
+                
+                // If desk has no position or is at (0,0), assign grid position
+                if (!x || !y || (x === 0 && y === 0)) {
+                    const gridSpacing = 120; // Space between desks
+                    const desksPerRow = Math.floor(canvas.offsetWidth / gridSpacing) || 5;
+                    const col = index % desksPerRow;
+                    const row = Math.floor(index / desksPerRow);
+                    x = col * gridSpacing + 20;
+                    y = row * gridSpacing + 20;
+                }
+                
+                addDesk(x, y, d.name, d.id);
+            });
             deskCounter = Math.max(...data.desks.map(d => parseInt(d.name.match(/\d+/)?.[0] || 0))) + 1;
         }
     } catch (error) {
@@ -39,30 +54,23 @@ function updateDeskCount() {
     const deskCountElement = document.getElementById('deskCount');
     if (deskCountElement) deskCountElement.textContent = count;
 
-    const addDeskBtn = document.getElementById('addDesk');
-    const deleteBtn = document.getElementById('deleteSelected');
     const saveBtn = document.getElementById('saveLayout');
     const downloadBtn = document.getElementById('downloadJSON');
     const uploadBtn = document.getElementById('uploadJSON');
     
-    if (addDeskBtn) addDeskBtn.disabled = !editModeEnabled || count >= MAX_DESKS;
-    if (deleteBtn) deleteBtn.disabled = !editModeEnabled;
     if (saveBtn) saveBtn.disabled = !editModeEnabled;
     if (downloadBtn) downloadBtn.disabled = !editModeEnabled;
     if (uploadBtn) uploadBtn.disabled = !editModeEnabled;
 }
 
 function addDesk(x, y, name = null, deskId = null) {
-    const currentCount = document.querySelectorAll('.desk').length;
-    if (currentCount >= MAX_DESKS) {
-        if (isAdmin) alert(`Maximum of ${MAX_DESKS} desks reached!`);
-        return;
-    }
-
     const desk = document.createElement('div');
     desk.className = 'desk';
+    
+    // Temporarily add to canvas to get dimensions for collision detection
     desk.style.left = `${x}px`;
     desk.style.top = `${y}px`;
+    desk.style.visibility = 'hidden';
     
     if (deskId) desk.setAttribute('data-desk-id', deskId);
     
@@ -70,6 +78,14 @@ function addDesk(x, y, name = null, deskId = null) {
         <img src="desk_icon.png" alt="Desk" style="width:48px;height:48px;display:block;margin:0 auto">
         <div class="desk-label" style="font-size:16px;margin-top:4px">${name || `Desk ${deskCounter++}`}</div>
     `;
+    
+    canvas.appendChild(desk);
+    
+    // Find valid position without collision
+    const validPos = findNearestValidPosition(desk, x, y, []);
+    desk.style.left = `${validPos.x}px`;
+    desk.style.top = `${validPos.y}px`;
+    desk.style.visibility = 'visible';
 
     desk.addEventListener('dblclick', (e) => {
         e.stopPropagation();
@@ -89,7 +105,6 @@ function addDesk(x, y, name = null, deskId = null) {
     desk.addEventListener('mouseleave', hideTooltip);
 
     updateDeskCursor(desk);
-    canvas.appendChild(desk);
     updateDeskCount();
 }
 
@@ -108,6 +123,71 @@ function showTooltip(desk) {
 
 function hideTooltip() {
     if (tooltip) tooltip.classList.remove('show');
+}
+
+// Check if a desk collides with any other desk
+function checkCollision(element, x, y, excludeDesks = []) {
+    const deskWidth = element.offsetWidth;
+    const deskHeight = element.offsetHeight;
+    const padding = 5; // Minimum space between desks
+    
+    const allDesks = document.querySelectorAll('.desk');
+    for (const otherDesk of allDesks) {
+        if (otherDesk === element || excludeDesks.includes(otherDesk)) continue;
+        
+        const otherX = otherDesk.offsetLeft;
+        const otherY = otherDesk.offsetTop;
+        const otherWidth = otherDesk.offsetWidth;
+        const otherHeight = otherDesk.offsetHeight;
+        
+        // Check if rectangles overlap (with padding)
+        if (x < otherX + otherWidth + padding &&
+            x + deskWidth + padding > otherX &&
+            y < otherY + otherHeight + padding &&
+            y + deskHeight + padding > otherY) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Find nearest valid position without collision
+function findNearestValidPosition(element, targetX, targetY, excludeDesks = []) {
+    // Try the target position first
+    if (!checkCollision(element, targetX, targetY, excludeDesks)) {
+        return { x: targetX, y: targetY };
+    }
+    
+    // Search in expanding circles for a valid position
+    const step = 10;
+    const maxDistance = 200;
+    
+    for (let distance = step; distance <= maxDistance; distance += step) {
+        // Try positions in a circle around the target
+        for (let angle = 0; angle < 360; angle += 45) {
+            const rad = angle * Math.PI / 180;
+            const x = Math.round(targetX + Math.cos(rad) * distance);
+            const y = Math.round(targetY + Math.sin(rad) * distance);
+            
+            // Keep within canvas bounds
+            const maxX = canvas.offsetWidth - element.offsetWidth;
+            const maxY = canvas.offsetHeight - element.offsetHeight;
+            const boundedX = Math.max(0, Math.min(x, maxX));
+            const boundedY = Math.max(0, Math.min(y, maxY));
+            
+            if (!checkCollision(element, boundedX, boundedY, excludeDesks)) {
+                return { x: boundedX, y: boundedY };
+            }
+        }
+    }
+    
+    // If no valid position found, return bounded target position anyway
+    const maxX = canvas.offsetWidth - element.offsetWidth;
+    const maxY = canvas.offsetHeight - element.offsetHeight;
+    return { 
+        x: Math.max(0, Math.min(targetX, maxX)), 
+        y: Math.max(0, Math.min(targetY, maxY)) 
+    };
 }
 
 function startDrag(e) {
@@ -147,10 +227,16 @@ document.addEventListener('mousemove', (e) => {
         const dy = e.clientY - dragStartY;
         
         draggedDesks.forEach(({ element, startX, startY }) => {
-            const newX = Math.max(0, Math.min(startX + dx, canvas.offsetWidth - element.offsetWidth));
-            const newY = Math.max(0, Math.min(startY + dy, canvas.offsetHeight - element.offsetHeight));
-            element.style.left = `${newX}px`;
-            element.style.top = `${newY}px`;
+            const targetX = Math.max(0, Math.min(startX + dx, canvas.offsetWidth - element.offsetWidth));
+            const targetY = Math.max(0, Math.min(startY + dy, canvas.offsetHeight - element.offsetHeight));
+            
+            // Get list of other desks being dragged (to exclude from collision check)
+            const excludeDesks = draggedDesks.map(d => d.element);
+            
+            // Check for collision and adjust position if needed
+            const validPos = findNearestValidPosition(element, targetX, targetY, excludeDesks);
+            element.style.left = `${validPos.x}px`;
+            element.style.top = `${validPos.y}px`;
         });
     }
 
@@ -228,38 +314,6 @@ function updateSelection(boxLeft, boxTop, boxWidth, boxHeight) {
 }
 
 if (isAdmin) {
-    const addDeskBtn = document.getElementById('addDesk');
-    if (addDeskBtn) {
-        addDeskBtn.addEventListener('click', () => {
-            if (!editModeEnabled) return;
-            const maxX = canvas.offsetWidth - 150;
-            const maxY = canvas.offsetHeight - 150;
-            addDesk(Math.random() * maxX, Math.random() * maxY);
-        });
-    }
-
-    const deleteBtn = document.getElementById('deleteSelected');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => {
-            if (!editModeEnabled || selectedDesks.size === 0) {
-                alert('No desks selected. Hold Shift and drag to select desks.');
-                return;
-            }
-
-            if (confirm(`Delete ${selectedDesks.size} selected desk(s)?`)) {
-                selectedDesks.forEach(d => d.remove());
-                selectedDesks.clear();
-
-                document.querySelectorAll('.desk').forEach((desk, i) => {
-                    const label = desk.querySelector('.desk-label');
-                    if (label) label.textContent = `Desk ${i + 1}`;
-                });
-                deskCounter = document.querySelectorAll('.desk').length + 1;
-                updateDeskCount();
-            }
-        });
-    }
-
     const editModeToggle = document.getElementById('editModeToggle');
     if (editModeToggle) {
         editModeToggle.addEventListener('change', (e) => {
