@@ -1,21 +1,147 @@
 // Get CSRF token
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-// Populate the select with unassigned desks
-document.querySelectorAll('.desk-select').forEach(select => {
-    Object.entries(window.desks).forEach(([id, name]) => {
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = name;
-        select.appendChild(option);
-    });
+// ============================================
+// NOTIFICATION MANAGEMENT FUNCTIONALITY
+// ============================================
 
-    select.addEventListener('change', () => {
-        assignDesk(select);
+// Settings Management
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+const autoNotificationsToggle = document.getElementById('autoNotificationsToggle');
+const sittingThreshold = document.getElementById('sittingThreshold');
+const settingsMessage = document.getElementById('settingsMessage');
+
+if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/notifications/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({
+                    automatic_notifications_enabled: autoNotificationsToggle.checked,
+                    sitting_time_threshold_minutes: parseInt(sittingThreshold.value),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showMessage(settingsMessage, 'Settings saved successfully!', 'success');
+            } else {
+                showMessage(settingsMessage, 'Failed to save settings', 'error');
+            }
+        } catch (error) {
+            console.error('Error saving settings:', error);
+            showMessage(settingsMessage, 'An error occurred', 'error');
+        }
     });
-});
+}
+
+// Manual Notification Form
+const manualNotificationForm = document.getElementById('manualNotificationForm');
+const sendToAll = document.getElementById('sendToAll');
+const userSelectGroup = document.getElementById('userSelectGroup');
+const notificationMessageEl = document.getElementById('notificationMessage');
+const charCount = document.getElementById('charCount');
+const notificationMessageTextarea = document.querySelector('#notificationMessage');
+
+// Character counter
+if (notificationMessageTextarea) {
+    notificationMessageTextarea.addEventListener('input', (e) => {
+        charCount.textContent = e.target.value.length;
+    });
+}
+
+// Toggle user selection
+if (sendToAll) {
+    sendToAll.addEventListener('change', () => {
+        userSelectGroup.style.display = sendToAll.checked ? 'none' : 'block';
+        
+        // Uncheck all user checkboxes when "send to all" is checked
+        if (sendToAll.checked) {
+            document.querySelectorAll('input[name="user_ids[]"]').forEach(cb => {
+                cb.checked = false;
+            });
+        }
+    });
+}
+
+// Submit manual notification
+if (manualNotificationForm) {
+    manualNotificationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(manualNotificationForm);
+        const data = {
+            title: formData.get('title'),
+            message: formData.get('message'),
+            send_to_all: sendToAll.checked,
+        };
+
+        if (!sendToAll.checked) {
+            const selectedUsers = Array.from(document.querySelectorAll('input[name="user_ids[]"]:checked'))
+                .map(cb => parseInt(cb.value));
+            
+            if (selectedUsers.length === 0) {
+                showMessage(notificationMessageEl, 'Please select at least one user or check "Send to all users"', 'error');
+                return;
+            }
+            
+            data.user_ids = selectedUsers;
+        }
+
+        try {
+            const response = await fetch('/api/notifications/send-manual', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showMessage(notificationMessageEl, `Notification sent to ${result.count} user(s)!`, 'success');
+                manualNotificationForm.reset();
+                charCount.textContent = '0';
+                userSelectGroup.style.display = 'block';
+            } else {
+                showMessage(notificationMessageEl, 'Failed to send notification', 'error');
+            }
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            showMessage(notificationMessageEl, 'An error occurred', 'error');
+        }
+    });
+}
+
+function showMessage(element, text, type) {
+    if (!element) return;
+    element.textContent = text;
+    element.className = `message ${type}`;
+    element.style.display = 'block';
+    
+    setTimeout(() => {
+        element.style.display = 'none';
+    }, 5000);
+}
+
+// ============================================
+// USER MANAGEMENT FUNCTIONALITY
+// ============================================
 
 // Assign desk to user
+document.addEventListener('change', (e) => {
+  if (e.target.matches('.desk-select')) {
+    assignDesk(e.target);
+  }
+});
+
 async function assignDesk(select) 
 {
     const userId = select.dataset.userId
@@ -161,6 +287,7 @@ document.querySelectorAll('.closeModal').forEach(button => {
     button.addEventListener('click', () => {
         document.getElementById('descriptionModal').style.display = 'none';
         document.getElementById('desksModal').style.display = 'none';
+        document.getElementById('createUserModal').style.display = 'none';
     })
 });
 
@@ -168,6 +295,7 @@ document.querySelectorAll('.closeModal').forEach(button => {
 window.onclick = function(event) {
     const descriptionModal = document.getElementById('descriptionModal');
     const desksModal = document.getElementById('desksModal');
+    const createUserModal = document.getElementById('createUserModal');
 
     if (event.target === descriptionModal) {
         document.getElementById('descriptionModal').style.display = 'none';
@@ -177,5 +305,63 @@ window.onclick = function(event) {
         document.getElementById('desksModal').style.display = 'none';
     }
 
+    if (event.target === createUserModal) {
+        document.getElementById('createUserModal').style.display = 'none';
+    }
+}
+
+// Create User Modal
+const createUserBtn = document.getElementById('createUserBtn');
+const createUserModal = document.getElementById('createUserModal');
+const submitCreateUserBtn = document.getElementById('submitCreateUser');
+const createUserForm = document.getElementById('createUserForm');
+
+if (createUserBtn) {
+    createUserBtn.addEventListener('click', () => {
+        createUserModal.style.display = 'block';
+        createUserForm.reset();
+    });
+}
+
+if (submitCreateUserBtn) {
+    submitCreateUserBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(createUserForm);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+            is_admin: document.getElementById('isAdmin').checked
+        };
+
+        try {
+            const response = await fetch('/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert('User created successfully!');
+                createUserModal.style.display = 'none';
+                location.reload();
+            } else {
+                let errorMsg = result.message || 'Failed to create user';
+                if (result.errors) {
+                    errorMsg += '\n' + Object.values(result.errors).flat().join('\n');
+                }
+                alert(errorMsg);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Network error: ' + error.message);
+        }
+    });
 }
 

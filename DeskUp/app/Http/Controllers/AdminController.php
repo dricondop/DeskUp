@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Desk;
 use App\Models\Event;
+use App\Models\NotificationSettings;
 
 class AdminController extends Controller
 {
@@ -15,11 +16,13 @@ class AdminController extends Controller
         $assignedDeskIds = User::pluck('assigned_desk_id')->filter();
         $unassignedDesks = Desk::whereNotIn('id', $assignedDeskIds)->pluck('name', 'id');
         $pendingEvents = Event::with(['creator', 'desks'])->where('status', 'pending')->get();
+        $settings = NotificationSettings::get();
 
         return view('users-management', [
             'users' => $users,
-            'desks' => $unassignedDesks,
-            'pendingEvents' => $pendingEvents
+            'unassignedDesks' => $unassignedDesks,
+            'pendingEvents' => $pendingEvents,
+            'settings' => $settings
         ]);
     }
 
@@ -64,15 +67,51 @@ class AdminController extends Controller
         ]);
     }
 
+    public function createUser(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8',
+                'is_admin' => 'nullable|boolean'
+            ]);
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+                'is_admin' => $validated['is_admin'] ?? false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User created successfully',
+                'user' => $user
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function approveEvent($id)
     {
         $event = Event::findOrFail($id);
-        $event->status = Event::STATUS_ACTIVE;
+        $event->status = Event::STATUS_APPROVED;
         $event->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'DRY-RUN: Event has been approved successfully'
+            'message' => 'Event has been approved successfully'
         ]);
     }
 
@@ -84,7 +123,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'DRY-RUN: Event has been rejected successfully'
+            'message' => 'Event has been rejected successfully'
         ]);
     }
 }

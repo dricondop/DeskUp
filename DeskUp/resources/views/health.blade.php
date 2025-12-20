@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Insights — DeskUp</title>
+    <title>Health Insights | DeskUp</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
     <script src="{{ asset('js/health.js') }}" defer></script>
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -24,6 +26,14 @@
 
             <nav>
                 <span class="badge">DeskUp</span>
+                <div style="display: inline-flex; gap: 8px; margin-left: 15px;">
+                    <button id="export-pdf-btn" class="export-btn" title="Export to PDF">
+                        <svg style="width: 16px; height: 16px; margin-right: 5px;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
+                        </svg>
+                        Export PDF
+                    </button>
+                </div>
             </nav>
         </div>
     </header>
@@ -69,7 +79,7 @@
 
             <article class="card metric-card" aria-labelledby="breaks-label">
                 <div class="metric">
-                    <h3 id="breaks-label" class="metric-title">Breaks</h3>
+                    <h3 id="breaks-label" class="metric-title">Position Changes</h3>
                     <p class="metric-value" data-key="periodBreaks">—</p>
                 </div>
                 <span class="metric-badge">Period</span>
@@ -117,8 +127,8 @@
                     </div>
                 </figure>
 
-                <figure class="card chart-card" data-key="heightOverview" aria-label="Height overview">
-                    <h3 class="chart-title">Height Overview</h3>
+                <figure class="card chart-card" data-key="heightOverview" aria-label="Height average overview">
+                    <h3 class="chart-title">Height Average Overview</h3>
                     <div class="chart-container">
                         <canvas id="heightOverviewChart" role="img" aria-label="Line chart showing desk height with color-coded sitting and standing"></canvas>
                     </div>
@@ -127,19 +137,31 @@
         </section>
 
         <section id="recommendations" class="recommendations" aria-labelledby="recommendations-heading">
-            <h2 id="recommendations-heading" class="section-title">Recommendations</h2>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Notification History</h1>
+                    <p class="subtitle">View your recent desk activity notifications</p>
+                </header>
 
-            <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+                <section class="card notification-history">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Recent Notifications</h2>
+                    <div id="notificationHistoryList" class="notification-list">
+                        <p class="loading-text">Loading notifications...</p>
+                    </div>
+                </section>
+            </div>
 
-            <aside class="aside-tips" aria-label="Quick tips">
-                <div class="card">
-                    <h3>Quick Tips</h3>
-                    <ul>
-                        <li>Try the 50/10 rule: 50 minutes sitting, 10 standing or moving.</li>
-                        <li>Set gentle reminders to stand or stretch every hour.</li>
-                    </ul>
-                </div>
-            </aside>
+            <div class="admin-container">
+                <header class="page-header">
+                    <h1>Health Recommendations</h1>
+                    <p class="subtitle">Personalized insights based on your activity</p>
+                </header>
+
+                <section class="card recommendations-card">
+                    <h2 style="margin-bottom: 1rem; color:#3A506B;">Insights & Tips</h2>
+                    <div class="insights" role="region" aria-live="polite" aria-label="Health recommendations"></div>
+                </section>
+            </div>
         </section>
     </main>
 
