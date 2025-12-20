@@ -25,11 +25,13 @@ class DeskSyncServiceTest extends TestCase
     use RefreshDatabase;
 
     private DeskSyncService $service;
+    private User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = new DeskSyncService();
+        $this->user = User::factory()->create();
         
         // Set required environment variables for API
         config(['app.env' => 'testing']);
