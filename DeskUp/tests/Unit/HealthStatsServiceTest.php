@@ -15,7 +15,12 @@ use Carbon\Carbon;
 
 /**
  * These tests ensure that the HealthStatsService works correctly:
- * 
+ * - Returns user data within a time range
+ * - Calculate sit/stand percentage
+ * - Calculates breaks
+ * - Calculates burned calories
+ * - Format UserStatsHistory records to chart data
+ * - Return current/latest desk data
  */
 class HealthStatsServiceTest extends TestCase
 {

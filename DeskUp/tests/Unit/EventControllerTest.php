@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Auth;
 use PhpParser\Lexer\TokenEmulator\VoidCastEmulator;
 use Carbon\Carbon;
 
+
+/**
+ * These tests ensure that the Event methods works correctly:
+ * - Creates events in database
+ * - Add user to events
+ * - Return users not assigned to specific event
+ * - Approve / Reject event
+ * - Create cleaning schedule 
+ */
 class EventControllerTest extends TestCase  
 {  
     use RefreshDatabase;  

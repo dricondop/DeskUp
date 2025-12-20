@@ -8,13 +8,14 @@ use App\Models\User;
 use App\Models\UserStatsHistory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
+
 
 /**
- * These tests ensure that the HTTP endpoints for desk synchronization work correctly:
- * - GET /sync-desks-from-api - Initial desk population
- * - GET /sync-all-desks-data - Continuous state synchronization
- * - GET /sync-desk-data/{apiDeskId} - Single desk sync
- * - GET /api-desk-mapping - Debugging endpoint
+ * These tests ensure that the HTTP endpoints for health analytics work correctly:
+ * - GET /api/health-stats - Get aggregated health stats
+ * - GET /api/health-live-status - Return current/latest desk data
+ * - GET /api/health-chart-data - Return chart formatted data
  */
 class HealthStatsEndpointsTest extends TestCase
 {
@@ -26,6 +27,8 @@ class HealthStatsEndpointsTest extends TestCase
     protected function setUp(): void 
     {
         parent::setUp();
+        Carbon::setTestNow(Carbon::create(2025, 12, 20, 12, 0, 0)); // freezez time, ensures it works if time is just past midnight
+
         $this->user = User::factory()->create();
         $this->desk = Desk::factory()->create();
     }

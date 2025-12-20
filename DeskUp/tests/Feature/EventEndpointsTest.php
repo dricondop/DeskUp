@@ -7,7 +7,18 @@ use App\Models\User;
 use App\Models\Desk;  
 use Illuminate\Foundation\Testing\RefreshDatabase;  
 use Tests\TestCase;  
-  
+use Carbon\Carbon;
+
+
+/**
+ * These tests ensure that the HTTP endpoints for events work correctly:
+ * - POST /api/addEvent - Create event 
+ * - POST /api/addCleaningSchedule - Create new cleaning schedule
+ * - GET /event/{event}/availableUsers - Return users not assigned to a specific event
+ * - POST /event/{event}/addUser - Add user to a specific event
+ * - POST /event/{id}/approve - Approve event
+ * - POST /event/{id}/reject - Reject event
+ */
 class EventEndpointsTest extends TestCase  
 {  
     use RefreshDatabase;  
@@ -20,6 +31,8 @@ class EventEndpointsTest extends TestCase
     protected function setUp(): void  
     {  
         parent::setUp();  
+        Carbon::setTestNow(Carbon::create(2025, 12, 20, 12, 0, 0)); // freezez time, ensures it works if time is just past midnight
+
         $this->adminUser = User::factory()->create(['is_admin' => true]);  
         $this->regularUser = User::factory()->create(['is_admin' => false]);  
         $this->desk1 = Desk::factory()->create();  
