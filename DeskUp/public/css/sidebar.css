@@ -221,3 +221,60 @@
     width: 16px;
     height: 16px;
 }
+
+.sidebar {
+    overflow-x: hidden;
+}
+
+.sidebar nav a,
+.sidebar label,
+.user-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-details,
+.sidebar nav {
+    min-width: 0;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+    }
+
+    .main-content {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+        padding: 20px 0;
+    }
+
+    .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .sidebar nav a {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+
+    .user-name {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sidebar {
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
+    }
+}
