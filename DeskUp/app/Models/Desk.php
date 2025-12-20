@@ -91,7 +91,7 @@ class Desk extends Model
     }
 
     // Update desk height by creating new UserStatsHistory record
-    public function updateHeight(int $height): void
+    public function newUserStatsHistoryRecord(int $height): void
     {
         // Find the user associated with this desk
         $user = \App\Models\User::where('assigned_desk_id', $this->id)->first();
@@ -100,7 +100,7 @@ class Desk extends Model
             \App\Models\UserStatsHistory::create([
                 'user_id' => $user->id,
                 'desk_id' => $this->desk_number,
-                'desk_height_mm' => $height * 10, // Convert cm to mm for storage
+                'desk_height_mm' => $height,
                 'desk_speed_mms' => $this->speed ?? 36,
                 'desk_status' => $this->status ?? 'OK',
                 'is_position_lost' => false,

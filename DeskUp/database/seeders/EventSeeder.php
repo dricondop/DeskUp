@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Event;
 use App\Models\Desk;
+use App\Models\User;
 
 class EventSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class EventSeeder extends Seeder
      */
     public function run(): void
     {
-        $events = [
+        $createEvents = [
         [
             'event_type'   => 'meeting',
             'description'  => 'Weekly team 12 meeting',
@@ -25,7 +26,7 @@ class EventSeeder extends Seeder
         ],
         [
             'event_type'   => 'cleaning',
-            'description'  => 'Monthly deep cleaning of the office area',
+            'description'  => 'Weekly deep cleaning of the office area',
             'scheduled_at' => '2025-12-02 17:00:00',
             'scheduled_to' => '2025-12-02 19:00:00',
             'status'       => 'approved',
@@ -63,9 +64,20 @@ class EventSeeder extends Seeder
             'status'       => 'pending',
             'created_by'   => 2,
         ],
+        [
+            'event_type'   => 'cleaning',
+            'description'  => 'Weekly deep cleaning of the office area',
+            'scheduled_at' => '2025-12-09 17:00:00',
+            'scheduled_to' => '2025-12-09 19:00:00',
+            'status'       => 'approved',
+            'created_by'   => 1,
+        ],
     ];
 
-    foreach ($events as $eventData) {
+
+
+
+    foreach ($createEvents as $eventData) {
         $event = Event::create($eventData);
 
         // Attach 1-3 random desks to each event
@@ -73,6 +85,28 @@ class EventSeeder extends Seeder
 
         $event->desks()->attach($deskIds);
     }
+    
 
+    $adminUser = User::where('is_admin', true)->firstOrFail();
+    $regularUser = User::where('is_admin', false)->firstOrFail();
+
+    $events = Event::all();
+
+        foreach ($events as $event) {
+
+            // meetings + generic events -> both users
+            if (in_array($event->event_type, ['meeting', 'event'], true)) {
+                $event->users()->syncWithoutDetaching([
+                    $adminUser->id,
+                    $regularUser->id,
+                ]);
+            }
+            // all other event types -> only admin
+            else {
+                $event->users()->syncWithoutDetaching([
+                    $adminUser->id,
+                ]);
+            }
+        }
     }
 }

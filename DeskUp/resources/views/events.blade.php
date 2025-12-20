@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Events — DeskUp</title>
+    <title>Events | DeskUp</title>
 
-    <link rel="stylesheet" href="{{ asset('css/events.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/events.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     @include('components.sidebar')
@@ -139,5 +141,18 @@
             </main>
         </div>
     </div>
+    
+    <!-- Event and Cleaning modals -->
+    @include('components.modals', ['recurringCleaningDays' => $recurringCleaningDays ?? collect()])
+
+    <script>
+        const loggedInUser = {{ auth()->user()->id }};      // used for adding user to event
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    </script>
+
+    <script src="{{ asset('js/tab-switcher.js') }}"></script>
+    <script src="{{ asset('js/desk-control.js') }}"></script>
+    <script src="{{ asset('js/events.js') }}"></script>
+    <script src="{{ asset('js/modals.js') }}"></script>
 </body>
 </html>

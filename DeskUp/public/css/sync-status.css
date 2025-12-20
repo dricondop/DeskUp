@@ -1,3 +1,7 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
+
 /* API Sync Status Indicator Styles */
 .api-status-indicator {
     position: fixed;
@@ -13,14 +17,25 @@
     z-index: 9999;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    cursor: pointer;
+    user-select: none;
 }
 
-.api-status-indicator.connected {
+.api-status-indicator:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.api-status-indicator:active {
+    transform: scale(0.98);
+}
+
+.api-status-indicator.online {
     background: #4CAF50;
     color: white;
 }
 
-.api-status-indicator.disconnected {
+.api-status-indicator.offline {
     background: #f44336;
     color: white;
 }
@@ -38,7 +53,11 @@
     animation: pulse 2s infinite;
 }
 
-.api-status-indicator.disconnected .api-status-dot {
+.api-status-indicator.offline .api-status-dot {
+    animation: pulse 1.5s infinite;
+}
+
+.api-status-indicator.online .api-status-dot {
     animation: none;
 }
 

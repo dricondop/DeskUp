@@ -4,7 +4,7 @@ html, body {
   margin: 0; 
 }
 
-p, h1, h2, h3, span { 
+p, h1, h2, h3, span, label, a { 
   font-family: 'Inter', sans-serif; 
 }
 
@@ -15,14 +15,10 @@ body {
 
 
 :root {
+  --darkblue: #3A506B;
   --card-bg:#fff;
-  --panel-bg:#EFF1F2;         
-  --green:#4db252;           
-  --red:#b24d4d;         
-  --muted:#666;
   --radius:14px;
   --shadow:0 2px 12px rgba(0,0,0,.06);
-  
 }
 
 /* fluid type to match the other pages */
@@ -34,22 +30,269 @@ button:hover {
   cursor: pointer; 
 }
 
+.btn {
+    cursor: pointer;
+}
+
+.horizontal-alignment {
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-between; 
+    align-items: center;
+}
+
+.vertical-alignment {
+    display: flex; 
+    flex-direction: column; 
+    justify-content:center; 
+    align-items:center;
+}
+
 /* ---- <Main> content layout (contains everything) ---- */
+.all-content {
+  padding: 0 30px 30px 30px;
+}
 
 .header-content {
     display:flex;
     flex-direction: row;
     justify-content: space-between;
-    margin: 20px 20px 0 20px;
+    margin: 40px 20px 0 50px;
 }
 
+
+/* Schedule Cleaning button */
+.scheduleCleaning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(228, 228, 228);;
+  border: 1.5px solid rgb(166, 166, 166);
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.scheduleCleaning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(66, 127, 189, 0.2);
+}
+
+
+/* Add event button button */
 .add-event {
-    font-size: 2rem;
-    width: 3rem;
-    height: 3rem;
+    font-size: 1.5rem;
+    width: 2rem;
+    height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid black;
     border-radius: 50%;
+    margin-right: 20px;
+    padding-bottom: 2px;
+    background: linear-gradient(180deg, #3e648b86 0%, #339ac36a 100%);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.add-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(66, 127, 189, 0.2);
+}
+
+/* Toggle 'My Events' button button */
+.my-event {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(228, 228, 228);;
+  border: 1.5px solid rgb(166, 166, 166);
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.my-event.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #3e648b86 0%, #339ac36a 100%);
+  border: 1px solid black;
+  border-radius: 15px;
+  padding: 5px 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  color: black;
+}
+.my-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(79, 79, 79, 0.2);
+}
+
+#event-tabs {
+    margin: 10px 0 0 50px;
+}
+.event-tab {
+    background-color: transparent;
+    border: none;
+    font-size: 1rem;
+    padding: 0 0 6px 0;
+    margin: 0 5px 0 5px;
+}
+.event-tab.active {
+  border-bottom: 2px solid var(--darkblue);
+}
+
+.event-panel.hidden {
+  display: none;
+}
+
+
+.horizontal-line {
+    margin: 10px 10px 30px 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.084);
+}
+
+.main-content-view {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: calc(100vh - 240px);
+}
+
+/* Events containers */
+#event-content {
+    flex: 1;
+}
+
+.event-container {
+    display: flex;
+    flex-direction: row;
+    border-radius: 10px;
+    background-color: white;
+    margin: 0 20px 10px 20px;
+    box-shadow: var(--shadow);
+}
+.event-container.active {
+    background-color: #ebf4ff;
+}
+.event-container:hover {
+    background-color: #F1F6FA;
+}
+
+.event-date {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    background: linear-gradient(180deg, #3e648bc7 0%, #339ac3c2 100%);
+    height: 100px;
+    width: 90px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.event-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+
+    padding: 0 0 0 20px;
+}
+
+.lucide-users {
+  height: 0.9rem;
+}
+
+.event-body div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 30px;
+}
+
+.hidden {
+    display:none;
+}
+
+
+/* Meeting-desks Management */
+
+.meeting-management  {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: auto;
+  min-width: 35%;
+  max-height: 600px;
+
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.3s ease; 
+}
+
+.meeting-management.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.desk-adjustment { 
+  margin-top: clamp(16px, 3vw, 28px); 
+  padding: clamp(16px, 3vw, 40px);
+  padding-top: 0;
+}
+
+.meeting-management-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.close-panel {
+  padding: 20px 15px 0 20px;
+}
+
+
+
+
+
+.meeting-attendees {
+  margin: 20px 0 0 0;
+}
+
+.attendee-btn {
+  position: relative;
+  display: inline-block;
+}
+
+.attendee-btn select {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.meeting-desks {
+  margin: 40px 0 0 0;
+}
+
+.desk-tag {
+  display: inline-block;
+  background: linear-gradient(180deg, #3e648b71 0%, #339ac363 100%);
+  padding: 6px 10px;
+  border-radius: 20px;
+  margin: 10px 8px 0 0;
+}
+
+.user-tag {
+  display: inline-block;
+  background: linear-gradient(180deg, #3e648b71 0%, #339ac363 100%);
+  padding: 6px 10px;
+  border-radius: 20px;
+  margin: 10px 8px 0 0;
 }

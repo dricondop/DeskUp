@@ -1,3 +1,7 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
+
 .posture-analysis-container {
     min-height: 100vh;
     background: #f8fafc;
@@ -54,10 +58,6 @@
     gap: 1rem; /* Menor gap */
 }
 
-.sidebar-left {
-    /* Espacio mínimo para balance */
-}
-
 /* Sección Central - Cámara MÁS GRANDE */
 .camera-main-section {
     padding: 1rem; /* Reducido padding */
@@ -97,6 +97,7 @@
     border-color: #48bb78;
     border-style: solid;
     box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
+    transform: scaleX(-1);
 }
 
 .capture-canvas {
