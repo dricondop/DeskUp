@@ -679,6 +679,11 @@ async function loadNotificationHistory() {
 
     try {
         const response = await fetch('/api/notifications/history');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
 
         if (!data.notifications || data.notifications.length === 0) {
