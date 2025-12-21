@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Health Insights | DeskUp</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -80,7 +79,7 @@
 
             <article class="card metric-card" aria-labelledby="breaks-label">
                 <div class="metric">
-                    <h3 id="breaks-label" class="metric-title">Breaks</h3>
+                    <h3 id="breaks-label" class="metric-title">Position Changes</h3>
                     <p class="metric-value" data-key="periodBreaks">—</p>
                 </div>
                 <span class="metric-badge">Period</span>
@@ -128,8 +127,8 @@
                     </div>
                 </figure>
 
-                <figure class="card chart-card" data-key="heightOverview" aria-label="Height overview">
-                    <h3 class="chart-title">Height Overview</h3>
+                <figure class="card chart-card" data-key="heightOverview" aria-label="Height average overview">
+                    <h3 class="chart-title">Height Average Overview</h3>
                     <div class="chart-container">
                         <canvas id="heightOverviewChart" role="img" aria-label="Line chart showing desk height with color-coded sitting and standing"></canvas>
                     </div>

@@ -16,6 +16,12 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
+        // checks if user is admin
+        $isAdmin = false;
+        if (Auth::user()->isAdmin()) {
+            $isAdmin = true;
+        }
+        
         // get all users for creating an event
         $users = User::select('id', 'name')->orderBy('name')->get();
 
@@ -43,6 +49,7 @@ class EventController extends Controller
         $maintenances     = $allEvents->where('event_type', 'maintenance');
 
         return view('events', [
+            'isAdmin' => $isAdmin,
             'upcomingEvents' => $allEvents,
             'meetings' => $meetings,
             'events' => $events,
@@ -94,13 +101,22 @@ class EventController extends Controller
 
     public function addCleaningSchedule(Request $request) 
     {
+        $user = Auth::user();
+
+        if (!$user->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Logged in user does not have administrator access',
+            ]);
+        }
+        
         $validated =   $request->validate([
             'cleaning_time' => 'required|date_format:H:i',
             'cleaning_days' => 'required|array|min:1',
             'cleaning_days.*' => 'required|string|in:MON,TUE,WED,THU,FRI,SAT,SUN',
         ]);
 
-        $user = Auth::user();
+        
 
         // change last cleaning schedule to 'completed'
         Event::where('event_type', 'cleaning')
@@ -115,7 +131,7 @@ class EventController extends Controller
             'cleaning_time' => $validated['cleaning_time'],
             'cleaning_days' => $validated['cleaning_days'],
             'is_recurring' => true,
-            'status' => $user->isAdmin() ? Event::STATUS_APPROVED : Event::STATUS_PENDING,
+            'status' => Event::STATUS_APPROVED,
             'created_by' => $user->id
         ]);
 

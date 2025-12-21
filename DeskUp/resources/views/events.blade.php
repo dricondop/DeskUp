@@ -29,7 +29,10 @@
                     </div>
                     <div class="horizontal-alignment">
                          <!-- My events / all events button -->
-                        <span class="btn scheduleCleaning">Cleaning</span>
+                        
+                        @if($isAdmin)
+                            <span class="btn scheduleCleaning">Cleaning</span>
+                        @endif
 
                         <!-- My events / all events button -->
                         <a href="{{ $myEventsButton 

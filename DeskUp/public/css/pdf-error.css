@@ -1,0 +1,175 @@
+body {
+    font-family: 'Inter', 'Arial', sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.error-container {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid #e0e6eb;
+}
+
+.error-icon {
+    font-size: 64px;
+    color: #e74c3c;
+    margin-bottom: 20px;
+    line-height: 1;
+}
+
+h1 {
+    color: #3A506B;
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.error-message {
+    color: #7D8893;
+    margin: 20px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 0 10px;
+}
+
+.btn {
+    display: inline-block;
+    background: #00A8A8;
+    color: white;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn:hover {
+    background: #009494;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 168, 168, 0.2);
+}
+
+.technical-info {
+    background: #F4F7F8;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 25px;
+    text-align: left;
+    font-size: 13px;
+    color: #5A6C7D;
+    border-left: 4px solid #3A506B;
+}
+
+.technical-info h3 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    color: #3A506B;
+    font-weight: 600;
+}
+
+.technical-info p {
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+}
+
+.technical-info ul {
+    margin: 10px 0 10px 20px;
+    padding: 0;
+}
+
+.technical-info li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.technical-info li:last-child {
+    margin-bottom: 0;
+}
+
+.timestamp {
+    color: #9FB3C8;
+    font-size: 12px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #F0F3F6;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .error-container {
+        padding: 30px 20px;
+        width: 95%;
+    }
+    
+    .error-icon {
+        font-size: 48px;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+    
+    .error-message {
+        font-size: 14px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
+    .technical-info {
+        padding: 15px;
+        font-size: 12px;
+    }
+    
+    .technical-info h3 {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-container {
+        padding: 25px 15px;
+    }
+    
+    .error-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+    
+    h1 {
+        font-size: 18px;
+    }
+    
+    .error-message {
+        font-size: 13px;
+        margin: 15px 0;
+    }
+    
+    .btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    .technical-info {
+        padding: 12px;
+        font-size: 11px;
+    }
+}
