@@ -2,65 +2,58 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Storage;
-
 class NotificationSettings
 {
-    private static $settingsFile = 'notification_settings.json';
+    private static $settingsFile = 'notification-settings.json';
 
     /**
-     * Get default settings.
+     * Get settings from JSON file or config defaults.
      */
-    private static function defaults()
+    public static function get()
     {
-        return [
-            'automatic_notifications_enabled' => true,
-            'sitting_time_threshold_minutes' => 50,
+        $filePath = public_path(self::$settingsFile);
+        
+        // Try to read from JSON file first
+        if (file_exists($filePath)) {
+            $json = file_get_contents($filePath);
+            $data = json_decode($json, true);
+            
+            if ($data !== null) {
+                return (object) [
+                    'automatic_notifications_enabled' => $data['automatic_notifications_enabled'] ?? true,
+                    'sitting_time_threshold_minutes' => $data['sitting_time_threshold_minutes'] ?? 50,
+                ];
+            }
+        }
+        
+        // Fall back to config defaults
+        return (object) [
+            'automatic_notifications_enabled' => config('notifications.automatic_notifications_enabled', true),
+            'sitting_time_threshold_minutes' => config('notifications.sitting_time_threshold_minutes', 50),
         ];
     }
 
     /**
-     * Get settings from local file.
-     */
-    public static function get()
-    {
-        if (!Storage::exists(self::$settingsFile)) {
-            self::initializeSettings();
-        }
-
-        $settings = json_decode(Storage::get(self::$settingsFile), true);
-        
-        if (!$settings) {
-            self::initializeSettings();
-            $settings = self::defaults();
-        }
-
-        return (object) $settings;
-    }
-
-    /**
-     * Update settings in local file.
+     * Update settings and save to JSON file.
      */
     public static function update(array $data)
     {
-        $currentSettings = (array) self::get();
-
-        if (isset($data['automatic_notifications_enabled'])) {
-            $currentSettings['automatic_notifications_enabled'] = (bool) $data['automatic_notifications_enabled'];
-        }
+        $filePath = public_path(self::$settingsFile);
         
-        if (isset($data['sitting_time_threshold_minutes'])) {
-            $currentSettings['sitting_time_threshold_minutes'] = (int) $data['sitting_time_threshold_minutes'];
-        }
-
-        Storage::put(self::$settingsFile, json_encode($currentSettings, JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Initialize settings file with defaults.
-     */
-    private static function initializeSettings()
-    {
-        Storage::put(self::$settingsFile, json_encode(self::defaults(), JSON_PRETTY_PRINT));
+        // Get current settings
+        $current = (array) self::get();
+        
+        // Merge with new data
+        $settings = [
+            'automatic_notifications_enabled' => $data['automatic_notifications_enabled'] ?? $current['automatic_notifications_enabled'],
+            'sitting_time_threshold_minutes' => $data['sitting_time_threshold_minutes'] ?? $current['sitting_time_threshold_minutes'],
+            'updated_at' => now()->toDateTimeString(),
+        ];
+        
+        // Save to JSON file
+        $json = json_encode($settings, JSON_PRETTY_PRINT);
+        file_put_contents($filePath, $json);
+        
+        return true;
     }
 }

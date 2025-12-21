@@ -14,7 +14,9 @@ class DeskController extends Controller
 {
     public function show($id)
     {
-        $desk = Desk::with('events')->findOrFail($id);
+        $desk = Desk::with(['events', 'latestStats'])->findOrFail($id);
+        
+        \Log::info("Desk control page loaded for desk {$desk->id}, current height: {$desk->height}cm");
 
         $desks = Desk::all();
     
@@ -55,18 +57,26 @@ class DeskController extends Controller
 
         $desk = Desk::findOrFail($id);
         
+        \Log::info("Height update request for desk {$desk->id}: {$height}mm ({$validated['height']}cm)");
+        
         try {
             // Send command to physical desk
             APIMethods::raiseDesk($height, $desk->api_desk_id);
+            \Log::info("API command sent to physical desk {$desk->api_desk_id}");
             
             // Update database immediately with target height (don't wait for physical movement)
             $desk->newUserStatsHistoryRecord($height);
+            \Log::info("Database update completed for desk {$desk->id}");
             
             // Refresh the desk model to load the new stats record
             $desk->refresh();
             $desk->load('latestStats');
             
+            $newHeight = $desk->height;
+            \Log::info("Desk {$desk->id} height after refresh: {$newHeight}cm");
+            
         } catch (\Exception $e) {
+            \Log::error("Height update failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update height',
