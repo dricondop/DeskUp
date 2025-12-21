@@ -80,6 +80,11 @@ Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     ->name('admin-statistics')
     ->middleware('auth');
 
+// Admin Statistics API for live updates
+Route::get('/api/admin-statistics/live', [AdminStatisticsController::class, 'getLiveData'])
+    ->name('api.admin-statistics.live')
+    ->middleware('auth');
+
 // Admin Statistics PDF Export routes
 Route::get('/admin/statistics/export/pdf', [PDFExportController::class, 'exportAdminStatsPDF'])->name('admin.statistics.export.pdf');
     Route::get('/admin/statistics/export/preview', [PDFExportController::class, 'previewAdminStatsPDF'])->name('admin.statistics.export.preview');

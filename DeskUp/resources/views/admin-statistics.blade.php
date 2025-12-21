@@ -210,23 +210,34 @@
         const topLabels = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.name) : [];
         const topValues = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.count) : [];
 
-        const topUsersChart = new Chart(ctxTop, {
+        window.topUsersChart = new Chart(ctxTop, {
             type: 'bar',
             data: {
                 labels: topLabels,
                 datasets: [{ label: 'Usage records', data: topValues, backgroundColor: palette.primary, borderRadius: 6 }]
             },
-            options: { plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.5,
+                plugins:{legend:{display:false}}, 
+                scales:{ y:{ beginAtZero:true } } 
+            }
         });
 
         const ctxDonut = document.getElementById('desksDonut').getContext('2d');
-        const desksDonut = new Chart(ctxDonut, {
+        window.desksDonut = new Chart(ctxDonut, {
             type: 'doughnut',
             data: {
                 labels: ['Occupied','Free'],
                 datasets: [{ data: [occupiedDesks, Math.max(0, totalDesks - occupiedDesks)], backgroundColor: [palette.primary, palette.alt] }]
             },
-            options: { plugins:{legend:{position:'bottom'}} }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins:{legend:{position:'bottom'}} 
+            }
         });
 
         const heatmapEl = document.getElementById('heatmap');

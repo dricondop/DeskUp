@@ -42,6 +42,9 @@ class EventController extends Controller
         $recurringCleaningDays = Event::where('event_type', 'cleaning')
             ->where('status', Event::STATUS_APPROVED)
             ->value('cleaning_days');
+        
+        // Convert to array for use in blade template
+        $recurringCleaningDays = $recurringCleaningDays ? json_decode($recurringCleaningDays, true) : [];
 
         
         $meetings   = $allEvents->where('event_type', 'meeting');
