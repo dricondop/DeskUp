@@ -78,10 +78,19 @@ class NotificationController extends Controller
     public function markAsRead(Request $request)
     {
         $validated = $request->validate([
-            'notification_id' => 'required|integer|exists:notifications,id',
+            'notification_id' => 'sometimes|integer|exists:notifications,id',
+            'notification_ids' => 'sometimes|array',
+            'notification_ids.*' => 'integer|exists:notifications,id',
         ]);
         
-        $this->notificationService->markAsRead($validated['notification_id']);
+        if (isset($validated['notification_ids'])) {
+            foreach ($validated['notification_ids'] as $id) {
+                $this->notificationService->markAsRead($id, Auth::id());
+            }
+        } elseif (isset($validated['notification_id'])) {
+            $this->notificationService->markAsRead($validated['notification_id'], Auth::id());
+        }
+        
         return response()->json(['success' => true]);
     }
 }
