@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,6 +22,9 @@ return new class extends Migration
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });
+
+        // Fix any NULL scheduled_at values by using created_at as fallback
+        DB::statement('UPDATE events SET scheduled_at = created_at WHERE scheduled_at IS NULL');
     }
 
     /**

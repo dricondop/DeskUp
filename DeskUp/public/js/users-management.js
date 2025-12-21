@@ -11,8 +11,23 @@ const autoNotificationsToggle = document.getElementById('autoNotificationsToggle
 const sittingThreshold = document.getElementById('sittingThreshold');
 const settingsMessage = document.getElementById('settingsMessage');
 
+// Load settings from localStorage on page load
+if (autoNotificationsToggle && sittingThreshold) {
+    const savedSettings = localStorage.getItem('notificationSettings');
+    if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        autoNotificationsToggle.checked = settings.automatic_notifications_enabled;
+        sittingThreshold.value = settings.sitting_time_threshold_minutes;
+    }
+}
+
 if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener('click', async () => {
+        const settingsData = {
+            automatic_notifications_enabled: autoNotificationsToggle.checked,
+            sitting_time_threshold_minutes: parseInt(sittingThreshold.value),
+        };
+
         try {
             const response = await fetch('/api/notifications/settings', {
                 method: 'POST',
@@ -20,15 +35,14 @@ if (saveSettingsBtn) {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                 },
-                body: JSON.stringify({
-                    automatic_notifications_enabled: autoNotificationsToggle.checked,
-                    sitting_time_threshold_minutes: parseInt(sittingThreshold.value),
-                }),
+                body: JSON.stringify(settingsData),
             });
 
             const data = await response.json();
 
             if (data.success) {
+                // Save to localStorage
+                localStorage.setItem('notificationSettings', JSON.stringify(settingsData));
                 showMessage(settingsMessage, 'Settings saved successfully!', 'success');
             } else {
                 showMessage(settingsMessage, 'Failed to save settings', 'error');
@@ -44,7 +58,7 @@ if (saveSettingsBtn) {
 const manualNotificationForm = document.getElementById('manualNotificationForm');
 const sendToAll = document.getElementById('sendToAll');
 const userSelectGroup = document.getElementById('userSelectGroup');
-const notificationMessageEl = document.getElementById('notificationMessage');
+const notificationFormMessageEl = document.getElementById('notificationFormMessage');
 const charCount = document.getElementById('charCount');
 const notificationMessageTextarea = document.querySelector('#notificationMessage');
 
@@ -86,7 +100,7 @@ if (manualNotificationForm) {
                 .map(cb => parseInt(cb.value));
             
             if (selectedUsers.length === 0) {
-                showMessage(notificationMessageEl, 'Please select at least one user or check "Send to all users"', 'error');
+                showMessage(notificationFormMessageEl, 'Please select at least one user or check "Send to all users"', 'error');
                 return;
             }
             
@@ -106,16 +120,16 @@ if (manualNotificationForm) {
             const result = await response.json();
 
             if (result.success) {
-                showMessage(notificationMessageEl, `Notification sent to ${result.count} user(s)!`, 'success');
+                showMessage(notificationFormMessageEl, `Notification sent to ${result.count} user(s)!`, 'success');
                 manualNotificationForm.reset();
                 charCount.textContent = '0';
                 userSelectGroup.style.display = 'block';
             } else {
-                showMessage(notificationMessageEl, 'Failed to send notification', 'error');
+                showMessage(notificationFormMessageEl, 'Failed to send notification', 'error');
             }
         } catch (error) {
             console.error('Error sending notification:', error);
-            showMessage(notificationMessageEl, 'An error occurred', 'error');
+            showMessage(notificationFormMessageEl, 'An error occurred', 'error');
         }
     });
 }
@@ -269,14 +283,14 @@ document.querySelectorAll('.btn-reject').forEach(button => {
 
 
 // Description modal
-function showMessage(description) {
+function showDescriptionModal(description) {
     document.getElementById('descriptionText').textContent = description;
     document.getElementById('descriptionModal').style.display = 'block';
     setTimeout(() => lucide.createIcons(), 0);
 }
 
 // Desks modal
-function showDesks(desks) {
+function showDesksModal(desks) {
     document.getElementById('desksText').textContent = desks;
     document.getElementById('desksModal').style.display = 'block';
     setTimeout(() => lucide.createIcons(), 0);

@@ -158,8 +158,19 @@ class NotificationService
     /**
      * Mark notification as read.
      */
-    public function markAsRead(int $notificationId): void
+    public function markAsRead(int $notificationId, int $userId): void
     {
-        Notification::where('id', $notificationId)->update(['is_read' => true]);
+        $updated = Notification::where('id', $notificationId)
+            ->where('user_id', $userId)
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+        
+        \Log::info('Notification mark as read', [
+            'notification_id' => $notificationId,
+            'user_id' => $userId,
+            'updated_count' => $updated
+        ]);
     }
 }

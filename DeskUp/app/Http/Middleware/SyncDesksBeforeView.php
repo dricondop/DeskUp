@@ -19,6 +19,17 @@ class SyncDesksBeforeView
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip sync if desks table doesn't exist yet (during migrations)
+        try {
+            \Illuminate\Support\Facades\Schema::hasTable('desks');
+        } catch (\Exception $e) {
+            return $next($request);
+        }
+        
+        if (!\Illuminate\Support\Facades\Schema::hasTable('desks')) {
+            return $next($request);
+        }
+        
         // Only sync once every 2 minutes to avoid excessive API calls
         // Uses cache to prevent concurrent requests from triggering multiple syncs
         $cacheKey = 'desks_sync_in_progress';

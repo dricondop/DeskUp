@@ -10,18 +10,8 @@ class DeskUserAssignmentSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get users by email
-        $regularUser = User::where('email', 'user@deskup.com')->first();
-        $adminUser = User::where('email', 'admin@deskup.com')->first();
-
-        if ($regularUser) {
-            Desk::where('desk_number', 102)->update(['user_id' => $regularUser->id]);
-            $this->command->info("Assigned regular user to desk 102");
-        }
-        
-        if ($adminUser) {
-            Desk::where('desk_number', 101)->update(['user_id' => $adminUser->id]);
-            $this->command->info("Assigned admin user to desk 101");
-        }
+        // This seeder is no longer needed as we use users.assigned_desk_id instead of desks.user_id
+        // Desk assignments are now managed through the User model's assigned_desk_id column
+        $this->command->info("Skipping DeskUserAssignmentSeeder - using users.assigned_desk_id instead");
     }
 }

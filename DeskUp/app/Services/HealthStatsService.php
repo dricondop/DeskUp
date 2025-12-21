@@ -25,11 +25,11 @@ class HealthStatsService
     private const WEIGHT_ERGONOMICS = 0.20;
 
     // MINIMUM DATA REQUIREMENTS
-    private const MIN_RECORDS_FOR_HOURLY_SCORE = 3; // Need 3+ records per hour
-    private const MIN_HOURS_FOR_DAILY_SCORE = 4;    // Need 4+ hours of data for daily score
-    private const MIN_DAYS_FOR_WEEKLY_SCORE = 3;    // Need 3+ days for weekly score
-    private const MIN_WEEKS_FOR_MONTHLY_SCORE = 2;  // Need 2+ weeks for monthly score
-    private const MIN_MONTHS_FOR_YEARLY_SCORE = 6;  // Need 6+ months for yearly score
+    private const MIN_RECORDS_FOR_HOURLY_SCORE = 1; // Need 1+ records per hour (relaxed for testing)
+    private const MIN_HOURS_FOR_DAILY_SCORE = 1;    // Need 1+ hours of data for daily score (relaxed for testing)
+    private const MIN_DAYS_FOR_WEEKLY_SCORE = 1;    // Need 1+ days for weekly score (relaxed for testing)
+    private const MIN_WEEKS_FOR_MONTHLY_SCORE = 1;  // Need 1+ weeks for monthly score (relaxed for testing)
+    private const MIN_MONTHS_FOR_YEARLY_SCORE = 1;  // Need 1+ months for yearly score (relaxed for testing)
 
     /**
      * Fetch user health stats with optional date filtering.
@@ -373,6 +373,7 @@ class HealthStatsService
             'avg_sit_height_cm' => $avgSitHeight,
             'avg_stand_height_cm' => $avgStandHeight,
             'position_changes' => $transitions,
+            'breaks_per_day' => $transitions, // Same as position_changes
             'calories_per_day' => $calories,
             'posture_score' => $postureScore,
             'data_quality' => $dataQuality, // NEW: Include data quality info
@@ -483,6 +484,7 @@ class HealthStatsService
             'avg_sit_height_cm' => 72,
             'avg_stand_height_cm' => 110,
             'position_changes' => 0,
+            'breaks_per_day' => 0,
             'calories_per_day' => 0,
             'posture_score' => null, // NEW: null instead of 50 when insufficient data
             'data_quality' => $dataQuality,
@@ -1108,6 +1110,7 @@ class HealthStatsService
             'avg_sit_height_cm' => 72,
             'avg_stand_height_cm' => 110,
             'position_changes' => 0,
+            'breaks_per_day' => 0,
             'calories_per_day' => 0,
         ];
     }

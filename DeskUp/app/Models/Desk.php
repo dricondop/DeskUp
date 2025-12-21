@@ -16,8 +16,7 @@ class Desk extends Model
         'api_desk_id',
         'position_x',
         'position_y',
-        'is_active',
-        'user_id'
+        'is_active'
     ];
 
     protected $casts = [
@@ -96,10 +95,14 @@ class Desk extends Model
         // Find the user associated with this desk
         $user = \App\Models\User::where('assigned_desk_id', $this->id)->first();
         
+        \Log::info("newUserStatsHistoryRecord called for desk {$this->id} with height {$height}mm");
+        
         if ($user) {
-            \App\Models\UserStatsHistory::create([
+            \Log::info("User {$user->id} ({$user->name}) is assigned to desk {$this->id}");
+            
+            $record = \App\Models\UserStatsHistory::create([
                 'user_id' => $user->id,
-                'desk_id' => $this->desk_number,
+                'desk_id' => $this->id,
                 'desk_height_mm' => $height,
                 'desk_speed_mms' => $this->speed ?? 36,
                 'desk_status' => $this->status ?? 'OK',
@@ -111,6 +114,10 @@ class Desk extends Model
                 'sit_stand_count' => $this->latestStats->sit_stand_count ?? 0,
                 'recorded_at' => now(),
             ]);
+            
+            \Log::info("UserStatsHistory record created: ID {$record->id}, desk_id {$record->desk_id}, height {$record->desk_height_mm}mm");
+        } else {
+            \Log::warning("No user assigned to desk {$this->id} - height record NOT created!");
         }
     }
 
@@ -122,7 +129,7 @@ class Desk extends Model
         if ($user) {
             \App\Models\UserStatsHistory::create([
                 'user_id' => $user->id,
-                'desk_id' => $this->desk_number,
+                'desk_id' => $this->id,
                 'desk_height_mm' => ($this->height ?? 110) * 10, // Convert cm to mm
                 'desk_speed_mms' => $this->speed ?? 36,
                 'desk_status' => $status,
@@ -135,11 +142,5 @@ class Desk extends Model
                 'recorded_at' => now(),
             ]);
         }
-    }
-
-    // Get the user assigned to this desk via user_id foreign key
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

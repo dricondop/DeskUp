@@ -529,6 +529,8 @@ function clearMetrics() {
 function clearRecommendations() {
     const container = q('.insights');
     if (container) container.innerHTML = '';
+}
+
 function setupPDFExport() {
     const exportBtn = document.getElementById('export-pdf-btn');
     if (!exportBtn) return;
@@ -663,6 +665,7 @@ async function init() {
 
 async function updateRange(range) {
     // Use combined endpoint for faster updates
+    // Maybe will remain unused
     await fetchAllData(range);
 }
 
@@ -679,6 +682,11 @@ async function loadNotificationHistory() {
 
     try {
         const response = await fetch('/api/notifications/history');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
 
         if (!data.notifications || data.notifications.length === 0) {
@@ -724,4 +732,3 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
-

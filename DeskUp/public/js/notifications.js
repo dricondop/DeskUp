@@ -39,7 +39,8 @@ class NotificationManager {
 
             if (!response.ok) return;
 
-            const notifications = await response.json();
+            const data = await response.json();
+            const notifications = data.notifications || data;
             
             // Show only unread notifications
             const unreadNotifications = notifications.filter(n => !n.is_read);
@@ -112,6 +113,7 @@ class NotificationManager {
     }
 
     closeNotification(element, notificationId) {
+        console.log('Closing notification ID:', notificationId);
         element.classList.remove('show');
         element.classList.add('hide');
 
@@ -125,14 +127,32 @@ class NotificationManager {
 
     async markAsRead(notificationIds) {
         try {
-            await fetch('/api/notifications/mark-read', {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing');
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found in page');
+                return;
+            }
+            
+            const response = await fetch('/api/notifications/mark-read', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
                 },
                 body: JSON.stringify({ notification_ids: notificationIds }),
             });
+            
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Failed to mark as read. Status:', response.status, 'Response:', text);
+                return;
+            }
+            
+            const result = await response.json();
+            console.log('Mark as read response:', result);
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }

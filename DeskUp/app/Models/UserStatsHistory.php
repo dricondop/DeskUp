@@ -16,7 +16,7 @@ class UserStatsHistory extends Model
 
     protected $fillable = [
         'user_id',
-        'desk_id', // This refers to desk_number
+        'desk_id', // References desks.id (primary key)
         'desk_height_mm',
         'desk_speed_mms',
         'desk_status',
@@ -44,7 +44,6 @@ class UserStatsHistory extends Model
 
     public function desk()
     {
-        // Desk_number as the foreign key
-        return $this->belongsTo(Desk::class, 'desk_id', 'desk_number');
+        return $this->belongsTo(Desk::class, 'desk_id', 'id');
     }
 }

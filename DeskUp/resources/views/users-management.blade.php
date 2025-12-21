@@ -127,7 +127,7 @@
                                 </td>
                                 <td>
                                     @if($event->description)
-                                            <button type="button" class="btn-description" onclick="showMessage('{{ addslashes($event->description) }}')">
+                                            <button type="button" class="btn-description" onclick="showDescriptionModal('{{ addslashes($event->description) }}')">
                                                 <p>Read</p>
                                             </button>
                                     @else
@@ -241,7 +241,7 @@
                     </button>
                 </form>
 
-                <div id="notificationMessage" class="message" style="display: none;"></div>
+                <div id="notificationFormMessage" class="message" style="display: none;"></div>
             </section>
         </div>
 
