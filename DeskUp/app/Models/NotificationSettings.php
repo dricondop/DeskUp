@@ -4,14 +4,14 @@ namespace App\Models;
 
 class NotificationSettings
 {
-    private static $settingsFile = 'app/notification-settings.json';
+    private static $settingsFile = 'notification-settings.json';
 
     /**
      * Get settings from JSON file or config defaults.
      */
     public static function get()
     {
-        $filePath = storage_path(self::$settingsFile);
+        $filePath = public_path(self::$settingsFile);
         
         // Try to read from JSON file first
         if (file_exists($filePath)) {
@@ -38,7 +38,7 @@ class NotificationSettings
      */
     public static function update(array $data)
     {
-        $filePath = storage_path(self::$settingsFile);
+        $filePath = public_path(self::$settingsFile);
         
         // Get current settings
         $current = (array) self::get();
