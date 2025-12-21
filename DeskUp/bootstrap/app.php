@@ -12,8 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-        'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
-    ]);
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'sync.desks' => \App\Http\Middleware\SyncDesksBeforeView::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIMethods;
 use App\Models\Desk;
 use App\Models\Event;
 use App\Models\User;
-use App\Models\DeskActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,13 +13,18 @@ class DeskController extends Controller
 {
     public function show($id)
     {
-        $desk = Desk::with('events')->findOrFail($id);
+        $desk = Desk::with(['events', 'latestStats'])->findOrFail($id);
+        
+        \Log::info("Desk control page loaded for desk {$desk->id}, current height: {$desk->height}cm");
 
         $desks = Desk::all();
     
         $user = Auth::user();
+        
+        // get all users for creating an event
+        $users = User::select('id', 'name')->orderBy('name')->get();
 
-        $pendingEvents = $user->events()
+        $pendingEvents = $user->eventsCreatedBy()
             ->pendingEvents()
             ->orderBy('scheduled_at', 'desc')
             ->get();
@@ -35,7 +40,8 @@ class DeskController extends Controller
             'desks' => $desks,
             'isAdmin' => $isAdmin,
             'isLoggedIn' => Auth::check(),
-            'pendingEvents' => $pendingEvents
+            'pendingEvents' => $pendingEvents,
+            'users' => $users,
         ]);
     }
 
@@ -45,14 +51,42 @@ class DeskController extends Controller
             'height' => 'required|integer'
         ]);
 
-        $desk = Desk::findOrFail($id);
+        // converts height from cm to mm
+        $height = $validated['height'] * 10;
 
-        $desk->updateHeight($validated['height']);
+        $desk = Desk::findOrFail($id);
+        
+        \Log::info("Height update request for desk {$desk->id}: {$height}mm ({$validated['height']}cm)");
+        
+        try {
+            // Send command to physical desk
+            APIMethods::raiseDesk($height, $desk->api_desk_id);
+            \Log::info("API command sent to physical desk {$desk->api_desk_id}");
+            
+            // Update database immediately with target height (don't wait for physical movement)
+            $desk->newUserStatsHistoryRecord($height);
+            \Log::info("Database update completed for desk {$desk->id}");
+            
+            // Refresh the desk model to load the new stats record
+            $desk->refresh();
+            $desk->load('latestStats');
+            
+            $newHeight = $desk->height;
+            \Log::info("Desk {$desk->id} height after refresh: {$newHeight}cm");
+            
+        } catch (\Exception $e) {
+            \Log::error("Height update failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update height',
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Height updated successfully',
-            'height' => $desk->height // This will now get the value from latest stats
+            'height' => $desk->height // Returns the target height from database
         ]);
         
     }
@@ -79,38 +113,4 @@ class DeskController extends Controller
         return response()->json(['desks' => $desks]);
     }
 
-    public function addEvent(Request $request)
-    {
-        $validated = $request->validate([
-            'event_type' => 'required|string|max:50',
-            'description' => 'nullable|string',
-            'scheduled_at' => 'required|date',
-            'scheduled_to' => 'required|date',
-            'desk_ids' => 'required|array|min:1',
-            'desk_ids.*' => 'exists:desks,id', // '.*' means it must apply to every element in an array
-        ]);
-
-        $user = Auth::user();
-        $status = $user && $user->isAdmin()
-            ? Event::STATUS_APPROVED
-            : Event::STATUS_PENDING;
-        
-
-        $event = Event::create([
-            'event_type' => $validated['event_type'],
-            'description' => $validated['description'],
-            'scheduled_at' => $validated['scheduled_at'],
-            'scheduled_to' => $validated['scheduled_to'],
-            'status' => $status,
-            'created_by' => $user->id
-        ]);
-
-        $event->desks()->attach($validated['desk_ids']);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Event added successfully',
-            'event' => $event
-        ]);
-    }
 }

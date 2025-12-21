@@ -7,17 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeProfilePage();
 });
 
-/**
- * Initialize the profile page with animations
- */
 function initializeProfilePage() {
     animateCharts();
     setupEventListeners();
 }
 
-/**
- * Animate charts on page load
- */
 function animateCharts() {
     const charts = document.querySelectorAll('.score-circle');
     
@@ -31,66 +25,34 @@ function animateCharts() {
     }, 300);
 }
 
-/**
- * Setup event listeners for interactive elements
- */
 function setupEventListeners() {
-    // Notification button
-    const notificationBtn = document.querySelector('.notification-btn');
-    if (notificationBtn) {
-        notificationBtn.addEventListener('click', handleNotificationClick);
-    }
-    
-    // Settings button
     const settingsBtn = document.querySelector('.settings-btn');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', handleSettingsClick);
     }
     
-    // Stats button
     const statsButton = document.querySelector('.stats-button');
     if (statsButton) {
         statsButton.addEventListener('click', handleStatsClick);
     }
     
-    // Height button
     const heightButton = document.querySelector('.height-button');
     if (heightButton) {
         heightButton.addEventListener('click', handleHeightClick);
     }
 }
 
-/**
- * Handle notification button click
- */
-function handleNotificationClick(event) {
-    console.log('Notifications clicked');
-    // Logic for notifications (to do)
-    showNotification('No new notifications');
-}
-
-/**
- * Handle settings button click
- */
 function handleSettingsClick(event) {
     console.log('Settings clicked');
-    window.location.href = '/settings'; // there is settings?
+    window.location.href = '/settings';
 }
 
-/**
- * Handle stats button click
- */
 function handleStatsClick(event) {
     console.log('View complete statistics clicked');
-    // Health page
     window.location.href = '/health';
 }
 
-/**
- * Show temporary notification
- */
 function showNotification(message) {
-    // Notifications (basic, to be polished)
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
@@ -109,15 +71,257 @@ function showNotification(message) {
     
     document.body.appendChild(notification);
     
-    // 3 sec delay
     setTimeout(() => {
         notification.remove();
     }, 3000);
 }
 
-// Export functions for potential module usage
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         initializeProfilePage
     };
 }
+
+'use strict';
+
+class ProfileHealthInsights {
+    constructor() {
+        this.chartInstance = null;
+        this.userId = document.querySelector('meta[name="user-id"]')?.getAttribute('content');
+        this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        this.init();
+    }
+
+    async init() {
+        await this.fetchTodayStats();
+        await this.createTimePercentageChart(); 
+        
+        setInterval(() => this.fetchTodayStats(), 1000);
+    }
+
+    async fetchTodayStats() {
+        try {
+            const response = await fetch('/api/health-stats?range=today', {
+                headers: {
+                    'X-CSRF-TOKEN': this.csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch stats');
+            
+            const data = await response.json();
+            
+            console.log('Health stats data:', data);
+            
+            this.updateStats(data);
+            this.updateChartData(data);
+            this.updatePercentagePills(data);
+            
+        } catch (error) {
+            console.error('Error fetching today stats:', error);
+            this.updateStatsWithDefaults();
+        }
+    }
+
+    updateStats(data) {
+        const postureScore = Math.max(0, Math.min(100, data.standing_pct || 0));
+        const scoreEl = document.getElementById('profile-posture-score');
+        const bar = document.getElementById('profile-posture-score-bar');
+        const postureCard = document.querySelector('.posture-score-card');
+        
+        const colorClasses = ['value-poor', 'value-fair', 'value-good', 'value-excellent'];
+        
+        if (scoreEl) {
+            scoreEl.textContent = `${postureScore}`;
+            
+            colorClasses.forEach(cls => {
+                scoreEl.classList.remove(cls);
+            });
+            
+            if (postureScore <= 30) {
+                scoreEl.classList.add('value-poor');
+            } else if (postureScore <= 60) {
+                scoreEl.classList.add('value-fair');
+            } else if (postureScore <= 80) {
+                scoreEl.classList.add('value-good');
+            } else {
+                scoreEl.classList.add('value-excellent');
+            }
+        }
+        
+        if (bar) {
+            bar.style.width = `${postureScore}%`;
+            
+            colorClasses.forEach(cls => {
+                bar.classList.remove(cls);
+            });
+            
+            if (postureScore <= 30) {
+                bar.classList.add('value-poor');
+            } else if (postureScore <= 60) {
+                bar.classList.add('value-fair');
+            } else if (postureScore <= 80) {
+                bar.classList.add('value-good');
+            } else {
+                bar.classList.add('value-excellent');
+            }
+        }
+        
+        if (postureCard) {
+            colorClasses.forEach(cls => {
+                postureCard.classList.remove(cls);
+            });
+            
+            if (postureScore <= 30) {
+                postureCard.classList.add('value-poor');
+            } else if (postureScore <= 60) {
+                postureCard.classList.add('value-fair');
+            } else if (postureScore <= 80) {
+                postureCard.classList.add('value-good');
+            } else {
+                postureCard.classList.add('value-excellent');
+            }
+        }
+        
+        console.log('Posture score calculated:', postureScore);
+    }
+
+    updateChartData(data) {
+        if (!this.chartInstance) {
+            this.createTimePercentageChart(data);
+            return;
+        }
+        
+        const sittingPct = data.sitting_pct || 0;
+        const standingPct = data.standing_pct || 0;
+        
+        console.log('Updating chart with:', { sittingPct, standingPct });
+        
+        this.chartInstance.data.datasets[0].data = [sittingPct, standingPct];
+        this.chartInstance.update();
+    }
+
+    updatePercentagePills(data) {
+        const sittingPct = data.sitting_pct || 0;
+        const standingPct = data.standing_pct || 0;
+        
+        const sittingEl = document.getElementById('sitting-percentage');
+        const standingEl = document.getElementById('standing-percentage');
+        
+        if (sittingEl) {
+            sittingEl.textContent = `${Math.round(sittingPct)}% Sit`;
+        }
+        if (standingEl) {
+            standingEl.textContent = `${Math.round(standingPct)}% Stand`;
+        }
+    }
+
+    createTimePercentageChart(data = null) {
+        const ctx = document.getElementById('timePercentageChartProfile')?.getContext('2d');
+        if (!ctx) {
+            console.error('Canvas element not found');
+            return;
+        }
+        
+        const palette = { 
+            primary: '#3A506B', 
+            accent: '#00A8A8' 
+        };
+        
+        const sittingData = data?.sitting_pct || 50;
+        const standingData = data?.standing_pct || 50;
+        
+        console.log('Creating chart with data:', { sittingData, standingData });
+        
+        if (this.chartInstance) {
+            this.chartInstance.destroy();
+        }
+        
+        this.chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sitting', 'Standing'],
+                datasets: [{
+                    data: [sittingData, standingData],
+                    backgroundColor: [palette.primary, palette.accent],
+                    borderWidth: 0,
+                    hoverOffset: 8,
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw.toFixed(1)}%`;
+                            }
+                        },
+                        backgroundColor: 'rgba(58, 80, 107, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#00A8A8',
+                        borderWidth: 1
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true,
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    }
+
+    updateStatsWithDefaults() {
+        const scoreEl = document.getElementById('profile-posture-score');
+        const bar = document.getElementById('profile-posture-score-bar');
+        const postureCard = document.querySelector('.posture-score-card');
+        
+        const colorClasses = ['value-poor', 'value-fair', 'value-good', 'value-excellent'];
+        
+        if (scoreEl) {
+            scoreEl.textContent = '—';
+            colorClasses.forEach(cls => {
+                scoreEl.classList.remove(cls);
+            });
+        }
+        
+        if (bar) {
+            bar.style.width = '0%';
+            colorClasses.forEach(cls => {
+                bar.classList.remove(cls);
+            });
+        }
+        
+        if (postureCard) {
+            colorClasses.forEach(cls => {
+                postureCard.classList.remove(cls);
+            });
+        }
+        
+        const sittingEl = document.getElementById('sitting-percentage');
+        const standingEl = document.getElementById('standing-percentage');
+        
+        if (sittingEl) sittingEl.textContent = '—% Sit';
+        if (standingEl) standingEl.textContent = '—% Stand';
+        
+        if (this.chartInstance) {
+            this.chartInstance.data.datasets[0].data = [50, 50];
+            this.chartInstance.update();
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing ProfileHealthInsights...');
+    new ProfileHealthInsights();
+});

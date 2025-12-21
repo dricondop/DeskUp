@@ -108,4 +108,5 @@ class EventSeeder extends Seeder
                 ]);
             }
         }
+    }
 }

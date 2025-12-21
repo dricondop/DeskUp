@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeskUp - User Profile</title>
+    <title>User Profile | DeskUp</title>
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/profile.js') }}" defer></script>
 </head>
 <body>
     @include('components.sidebar')
@@ -39,18 +41,6 @@
                             {{ $userProfile->location ?? 'Location not set' }}
                         </p>
                     </div>
-                </div>
-                <div class="header-actions">
-                    <button class="notification-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.93 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                        </svg>
-                    </button>
-                    <button class="settings-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-                        </svg>
-                    </button>
                 </div>
             </div>
         </div>
@@ -125,48 +115,76 @@
                 </div>
             </div>
 
-            <!-- Health Stats Insights -->
-            <div class="info-card combined-card">
-                <div class="health-section">
-                    <div class="card-header">
-                        <h2 class="card-title">Health Score</h2>
+            <!-- Health Insights Dashboard -->
+            <div class="info-card health-insights-card">
+                <div class="card-header">
+                    <h2 class="card-title">Health Insights</h2>
+                    <a href="{{ route('health') }}" class="edit-btn">
+                        View Details
+                    </a>
+                </div>
+            <div class="health-insights-horizontal">
+                <!-- Horizontal Metrics Container -->
+                <div class="health-metrics-row">
+                
+                <!-- Sit/Stand Ratio -->
+                <div class="health-metric-horizontal time-percentage-card">
+                    <div class="health-metric">
+                    <div class="metric-header">
+                        <h3 class="health-metric-title">Sit/Stand Ratio</h3>
+                        <span class="health-metric-badge">Today</span>
                     </div>
-                    <div class="health-score-container">
-                        <div class="score-display">
-                            <div class="score-item">
-                                <div class="score-circle" style="background: conic-gradient(#57C785 0% 65%, #eaeaea 65% 100%);">
-                                    <span class="score-value">65%</span>
-                                </div>
-                                <span class="score-label">Sitting Time</span>
-                            </div>
-                            <div class="score-item">
-                                <div class="score-circle" style="background: conic-gradient(#2A7B9B 0% 35%, #eaeaea 35% 100%);">
-                                    <span class="score-value">35%</span>
-                                </div>
-                                <span class="score-label">Standing Time</span>
-                            </div>
-                        </div>
-                        <button class="stats-button">View Complete Statistics</button>
+
+                    <div class="chart-container-horizontal">
+                        <canvas id="timePercentageChartProfile"></canvas>
+                    </div>
+
+                    <div class="chart-pills">
+                        <span class="pill pill-sit" id="sitting-percentage">65% Sit</span>
+                        <span class="pill pill-stand" id="standing-percentage">35% Stand</span>
+                    </div>
                     </div>
                 </div>
-                
-                <div class="divider"></div>
-                
-                    <div class="height-section">
-                        <div class="card-header">
-                            <h2 class="card-title">Ideal Height</h2>
-                        </div>
-                        <div class="ideal-height-container">
-                            <div class="height-display">
-                                <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
-                                <span class="height-unit">cm</span>
-                            </div>
-                            <p class="height-description">
-                                Your personalized ideal desk height for optimal ergonomics
-                            </p>
-                            <a href="{{ route('ideal.height') }}" class="height-button">Configure Ideal Height</a>
-                        </div>
+
+                <div class="health-metric-horizontal posture-score-card">
+                    <div class="health-metric">
+                    <div class="metric-header">
+                        <h3 class="health-metric-title">Posture Score</h3>
+                        <span class="health-metric-badge">Today</span>
                     </div>
+
+                    <div class="posture-score-display">
+                        <p class="posture-score-value" id="profile-posture-score">65</p>
+                    </div>
+
+                    <div class="progress-wrap-horizontal" aria-label="Posture score progression">
+                        <div class="progress-bar" id="profile-posture-score-bar" style="width:65%"></div>
+                    </div>
+
+                    <div class="score-scale">
+                        <span class="scale-min">Poor</span>
+                        <span class="scale-max">Excellent</span>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Ideal Height Card -->
+            <div class="info-card ideal-height-card">
+                <div class="card-header">
+                    <h2 class="card-title">Ideal Height</h2>
+                </div>
+                <div class="ideal-height-container">
+                    <div class="height-display">
+                        <span class="height-value">{{ $userProfile->ideal_height ?? 'N/A' }}</span>
+                        <span class="height-unit">cm</span>
+                    </div>
+                    <p class="height-description">
+                        Your personalized ideal desk height for optimal ergonomics
+                    </p>
+                    <a href="{{ route('ideal.height') }}" class="height-button">Configure Ideal Height</a>
                 </div>
             </div>
         </div>
@@ -176,6 +194,8 @@
     @include('components.footer')
     </div>
 
-    <script src="{{ asset('js/profile.js') }}"></script>
+    <!-- Hidden data for API calls -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-id" content="{{ Auth::id() }}">
 </body>
 </html>

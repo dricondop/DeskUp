@@ -13,5 +13,19 @@
         "laravel-vite-plugin": "^2.0.0",
         "tailwindcss": "^4.0.0",
         "vite": "^7.0.7"
+    },
+    "name": "deskup",
+    "version": "1.0.0",
+    "description": "DeskUp is a semester project built with Laravel that manages desks and schedules, including an automated recurring cleaning schedule.",
+    "main": "vite.config.js",
+    "directories": {
+        "test": "tests"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "three": "^0.182.0",
+        "three-stdlib": "^2.36.1"
     }
 }

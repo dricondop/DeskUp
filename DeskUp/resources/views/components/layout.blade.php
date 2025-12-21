@@ -7,6 +7,7 @@
     <title>{{ $title ?? 'DeskUp' }}</title>
     
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
     
     {{ $styles ?? '' }}
 </head>
@@ -17,6 +18,7 @@
         {{ $slot }}
     </div>
 
+    <script src="{{ asset('js/notifications.js') }}"></script>
     {{ $scripts ?? '' }}
 </body>
 </html>

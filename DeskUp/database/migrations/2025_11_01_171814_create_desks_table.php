@@ -19,7 +19,6 @@ return new class extends Migration
             $table->float('position_x')->nullable();
             $table->float('position_y')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

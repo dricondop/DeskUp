@@ -1,0 +1,363 @@
+/* Admin Statistics Report Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DejaVu Sans', 'Arial', sans-serif;
+    color: #3A506B;
+    line-height: 1.1;
+    font-size: 9px;
+    padding: 10px;
+    background: #FFFFFF;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #00A8A8;
+}
+
+.header h1 {
+    color: #3A506B;
+    font-size: 16px;
+    margin-bottom: 2px;
+    font-weight: 700;
+}
+
+.header .subtitle {
+    color: #7D8893;
+    font-size: 10px;
+    margin-bottom: 2px;
+}
+
+.report-id {
+    margin-top: 4px;
+    font-size: 7px;
+    color: #9FB3C8;
+}
+
+/* Meta Information */
+.meta-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px;
+    background-color: #F4F7F8;
+    border-radius: 4px;
+    border: 1px solid #E0E6EB;
+    font-size: 9px;
+}
+
+.meta-item {
+    flex: 1;
+    padding: 0 6px;
+}
+
+.meta-label {
+    font-weight: 700;
+    color: #3A506B;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 1px;
+    display: block;
+}
+
+.meta-value {
+    color: #5A6C7D;
+    font-size: 9px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 1px;
+}
+
+.meta-detail {
+    color: #9FB3C8;
+    font-size: 8px;
+    display: block;
+}
+
+/* Section Styles */
+.section {
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+}
+
+.section-title {
+    color: #3A506B;
+    font-size: 12px;
+    border-bottom: 1px solid #00A8A8;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 4px;
+    padding: 6px;
+    border: 1px solid #E0E6EB;
+    min-height: 50px;
+}
+
+.card-title {
+    font-size: 9px;
+    font-weight: 600;
+    color: #7D8893;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+
+.card-value {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.card-subtitle {
+    font-size: 8px;
+    color: #9FB3C8;
+    font-style: italic;
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 4px;
+    padding: 6px;
+    border: 1px solid #E0E6EB;
+    text-align: center;
+}
+
+.chart-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #3A506B;
+    margin-bottom: 4px;
+}
+
+.chart-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 2px;
+    border: 1px solid #F0F3F6;
+}
+
+.chart-placeholder {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9FB3C8;
+    font-size: 10px;
+}
+
+/* Table Styles */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 8px;
+}
+
+.stats-table th {
+    background-color: #F4F7F8;
+    padding: 6px 4px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid #00A8A8;
+    color: #3A506B;
+    text-transform: uppercase;
+    font-size: 8px;
+}
+
+.stats-table td {
+    padding: 5px 4px;
+    border-bottom: 1px solid #E0E6EB;
+    color: #5A6C7D;
+}
+
+/* Heatmap Styles */
+.heatmap-section {
+    margin: 15px 0;
+}
+
+.heatmap-table {
+    border-collapse: collapse;
+    font-size: 8px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.heatmap-table th {
+    background: #F4F7F8;
+    padding: 6px 4px;
+    text-align: center;
+    border: 1px solid #E0E6EB;
+    font-weight: 600;
+}
+
+.heatmap-table td {
+    padding: 6px 2px;
+    border: 1px solid #E0E6EB;
+    text-align: center;
+    min-width: 24px;
+}
+
+.day-header {
+    background: #F8F9FA !important;
+    font-weight: 600 !important;
+    padding: 6px !important;
+    text-align: left !important;
+}
+
+.hour-total-cell {
+    background: rgba(58,80,107,0.1) !important;
+    font-weight: 600 !important;
+}
+
+.day-total-cell {
+    background: rgba(0,168,168,0.1) !important;
+    font-weight: 600 !important;
+}
+
+.grand-total-cell {
+    background: rgba(58,80,107,0.15) !important;
+    font-weight: 700 !important;
+    font-size: 9px !important;
+}
+
+/* Heatmap Legend */
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+    font-size: 7px;
+}
+
+.legend-label {
+    margin-right: 10px;
+    color: #666;
+}
+
+.legend-items {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ddd;
+}
+
+.legend-text {
+    color: #666;
+}
+
+/* Heatmap Color Classes */
+.color-0 { background: #f8f9fa !important; color: #333 !important; }
+.color-low { background: #e9ecef !important; color: #333 !important; }
+.color-medium { background: #9fb3c8 !important; color: #333 !important; }
+.color-high { background: #00A8A8 !important; color: white !important; }
+.color-peak { background: #3A506B !important; color: white !important; }
+
+/* Value color classes */
+.value-excellent { color: #4CAF50 !important; }
+.value-good { color: #66BB6A !important; }
+.value-fair { color: #FFAA00 !important; }
+.value-poor { color: #FF4444 !important; }
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 8px;
+    border-top: 1px solid #F0F3F6;
+    color: #9FB3C8;
+    font-size: 7px;
+    line-height: 1.2;
+}
+
+.footer p {
+    margin: 2px 0;
+}
+
+.footer-details {
+    margin-top: 4px;
+    font-size: 6px;
+    color: #9FB3C8;
+}
+
+.confidential {
+    margin-top: 4px;
+    font-size: 6px;
+    color: #D0DAE3;
+    border-top: 1px solid #F0F3F6;
+    padding-top: 4px;
+}
+
+/* Page Break Controls */
+.page-break {
+    page-break-before: always;
+}
+
+.keep-together {
+    page-break-inside: avoid;
+}
+
+/* Status Indicators */
+.status-ok {
+    color: #4CAF50;
+}
+
+.status-error {
+    color: #FF4444;
+}
+
+.not-assigned {
+    color: #9FB3C8;
+}
+
+/* Responsive adjustments for PDF */
+@media print {
+    body {
+        font-size: 8px;
+    }
+    
+    .section {
+        margin-bottom: 12px;
+    }
+    
+    .heatmap-table {
+        font-size: 7px;
+    }
+    
+    .heatmap-table td {
+        padding: 4px 1px;
+        min-width: 20px;
+    }
+}

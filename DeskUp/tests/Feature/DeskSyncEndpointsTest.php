@@ -87,12 +87,14 @@ class DeskSyncEndpointsTest extends TestCase
     public function test_sync_all_desks_data_endpoint_works(): void
     {
         $user = User::factory()->create();
-        Desk::create([
+        $desk = Desk::create([
             'name' => 'Test Desk',
             'desk_number' => 100,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:id'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:id'], 200),
@@ -147,8 +149,10 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 200,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:200'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:200'], 200),
@@ -173,7 +177,7 @@ class DeskSyncEndpointsTest extends TestCase
 
         $this->getJson('/sync-all-desks-data');
 
-        $history = UserStatsHistory::where('desk_id', $desk->desk_number)
+        $history = UserStatsHistory::where('desk_id', $desk->id)
             ->latest('recorded_at')
             ->first();
 
@@ -194,8 +198,10 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 300,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'cd:fb:1a:53:fb:e6'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks/cd:fb:1a:53:fb:e6' => Http::response([
@@ -257,12 +263,14 @@ class DeskSyncEndpointsTest extends TestCase
     public function test_api_desk_mapping_endpoint_works(): void
     {
         $user = User::factory()->create();
-        Desk::create([
+        $desk = Desk::create([
             'name' => 'Test Desk',
             'desk_number' => 400,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:400'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:400'], 200),
@@ -318,13 +326,16 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Desk 1',
             'desk_number' => 500,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:500'
         ]);
+        $user->assigned_desk_id = $desk1->id;
+        $user->save();
         $desk2 = Desk::create([
             'name' => 'Desk 2',
             'desk_number' => 501,
             'is_active' => true,
-            'user_id' => null // Unassigned
+            'user_id' => null, // Unassigned
+            'api_desk_id' => 'test:desk:501'
         ]);
 
         Http::fake([
@@ -377,8 +388,10 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 600,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:600'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:600'], 200),
@@ -402,7 +415,7 @@ class DeskSyncEndpointsTest extends TestCase
         $this->getJson('/sync-all-desks-data');
         $this->getJson('/sync-all-desks-data');
 
-        $count = UserStatsHistory::where('desk_id', $desk->desk_number)->count();
+        $count = UserStatsHistory::where('desk_id', $desk->id)->count();
         $this->assertEquals(3, $count, 'Should create three separate history records');
     }
 
@@ -435,8 +448,10 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 700,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:700'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:700'], 200),
@@ -462,7 +477,7 @@ class DeskSyncEndpointsTest extends TestCase
         $this->getJson('/sync-all-desks-data');
 
         $this->assertDatabaseHas('user_stats_history', [
-            'desk_id' => 700,
+            'desk_id' => $desk->id,
             'desk_height_mm' => 1300,
             'desk_speed_mms' => 40,
             'desk_status' => 'Testing',
@@ -484,8 +499,10 @@ class DeskSyncEndpointsTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 800,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:800'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:800'], 200),
@@ -507,9 +524,9 @@ class DeskSyncEndpointsTest extends TestCase
 
         $this->getJson('/sync-all-desks-data');
 
-        $history = UserStatsHistory::where('desk_id', 800)->first();
-        $this->assertNotNull($history, 'Should find history by desk_number');
-        $this->assertEquals(800, $history->desk_id, 'desk_id should be desk_number');
-        $this->assertNotEquals($desk->id, $history->desk_id, 'desk_id should NOT be primary key');
+        $history = UserStatsHistory::where('desk_id', $desk->id)->first();
+        $this->assertNotNull($history, 'Should find history by desk primary key');
+        $this->assertEquals($desk->id, $history->desk_id, 'desk_id should be primary key');
+        $this->assertNotEquals($desk->desk_number, $history->desk_id, 'desk_id should NOT be desk_number');
     }
 }

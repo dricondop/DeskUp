@@ -3,12 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Admin Statistics — DeskUp</title>
+    <title>Admin Statistics | DeskUp</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-stats.css') }}">
+    <script src="{{ asset('js/admin-stats.js') }}" defer></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -22,7 +23,17 @@
                     <h1>Admin Statistics</h1>
                     <p class="subtitle">Desk usage analytics</p>
                 </div>
-                <nav><span class="badge">DeskUp Admin</span></nav>
+                <nav>
+                    <span class="badge">DeskUp Admin</span>
+                    <div style="display: inline-flex; gap: 8px; margin-left: 15px;">
+                        <button id="export-stats-pdf-btn" class="export-btn" title="Export Statistics to PDF">
+                            <svg style="width: 16px; height: 16px; margin-right: 5px;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
+                            </svg>
+                            Export PDF
+                        </button>
+                    </div>
+                </nav>
             </div>
         </header>
 
@@ -59,13 +70,12 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <h2 id="usage-title" class="chart-title">User Desk Usage</h2>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <button class="btn-ghost" id="refreshDataBtn" title="Refresh">Refresh</button>
                             </div>
                         </div>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
                             <div style="min-height:180px;">
-                                <h4 style="margin:6px 0 8px 0; font-size:0.95rem; color:#3A506B;">Top Users (activities)</h4>
+                                <h4 style="margin:6px 0 8px 0; font-size:0.95rem; color:#3A506B;">Top Users (usage records)</h4>
                                 <div class="chart-container">
                                     <canvas id="topUsersChart" aria-label="Top users bar chart"></canvas>
                                 </div>
@@ -83,7 +93,7 @@
                     <section class="card" aria-labelledby="heatmap-title" style="margin-top:12px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 id="heatmap-title" class="chart-title">Occupancy Heatmap (hours × days)</h3>
-                            <p class="muted small" style="margin:0">Intensity = Number of scheduled activities</p>
+                            <p class="muted small" style="margin:0">Intensity = Number of usage records</p>
                         </div>
 
                         <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
@@ -146,10 +156,6 @@
                                 </li>
                             @endforeach
                         </ul>
-
-                        <div style="margin-top:12px; display:flex; justify-content:flex-end;">
-                            <button class="btn-ghost" id="addUser">Add user</button>
-                        </div>
                     </section>
                 </aside>
             </section>
@@ -174,32 +180,66 @@
     (function(){
         const palette = { primary: '#3A506B', accent: '#00A8A8', alt: '#9FB3C8', light: '#f1f3f5' };
 
+        function updateClock() {
+            const clockEl = document.getElementById('clock');
+            if (!clockEl) return;
+
+            const now = new Date();
+
+            const datePart = now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
+            const timePart = now.toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            clockEl.textContent = `${datePart} ${timePart}`;
+        }
+
+        updateClock();      
+        setInterval(updateClock, 1000); 
+
+
         
         const ctxTop = document.getElementById('topUsersChart').getContext('2d');
         const topLabels = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.name) : [];
         const topValues = (Array.isArray(topUsersData) && topUsersData.length) ? topUsersData.map(u => u.count) : [];
 
-        const topUsersChart = new Chart(ctxTop, {
+        window.topUsersChart = new Chart(ctxTop, {
             type: 'bar',
             data: {
                 labels: topLabels,
-                datasets: [{ label: 'Activities', data: topValues, backgroundColor: palette.primary, borderRadius: 6 }]
+                datasets: [{ label: 'Usage records', data: topValues, backgroundColor: palette.primary, borderRadius: 6 }]
             },
-            options: { plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true } } }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1.5,
+                plugins:{legend:{display:false}}, 
+                scales:{ y:{ beginAtZero:true } } 
+            }
         });
 
-        
         const ctxDonut = document.getElementById('desksDonut').getContext('2d');
-        const desksDonut = new Chart(ctxDonut, {
+        window.desksDonut = new Chart(ctxDonut, {
             type: 'doughnut',
             data: {
                 labels: ['Occupied','Free'],
                 datasets: [{ data: [occupiedDesks, Math.max(0, totalDesks - occupiedDesks)], backgroundColor: [palette.primary, palette.alt] }]
             },
-            options: { plugins:{legend:{position:'bottom'}} }
+            options: { 
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins:{legend:{position:'bottom'}} 
+            }
         });
 
-      
         const heatmapEl = document.getElementById('heatmap');
 
         function drawHeatmap(grid){
@@ -207,7 +247,6 @@
             const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
             const hours = 24;
 
-            
             let max = 0;
             for(let d=0; d<7; d++){
                 for(let h=0; h<hours; h++){
@@ -228,12 +267,11 @@
                     else if(t < 0.75) bg = '#00A8A8';
                     else bg = '#3A506B';
                     cell.style.background = bg;
-                    cell.title = `${days[d]} ${h}:00 — ${v} activities`;
+                    cell.title = `${days[d]} ${h}:00 — ${v} usage records`;
                     heatmapEl.appendChild(cell);
                 }
             }
 
-         
             const hoursRow = document.createElement('div');
             hoursRow.style.display = 'grid';
             hoursRow.style.gridAutoFlow = 'column';
@@ -256,19 +294,8 @@
 
         drawHeatmap(heatmapGrid);
 
-        
-        document.getElementById('refreshDataBtn').addEventListener('click', () => {
-          
-            location.reload();
-        });
-
         document.getElementById('exportBtn').addEventListener('click', () => {
             alert('Export — you can implement CSV/Excel export in a controller that returns a downloadable file.');
-        });
-
-        document.getElementById('addUser').addEventListener('click', () => {
-            
-           // Aquí le metemos funcionalidad?? 
         });
 
     })();

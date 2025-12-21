@@ -1,3 +1,7 @@
+html, body {
+    font-family: 'Inter', sans-serif;
+}
+
 .posture-analysis-container {
     min-height: 100vh;
     background: #f8fafc;
@@ -96,6 +100,7 @@
     border-color: #48bb78;
     border-style: solid;
     box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
+    transform: scaleX(-1);
 }
 
 .capture-canvas {

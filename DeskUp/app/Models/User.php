@@ -53,11 +53,6 @@ class User extends Authenticatable
     {
         return $this->is_admin;
     }
-    public function deskActivities()
-    {
-    return $this->hasManyThrough(DeskActivity::class, Desk::class, 'user_id', 'desk_id', 'id', 'id');
-    }
-
 
     /**
      * Get the desk assigned to the user.
@@ -70,8 +65,34 @@ class User extends Authenticatable
     /**
      * Get the events created by the user.
      */
-    public function events()
+    public function eventsCreatedBy()
     {
         return $this->hasMany(Event::class, 'created_by');
+    }
+
+    // can be used to return all events a user is assigned to, or attach/detach users to events
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_users');
+    }
+
+    public function assignedEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_users');
+    }
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Get the active sessions for the user.
+     */
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
     }
 }
