@@ -41,7 +41,7 @@ class HealthStatsEndpointsTest extends TestCase
         // create latest record data
         UserStatsHistory::create([  
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now() 
         ]);  
@@ -79,28 +79,28 @@ class HealthStatsEndpointsTest extends TestCase
         // create records at different dates
         UserStatsHistory::create([          // daily
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now() 
         ]); 
 
         UserStatsHistory::create([          // weekly
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now()->subDays(2),
         ]); 
 
         UserStatsHistory::create([  
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now()->subDays(20),    // monthly
         ]); 
 
         UserStatsHistory::create([  
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now()->subDays(200),   // yearly
         ]); 
@@ -146,7 +146,7 @@ class HealthStatsEndpointsTest extends TestCase
         foreach (range(8, 12) as $hour) {  
             UserStatsHistory::create([  
                 'user_id' => $this->user->id,  
-                'desk_id' => $this->desk->desk_number, 
+                'desk_id' => $this->desk->id, 
                 'desk_height_mm' => 800,  
                 'recorded_at' => now()->setHour($hour)->setMinute(0)  
             ]);  
@@ -180,14 +180,14 @@ class HealthStatsEndpointsTest extends TestCase
         // Create recent record  
         UserStatsHistory::create([  
             'user_id' => $this->user->id,  
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1200,  
             'recorded_at' => now()->subMinutes(15)  
         ]);  
 
         UserStatsHistory::create([  
             'user_id' => $this->user->id,  
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 800,  
             'recorded_at' => now()->subMinutes(55)  
         ]);  
@@ -237,7 +237,7 @@ class HealthStatsEndpointsTest extends TestCase
         // create data only for second user
         UserStatsHistory::create([  
             'user_id' => $user2->id,  
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1200,  
             'recorded_at' => now()  
         ]);  

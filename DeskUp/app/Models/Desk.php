@@ -102,7 +102,7 @@ class Desk extends Model
             
             $record = \App\Models\UserStatsHistory::create([
                 'user_id' => $user->id,
-                'desk_id' => $this->desk_number,
+                'desk_id' => $this->id,
                 'desk_height_mm' => $height,
                 'desk_speed_mms' => $this->speed ?? 36,
                 'desk_status' => $this->status ?? 'OK',
@@ -129,7 +129,7 @@ class Desk extends Model
         if ($user) {
             \App\Models\UserStatsHistory::create([
                 'user_id' => $user->id,
-                'desk_id' => $this->desk_number,
+                'desk_id' => $this->id,
                 'desk_height_mm' => ($this->height ?? 110) * 10, // Convert cm to mm
                 'desk_speed_mms' => $this->speed ?? 36,
                 'desk_status' => $status,

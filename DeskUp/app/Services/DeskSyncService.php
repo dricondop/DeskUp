@@ -278,10 +278,10 @@ class DeskSyncService
             return false;
         }
 
-        // Insert data using desk_number instead of desk->id
+        // Insert data using desk id (primary key)
         UserStatsHistory::create([
             'user_id' => $user->id,
-            'desk_id' => $desk->desk_number,
+            'desk_id' => $desk->id,
             'desk_height_mm' => $deskData['position_mm'],
             'desk_speed_mms' => $deskData['speed_mms'],
             'desk_status' => $deskData['status'],
