@@ -27,6 +27,9 @@ return new class extends Migration
             $table->index(['user_id', 'recorded_at']);
             // Add foreign key constraint referencing desks.id (primary key)
             $table->foreign('desk_id')->references('id')->on('desks')->onDelete('cascade');
+            
+            // Add check constraint for desk height (680-1320mm inclusive)
+            DB::statement('ALTER TABLE user_stats_history ADD CONSTRAINT chk_desk_height CHECK (desk_height_mm >= 680 AND desk_height_mm <= 1320)');
         });
     }
 
