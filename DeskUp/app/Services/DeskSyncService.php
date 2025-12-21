@@ -208,8 +208,7 @@ class DeskSyncService
             'api_desk_id' => $apiDeskId,
             'position_x' => $desk ? $desk->position_x : $randomX,
             'position_y' => $desk ? $desk->position_y : $randomY,
-            'is_active' => true,
-            'user_id' => null,
+            'is_active' => true
         ];
 
         if ($desk) {
@@ -311,8 +310,12 @@ class DeskSyncService
         // First, try to find the desk in our database
         $desk = $this->findDeskForApiDesk($apiDeskId);
         
-        if ($desk && $desk->user_id) {
-            return User::find($desk->user_id);
+        if ($desk) {
+            // Find user by checking who has this desk assigned
+            $user = User::where('assigned_desk_id', $desk->id)->first();
+            if ($user) {
+                return $user;
+            }
         }
 
         // Fallback: if no user is assigned to the desk, return the first admin user
@@ -344,13 +347,19 @@ class DeskSyncService
                     $deskNumber = $this->extractDeskNumberFromApiId($apiDeskId);
                     $desk = Desk::where('desk_number', $deskNumber)->first();
                     
+                    $assignedUser = null;
+                    if ($desk) {
+                        $user = User::where('assigned_desk_id', $desk->id)->first();
+                        $assignedUser = $user ? $user->name : null;
+                    }
+                    
                     $mapping[] = [
                         'api_desk_id' => $apiDeskId,
                         'api_desk_name' => $deskData['config']['name'] ?? 'Unknown',
                         'extracted_desk_number' => $deskNumber,
                         'found_in_db' => !!$desk,
                         'db_desk_name' => $desk ? $desk->name : null,
-                        'assigned_user' => $desk && $desk->user_id ? $desk->user->name : null
+                        'assigned_user' => $assignedUser
                     ];
                 } catch (\Exception $e) {
                     $mapping[] = [

@@ -24,8 +24,7 @@ class DeskFactory extends Factory
             'api_desk_id' => null,
             'position_x' => null,
             'position_y' => null,
-            'is_active' => true,
-            'user_id' => null,
+            'is_active' => true
         ];
     }
 }

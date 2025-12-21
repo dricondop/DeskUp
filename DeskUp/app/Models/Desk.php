@@ -16,8 +16,7 @@ class Desk extends Model
         'api_desk_id',
         'position_x',
         'position_y',
-        'is_active',
-        'user_id'
+        'is_active'
     ];
 
     protected $casts = [
@@ -143,11 +142,5 @@ class Desk extends Model
                 'recorded_at' => now(),
             ]);
         }
-    }
-
-    // Get the user assigned to this desk via user_id foreign key
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

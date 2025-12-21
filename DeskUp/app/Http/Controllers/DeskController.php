@@ -6,7 +6,6 @@ use App\Helpers\APIMethods;
 use App\Models\Desk;
 use App\Models\Event;
 use App\Models\User;
-use App\Models\DeskActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
