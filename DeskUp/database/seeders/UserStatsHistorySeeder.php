@@ -17,35 +17,38 @@ class UserStatsHistorySeeder extends Seeder
         DB::table('user_stats_history')->truncate();
         $this->command->info('Cleared existing user_stats_history records');
 
-        $user = User::find(2);
+        // Get all users and available desk IDs
+        $users = User::all();
+        $deskIds = Desk::pluck('id')->toArray(); // Get only existing desk IDs
         
-        if (!$user) {
-            $this->command->warn('User ID 2 not found. Skipping user_stats_history seeding.');
+        if ($users->isEmpty()) {
+            $this->command->warn('No users found. Skipping user_stats_history seeding.');
             return;
         }
 
-        // Try multiple ways to get the desk
-        $desk = null;
-        
-        // Method 1: Try assignedDesk relationship if it exists
-        try {
-            $desk = $user->assignedDesk;
-        } catch (\Exception $e) {
-            $this->command->warn('assignedDesk relationship not found, trying alternative methods...');
-        }
-        
-        // Method 3: Use any available desk as fallback
-        if (!$desk) {
-            $desk = Desk::first();
-            if ($desk) {
-                $this->command->warn('No desk assigned to User ID 2, using first available desk: ' . $desk->desk_number);
-            }
-        }
-
-        if (!$desk) {
+        if (empty($deskIds)) {
             $this->command->warn('No desks found in database. Skipping user_stats_history seeding.');
             return;
         }
+
+        $this->command->info('Available desk IDs: ' . implode(', ', $deskIds));
+
+        // Generate data for each user
+        foreach ($users as $user) {
+            $this->command->info("Generating data for user: {$user->name} (ID: {$user->id})");
+            
+            // Assign a random desk ID that actually exists
+            $deskId = $deskIds[array_rand($deskIds)];
+            
+            $this->generateUserData($user, $deskId);
+        }
+    }
+
+    /**
+     * Generate data for a specific user
+     */
+    private function generateUserData($user, $deskId)
+    {
 
         $currentDate = Carbon::now();
         $recordsCreated = 0;
@@ -95,7 +98,7 @@ class UserStatsHistorySeeder extends Seeder
                 $hour = rand(8, 17);
                 $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
                 
-                $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                $this->createRecord($user, $deskId, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
                 $recordsCreated++;
             }
         }
@@ -144,7 +147,7 @@ class UserStatsHistorySeeder extends Seeder
                     $hour = rand(8, 17);
                     $recordTime = $recordDate->copy()->setHour($hour)->setMinute(rand(0, 59))->setSecond(0);
                     
-                    $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                    $this->createRecord($user, $deskId, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
                     $recordsCreated++;
                 }
             }
@@ -173,14 +176,14 @@ class UserStatsHistorySeeder extends Seeder
                     continue;
                 }
                 
-                $this->createRecord($user, $desk, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
+                $this->createRecord($user, $deskId, $recordTime, $baseActivationCount, $recordsCreated, $transitionCount, $previousMode);
                 $recordsCreated++;
             }
         }
 
         $todayRecords = $recordsCreated - $weeklyRecords - $yearlyRecords;
 
-        $this->command->info("Created total of {$recordsCreated} user_stats_history records for User ID 2");
+        $this->command->info("Created total of {$recordsCreated} user_stats_history records for User: {$user->name}");
         $this->command->info("  - Total position transitions: {$transitionCount}");
         $this->command->info("  - {$todayRecords} records for today (8 AM - 3 PM, 3/hour)");
         $this->command->info("  - {$weeklyRecords} records for the past 4 weeks (at least 3 weekdays each)");
@@ -190,12 +193,12 @@ class UserStatsHistorySeeder extends Seeder
     /**
      * Helper method to create a single record with realistic data
      */
-    private function createRecord($user, $desk, $recordTime, $baseActivationCount, &$recordsCreated, &$transitionCount, &$previousMode)
+    private function createRecord($user, $deskId, $recordTime, $baseActivationCount, &$recordsCreated, &$transitionCount, &$previousMode)
     {
         // Randomized sitting vs standing (60% sitting, 40% standing)
+        // Desk height constraint: 680-1320mm
         $isSitting = rand(1, 100) <= 60;
-        $baseHeight = $isSitting ? rand(600, 750) : rand(1200, 1400);
-        $height = $baseHeight + rand(-50, 50);
+        $height = $isSitting ? rand(680, 900) : rand(1000, 1320); // Direct range within constraint bounds
         
         // Determine current mode and check for transition
         $currentMode = $height < 1000 ? 'sit' : 'stand';
@@ -217,7 +220,7 @@ class UserStatsHistorySeeder extends Seeder
         
         UserStatsHistory::create([
             'user_id' => $user->id,
-            'desk_id' => $desk->desk_number,
+            'desk_id' => $deskId, // Use the actual existing desk ID
             'desk_height_mm' => $height,
             'desk_speed_mms' => $speed,
             'desk_status' => $status,

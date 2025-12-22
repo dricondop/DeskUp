@@ -306,13 +306,13 @@ function createCharts() {
             chartInstances.timePercentage = new Chart(pctCtx, {
                 type: 'doughnut',
                 data: { 
-                    labels: ['Standing', 'Sitting'], 
+                    labels: ['Sitting', 'Standing'],  // Fixed: Match data order
                     datasets: [{
                         data: [50, 50],
-                        backgroundColor: [palette.accent,palette.primary]
+                        backgroundColor: [palette.primary, palette.accent]  // Fixed: Sitting=primary, Standing=accent
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom', reverse: true} } }
+                options: { responsive: true, plugins: { legend: { position: 'bottom'} } }  // Removed reverse
             });
         }
 

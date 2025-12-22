@@ -113,4 +113,54 @@ class DeskController extends Controller
         return response()->json(['desks' => $desks]);
     }
 
+    // Get current desk state from API in real-time
+    public function getCurrentState($id)
+    {
+        try {
+            $desk = Desk::findOrFail($id);
+            
+            if (!$desk->api_desk_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Desk has no API ID'
+                ]);
+            }
+            
+            // Fetch current data from API
+            $apiData = APIMethods::getDeskData($desk->api_desk_id);
+            
+            // Extract current height and status
+            $currentHeightMm = $apiData['state']['position_mm'] ?? null;
+            $currentStatus = $apiData['state']['status'] ?? 'Unknown';
+            $currentSpeedMms = $apiData['state']['speed_mms'] ?? 0;
+            
+            if ($currentHeightMm === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not retrieve height from API'
+                ]);
+            }
+            
+            // Convert mm to cm
+            $currentHeightCm = round($currentHeightMm / 10);
+            
+            return response()->json([
+                'success' => true,
+                'height' => $currentHeightCm,
+                'heightMm' => $currentHeightMm,
+                'status' => $currentStatus,
+                'speed' => $currentSpeedMms,
+                'timestamp' => now()->toIso8601String()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error("Failed to get current desk state: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch desk state',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
