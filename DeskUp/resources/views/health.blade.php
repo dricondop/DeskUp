@@ -45,8 +45,8 @@
             <article class="card metric-card" id="live-status-card" aria-labelledby="live-status-label">
                 <div class="metric">
                     <h3 id="live-status-label" class="metric-title">Live Status</h3>
-                    <p class="metric-value"><span id="live-mode">Standing</span> — <span id="live-height">102 cm</span></p>
-                    <p class="muted small" id="live-last">Last adjusted: 12m ago</p>
+                    <p class="metric-value"><span id="live-mode">—</span> — <span id="live-height">— cm</span></p>
+                    <p class="muted small" id="live-last">Loading...</p>
                 </div>
                 <span class="metric-badge">Real-time</span>
             </article>
