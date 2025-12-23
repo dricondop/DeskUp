@@ -15,11 +15,13 @@
 <body>
     @include('components.sidebar')
     
-    <div id="height-detection-app">
-        <height-detection></height-detection>
+    <div id="height-detection-app" data-current-height="{{ $currentHeight }}">
+        <height-detection 
+            :current-height="{{ $currentHeight }}"
+        ></height-detection>
     </div>
 
-    <!-- Archivo Vue.js separado -->
+    <!-- Vue.js file -->
     <script src="{{ asset('js/posture-analysis.js') }}"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@ const HeightDetection = {
                     </a>
                     <div class="header-text">
                         <h1>Posture Analysis</h1>
-                        <p class="subtitle">Position yourself in frame for accurate height detection</p>
+                        <p class="subtitle">Position yourself in frame for accurate ideal height calculation</p>
                     </div>
                 </div>
             </div>
@@ -20,8 +20,29 @@ const HeightDetection = {
 
                 <div class="camera-main-section">
                     <div class="camera-container" v-if="!isAnalyzing && !analysisResult">
+                        <!-- Display current desk height -->
+                        <div class="current-height-display" style="
+                            background: white;
+                            padding: 1rem;
+                            border-radius: 8px;
+                            margin-bottom: 1.5rem;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            border-left: 4px solid #4299e1;
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; color: #4a5568;">Current Desk Height:</span>
+                                <span style="font-weight: 700; color: #1a202c; font-size: 1.2rem;">
+                                    {{ currentHeight }} cm
+                                </span>
+                            </div>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #718096;">
+                                This is your desk's current height. We'll calculate the ideal height based on your posture.
+                            </p>
+                        </div>
+
                         <div class="camera-wrapper">
                             <video 
+                                id="posture-video"
                                 ref="videoElement" 
                                 autoplay 
                                 playsinline 
@@ -29,7 +50,7 @@ const HeightDetection = {
                                 :class="{ 'camera-active': isCameraActive }"
                                 @loadedmetadata="onVideoLoaded"
                             ></video>
-                            <canvas ref="canvasElement" class="capture-canvas"></canvas>
+                            <canvas id="posture-canvas" ref="canvasElement" class="capture-canvas"></canvas>
                         </div>
                         
                         <div class="camera-controls">
@@ -50,7 +71,7 @@ const HeightDetection = {
                                 v-if="isCameraActive && !isAnalyzing"
                             >
                                 <span v-if="!isVideoReady">Preparing Camera...</span>
-                                <span v-else>Analyze Posture</span>
+                                <span v-else>Calculate Ideal Height</span>
                             </button>
 
                             <button 
@@ -72,7 +93,7 @@ const HeightDetection = {
                     <div class="loading-state" v-if="isAnalyzing">
                         <div class="loading-spinner"></div>
                         <h3>Analyzing Your Posture</h3>
-                        <p>Please wait while we calculate your ideal desk height...</p>
+                        <p>Calculating your ideal desk height...</p>
                     </div>
 
                     <div class="results-section" v-if="analysisResult && !isAnalyzing">
@@ -84,24 +105,24 @@ const HeightDetection = {
                             
                             <div class="result-data">
                                 <div class="data-item">
-                                    <span class="data-label">Your Height</span>
-                                    <span class="data-value">{{ analysisResult.user_height }} cm</span>
+                                    <span class="data-label">Current Desk Height</span>
+                                    <span class="data-value">{{ analysisResult.current_height }} cm</span>
                                 </div>
                                 <div class="data-item">
-                                    <span class="data-label">Recommended Desk Height</span>
-                                    <span class="data-value highlight">{{ analysisResult.recommended_height }} cm</span>
+                                    <span class="data-label">Recommended Ideal Height</span>
+                                    <span class="data-value highlight">{{ analysisResult.ideal_height }} cm</span>
                                 </div>
-                                <div class="data-item">
-                                    <span class="data-label">Posture Score</span>
-                                    <span class="data-value" :class="'score-' + getScoreLevel(analysisResult.posture_score)">
-                                        {{ analysisResult.posture_score }}/100
+                                <div class="data-item" v-if="analysisResult.difference">
+                                    <span class="data-label">Adjustment Needed</span>
+                                    <span class="data-value" :class="adjustmentClass">
+                                        {{ analysisResult.difference > 0 ? '+' : '' }}{{ analysisResult.difference }} cm
                                     </span>
                                 </div>
                             </div>
 
                             <div class="result-actions">
                                 <button @click="saveAndContinue" class="btn-primary">
-                                    Save & Continue
+                                    Save Ideal Height
                                 </button>
                                 <button @click="retryAnalysis" class="btn-secondary">
                                     Analyze Again
@@ -145,10 +166,27 @@ const HeightDetection = {
                             <li>Keep arms at your sides</li>
                         </ul>
                     </div>
+                    
+                    <div class="instruction-card">
+                        <h3>📊 About Ideal Height</h3>
+                        <ul>
+                            <li>Based on your posture analysis</li>
+                            <li>Calculated using computer vision</li>
+                            <li>Saved to your profile</li>
+                            <li>Used for desk adjustments</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     `,
+    
+    props: {
+        currentHeight: {
+            type: Number,
+            default: 0
+        }
+    },
     
     data() {
         return {
@@ -159,6 +197,16 @@ const HeightDetection = {
             analysisResult: null,
             cameraStream: null,
             cameraStatus: null
+        }
+    },
+
+    computed: {
+        adjustmentClass() {
+            if (!this.analysisResult || !this.analysisResult.difference) return '';
+            const diff = this.analysisResult.difference;
+            if (diff > 0) return 'score-good';
+            if (diff < 0) return 'score-poor';
+            return 'score-excellent';
         }
     },
 
@@ -213,17 +261,26 @@ const HeightDetection = {
             this.cameraStatus = null;
         },
 
-        captureFrame() {
+        async captureFrame() {
             try {
-                const video = this.$refs.videoElement;
-                const canvas = this.$refs.canvasElement;
+                console.log('Attempting to capture frame...');
+                
+                // Wait for Vue.js to update the DOM
+                await this.$nextTick();
+                
+                // Use getElementById as a secure fallback
+                const video = document.getElementById('posture-video') || this.$refs.videoElement;
+                const canvas = document.getElementById('posture-canvas') || this.$refs.canvasElement;
+                
+                console.log('Video element:', video);
+                console.log('Canvas element:', canvas);
                 
                 if (!video) {
-                    throw new Error('Video element not found');
+                    throw new Error('Video element not found. Please restart camera.');
                 }
                 
                 if (!canvas) {
-                    throw new Error('Canvas element not found');
+                    throw new Error('Canvas element not found.');
                 }
 
                 if (!this.isVideoReady || video.videoWidth === 0 || video.videoHeight === 0) {
@@ -231,39 +288,44 @@ const HeightDetection = {
                 }
 
                 const context = canvas.getContext('2d');
-                
                 if (!context) {
                     throw new Error('Could not get canvas context');
                 }
 
+                // Set dimensions
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
 
+                // Capture frame
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+                // Convert to base64
                 const imageData = canvas.toDataURL('image/jpeg', 0.8);
                 
                 if (!imageData || imageData.length < 1000) {
                     throw new Error('Captured image is empty or too small');
                 }
 
-                console.log('Image captured successfully, size:', imageData.length, 'chars');
+                console.log('Image captured successfully');
                 return imageData;
                 
             } catch (error) {
-                console.error('Error in captureFrame:', error);
+                console.error('Capture error:', error);
                 throw new Error('Failed to capture image: ' + error.message);
             }
         },
 
         async captureAndAnalyze() {
+            console.log('Starting capture and analyze...');
+            
             this.isAnalyzing = true;
             this.cameraStatus = { type: 'info', message: 'Capturing image...' };
 
             try {
+                // Critical delay: Wait for DOM to be ready
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
-                const imageData = this.captureFrame();
+                const imageData = await this.captureFrame();
                 
                 this.cameraStatus = { type: 'info', message: 'Analyzing posture...' };
                 console.log('Sending request to server...');
@@ -277,7 +339,8 @@ const HeightDetection = {
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
-                        image: imageData
+                        image: imageData,
+                        current_height: this.currentHeight
                     })
                 });
 
@@ -292,13 +355,15 @@ const HeightDetection = {
                 console.log('Analysis result:', result);
 
                 if (result.success) {
+                    // Calculate the difference
+                    const difference = result.ideal_height - this.currentHeight;
+                    
                     this.analysisResult = {
                         success: true,
-                        user_height: result.user_height,
-                        recommended_height: result.recommended_height,
-                        posture_score: result.posture_score,
-                        posture_issues: result.posture_issues || [],
-                        detection_id: result.detection_id
+                        current_height: this.currentHeight,
+                        ideal_height: result.ideal_height,
+                        difference: Math.round(difference * 10) / 10, // One decimal
+                        message: result.message || 'Ideal height calculated'
                     };
                     this.cameraStatus = { type: 'success', message: 'Analysis complete!' };
                 } else {
@@ -322,6 +387,7 @@ const HeightDetection = {
         },
 
         saveAndContinue() {
+            // Already saved automatically in the backend
             window.location.href = '/profile';
         },
 
@@ -346,18 +412,12 @@ const HeightDetection = {
         goBack() {
             this.stopCamera();
             window.location.href = '/ideal-height';
-        },
-
-        getScoreLevel(score) {
-            if (score >= 80) return 'excellent';
-            if (score >= 60) return 'good';
-            if (score >= 40) return 'fair';
-            return 'poor';
         }
     },
 
     mounted() {
         console.log('Height Detection component mounted');
+        console.log('Current height from Laravel:', this.currentHeight);
         this.cameraStatus = { type: 'info', message: 'Click "Start Camera" to begin analysis' };
     },
 
@@ -366,7 +426,14 @@ const HeightDetection = {
     }
 };
 
-// Inicializar la aplicación Vue
+// Initialize Vue application
 document.addEventListener('DOMContentLoaded', function() {
-    createApp(HeightDetection).mount('#height-detection-app');
+    const app = createApp(HeightDetection);
+    
+    // Get current height from data attribute
+    const appElement = document.getElementById('height-detection-app');
+    const currentHeight = appElement ? (appElement.getAttribute('data-current-height') || 0) : 0;
+    
+    console.log('Initializing Vue app with currentHeight:', currentHeight);
+    app.mount('#height-detection-app');
 });
