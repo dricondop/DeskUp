@@ -9,4 +9,4 @@ RUN pip install --default-timeout=300 --no-cache-dir -r requirements.txt
 
 COPY . .
 EXPOSE 5000
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
