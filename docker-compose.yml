@@ -1,0 +1,38 @@
+services:
+  # Backend Laravel
+  app:
+    build: ./DeskUp
+    container_name: deskup-app
+    restart: unless-stopped
+    env_file:
+      - ./DeskUp/.env
+    volumes:
+      - ./DeskUp:/var/www
+
+  # Python IA Cam Service
+  python-service:
+    build: ./DeskUp/python_service
+    container_name: deskup-python
+    ports:
+      - "5000:5000"
+
+  # Wifi2Ble Desk Simulator
+  wifi2ble-simulator:
+    build: ./Wifi2Ble
+    container_name: deskup-wifi2ble
+    ports:
+      - "8443:8443"
+    restart: unless-stopped
+
+  # Nginx
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: deskup-webserver
+    ports:
+      - "80:80"
+    volumes:
+      - ./DeskUp:/var/www
+    depends_on:
+      - app

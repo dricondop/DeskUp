@@ -6,7 +6,6 @@ use App\Helpers\APIMethods;
 use App\Models\Desk;
 use App\Models\Event;
 use App\Models\User;
-use App\Models\DeskActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +13,9 @@ class DeskController extends Controller
 {
     public function show($id)
     {
-        $desk = Desk::with('events')->findOrFail($id);
+        $desk = Desk::with(['events', 'latestStats'])->findOrFail($id);
+        
+        \Log::info("Desk control page loaded for desk {$desk->id}, current height: {$desk->height}cm");
 
         $desks = Desk::all();
     
@@ -55,18 +56,26 @@ class DeskController extends Controller
 
         $desk = Desk::findOrFail($id);
         
+        \Log::info("Height update request for desk {$desk->id}: {$height}mm ({$validated['height']}cm)");
+        
         try {
             // Send command to physical desk
             APIMethods::raiseDesk($height, $desk->api_desk_id);
+            \Log::info("API command sent to physical desk {$desk->api_desk_id}");
             
             // Update database immediately with target height (don't wait for physical movement)
             $desk->newUserStatsHistoryRecord($height);
+            \Log::info("Database update completed for desk {$desk->id}");
             
             // Refresh the desk model to load the new stats record
             $desk->refresh();
             $desk->load('latestStats');
             
+            $newHeight = $desk->height;
+            \Log::info("Desk {$desk->id} height after refresh: {$newHeight}cm");
+            
         } catch (\Exception $e) {
+            \Log::error("Height update failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update height',
@@ -102,6 +111,56 @@ class DeskController extends Controller
     {
         $desks = Desk::all();
         return response()->json(['desks' => $desks]);
+    }
+
+    // Get current desk state from API in real-time
+    public function getCurrentState($id)
+    {
+        try {
+            $desk = Desk::findOrFail($id);
+            
+            if (!$desk->api_desk_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Desk has no API ID'
+                ]);
+            }
+            
+            // Fetch current data from API
+            $apiData = APIMethods::getDeskData($desk->api_desk_id);
+            
+            // Extract current height and status
+            $currentHeightMm = $apiData['state']['position_mm'] ?? null;
+            $currentStatus = $apiData['state']['status'] ?? 'Unknown';
+            $currentSpeedMms = $apiData['state']['speed_mms'] ?? 0;
+            
+            if ($currentHeightMm === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not retrieve height from API'
+                ]);
+            }
+            
+            // Convert mm to cm
+            $currentHeightCm = round($currentHeightMm / 10);
+            
+            return response()->json([
+                'success' => true,
+                'height' => $currentHeightCm,
+                'heightMm' => $currentHeightMm,
+                'status' => $currentStatus,
+                'speed' => $currentSpeedMms,
+                'timestamp' => now()->toIso8601String()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error("Failed to get current desk state: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch desk state',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
 }

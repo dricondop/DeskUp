@@ -73,7 +73,8 @@ class DeskSyncServiceTest extends TestCase
         $existingDesk = Desk::create([
             'name' => 'Old Name',
             'desk_number' => 3677,
-            'is_active' => false
+            'is_active' => false,
+            'api_desk_id' => 'cd:fb:1a:53:fb:e6'
         ]);
 
         // Mock API response
@@ -123,8 +124,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 100,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:id'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         // Mock API responses
         Http::fake([
@@ -157,7 +160,7 @@ class DeskSyncServiceTest extends TestCase
         $latestHistory = UserStatsHistory::latest('recorded_at')->first();
         $this->assertNotNull($latestHistory, 'Should have a history record');
         $this->assertEquals($user->id, $latestHistory->user_id, 'Should use correct user');
-        $this->assertEquals($desk->desk_number, $latestHistory->desk_id, 'Should use desk_number as foreign key');
+        $this->assertEquals($desk->id, $latestHistory->desk_id, 'Should use desk primary key as foreign key');
     }
 
     /**
@@ -170,8 +173,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 200,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:200'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:200'], 200),
@@ -196,7 +201,7 @@ class DeskSyncServiceTest extends TestCase
 
         $this->service->syncAllDesksData();
 
-        $history = UserStatsHistory::where('desk_id', $desk->desk_number)->latest('recorded_at')->first();
+        $history = UserStatsHistory::where('desk_id', $desk->id)->latest('recorded_at')->first();
         
         $this->assertEquals(1250, $history->desk_height_mm, 'Should store correct height');
         $this->assertEquals(36, $history->desk_speed_mms, 'Should store correct speed');
@@ -216,7 +221,8 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Unassigned Desk',
             'desk_number' => 300,
             'is_active' => true,
-            'user_id' => null
+            'user_id' => null,
+            'api_desk_id' => 'test:desk:300'
         ]);
 
         Http::fake([
@@ -245,7 +251,8 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Unassigned Desk',
             'desk_number' => 400,
             'is_active' => true,
-            'user_id' => null
+            'user_id' => null,
+            'api_desk_id' => 'test:desk:400'
         ]);
 
         Http::fake([
@@ -268,7 +275,7 @@ class DeskSyncServiceTest extends TestCase
 
         $this->service->syncAllDesksData();
 
-        $history = UserStatsHistory::where('desk_id', $desk->desk_number)->latest('recorded_at')->first();
+        $history = UserStatsHistory::where('desk_id', $desk->id)->latest('recorded_at')->first();
         $this->assertNotNull($history, 'Should create history for unassigned desk');
         $this->assertEquals($admin->id, $history->user_id, 'Should use admin as fallback user');
     }
@@ -283,8 +290,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 500,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'specific:desk:id'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks/specific:desk:id' => Http::response([
@@ -337,8 +346,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Desk 600',
             'desk_number' => 600,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'mapped:desk:id'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['mapped:desk:id'], 200),
@@ -371,8 +382,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 700,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:700'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:700'], 200),
@@ -396,7 +409,7 @@ class DeskSyncServiceTest extends TestCase
         $this->service->syncAllDesksData();
         $this->service->syncAllDesksData();
 
-        $count = UserStatsHistory::where('desk_id', $desk->desk_number)->count();
+        $count = UserStatsHistory::where('desk_id', $desk->id)->count();
         $this->assertEquals(3, $count, 'Should create three separate history records');
     }
 
@@ -429,8 +442,10 @@ class DeskSyncServiceTest extends TestCase
             'name' => 'Test Desk',
             'desk_number' => 800,
             'is_active' => true,
-            'user_id' => $user->id
+            'api_desk_id' => 'test:desk:800'
         ]);
+        $user->assigned_desk_id = $desk->id;
+        $user->save();
 
         Http::fake([
             '*/api/v2/*/desks' => Http::response(['test:desk:800'], 200),
@@ -452,10 +467,10 @@ class DeskSyncServiceTest extends TestCase
 
         $this->service->syncAllDesksData();
 
-        $history = UserStatsHistory::where('desk_id', $desk->desk_number)->first();
+        $history = UserStatsHistory::where('desk_id', $desk->id)->first();
         $this->assertNotNull($history, 'Should create history record');
-        $this->assertEquals($desk->desk_number, $history->desk_id, 'desk_id should equal desk_number');
-        $this->assertNotEquals($desk->id, $history->desk_id, 'desk_id should NOT equal desk primary key');
+        $this->assertEquals($desk->id, $history->desk_id, 'desk_id should equal desk primary key');
+        $this->assertNotEquals($desk->desk_number, $history->desk_id, 'desk_id should NOT equal desk_number');
     }
 
     /**

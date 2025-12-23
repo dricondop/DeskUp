@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Health Insights | DeskUp</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
     <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
-    <script src="{{ asset('js/health.js') }}" defer></script>
-    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
+    <script src="{{ asset('js/health.js') }}" defer></script>
 </head>
 <body>
     @include('components.sidebar')
@@ -44,8 +45,8 @@
             <article class="card metric-card" id="live-status-card" aria-labelledby="live-status-label">
                 <div class="metric">
                     <h3 id="live-status-label" class="metric-title">Live Status</h3>
-                    <p class="metric-value"><span id="live-mode">Standing</span> — <span id="live-height">102 cm</span></p>
-                    <p class="muted small" id="live-last">Last adjusted: 12m ago</p>
+                    <p class="metric-value"><span id="live-mode">—</span> — <span id="live-height">— cm</span></p>
+                    <p class="muted small" id="live-last">Loading...</p>
                 </div>
                 <span class="metric-badge">Real-time</span>
             </article>

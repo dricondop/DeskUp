@@ -14,8 +14,7 @@
                 <div class="tag">Smart sit‑stand ergonomics</div>
             </div>
             <nav class="actions">
-                <a class="btn btn-ghost" href="/signin">Login</a>
-                <a class="btn btn-primary" href="/signup">Sign Up</a>
+                <a class="btn btn-primary" href="/signin">Login</a>
             </nav>
         </div>
     </header>
@@ -32,7 +31,6 @@
                     and delivers actionable analytics for users and facility managers.
                 </p>
                 <div class="hero-cta">
-                    <a class="btn btn-primary" href="/signup">Get Started</a>
                     <a class="btn btn-ghost" href="#features">Learn More</a>
                 </div>
             </div>

@@ -51,21 +51,21 @@ class HealthStatsServiceTest extends TestCase
         // create record data
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 800,
             'recorded_at' => now()->subDays(2)
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1200,
             'recorded_at' => now()->subDays(1)
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1000,
             'recorded_at' => now()->subDays(5)
         ]);
@@ -91,21 +91,21 @@ class HealthStatsServiceTest extends TestCase
         // create record data
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
-            'desk_height_mm' => 600,
+            'desk_id' => $this->desk->id,
+            'desk_height_mm' => 700,
             'recorded_at' => now(),
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1200,
             'recorded_at' => now()->subHour(1)
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1000,
             'recorded_at' => now()->subHour(2)
         ]);
@@ -125,21 +125,21 @@ class HealthStatsServiceTest extends TestCase
         // create record data
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 800,    // sit
             'recorded_at' => now()->subHours(3),
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1200,   // Stand (1st break)
             'recorded_at' => now()->subHours(2)
         ]);
 
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 900,       // sit (2nd break)
             'recorded_at' => now()->subHours(1),
         ]);
@@ -157,7 +157,7 @@ class HealthStatsServiceTest extends TestCase
         // create record data  
         UserStatsHistory::create([
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,
+            'desk_id' => $this->desk->id,
             'desk_height_mm' => 1000,       // standing
             'recorded_at' => now()->subHours(1),
         ]);
@@ -177,7 +177,7 @@ class HealthStatsServiceTest extends TestCase
         foreach (range(8, 17) as $hour) {  
             UserStatsHistory::create([  
                 'user_id' => $this->user->id,  
-                'desk_id' => $this->desk->desk_number,
+                'desk_id' => $this->desk->id,
                 'desk_height_mm' => $hour % 2 === 0 ? 800 : 1200,  // change between desk height 800 and 1200 every hour
                 'recorded_at' => now()->setHour($hour)->setMinute(0)->setSecond(0)  
             ]);  
@@ -219,14 +219,14 @@ class HealthStatsServiceTest extends TestCase
         // create latest record data
         UserStatsHistory::create([  
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 800,  
             'recorded_at' => now()->subHours(1)  
         ]);  
 
         UserStatsHistory::create([  
             'user_id' => $this->user->id,
-            'desk_id' => $this->desk->desk_number,  
+            'desk_id' => $this->desk->id,  
             'desk_height_mm' => 1200,  
             'recorded_at' => now()->subMinutes(30)  
         ]);  

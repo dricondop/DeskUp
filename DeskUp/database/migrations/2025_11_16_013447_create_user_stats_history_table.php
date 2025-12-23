@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,7 +12,7 @@ return new class extends Migration
         Schema::create('user_stats_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('desk_id'); // Changed from foreignId to integer
+            $table->unsignedBigInteger('desk_id');
             $table->integer('desk_height_mm');
             $table->integer('desk_speed_mms')->default(0);
             $table->string('desk_status')->default('Normal');
@@ -24,9 +25,30 @@ return new class extends Migration
             $table->timestamp('recorded_at');
             
             $table->index(['user_id', 'recorded_at']);
-            // Add foreign key constraint referencing desk_number
-            $table->foreign('desk_id')->references('desk_number')->on('desks')->onDelete('cascade');
+            // Add foreign key constraint referencing desks.id (primary key)
+            $table->foreign('desk_id')->references('id')->on('desks')->onDelete('cascade');
         });
+        
+        // Add check constraint for desk height (680-1320mm inclusive)
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE user_stats_history ADD CONSTRAINT chk_desk_height CHECK (desk_height_mm >= 680 AND desk_height_mm <= 1320)');
+        } 
+        
+        // SQLite for testing, PGSQL does not support RAM databases
+        elseif (DB::getDriverName() === 'sqlite') {
+            DB::statement('CREATE TRIGGER chk_desk_height_insert BEFORE INSERT ON user_stats_history
+                BEGIN
+                    SELECT CASE WHEN NEW.desk_height_mm < 680 OR NEW.desk_height_mm > 1320
+                    THEN RAISE(ABORT, "desk_height_mm must be between 680 and 1320")
+                    END;
+                END');
+            DB::statement('CREATE TRIGGER chk_desk_height_update BEFORE UPDATE ON user_stats_history
+                BEGIN
+                    SELECT CASE WHEN NEW.desk_height_mm < 680 OR NEW.desk_height_mm > 1320
+                    THEN RAISE(ABORT, "desk_height_mm must be between 680 and 1320")
+                    END;
+                END');
+        }
     }
 
     public function down(): void

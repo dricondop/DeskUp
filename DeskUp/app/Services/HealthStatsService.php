@@ -12,8 +12,7 @@ class HealthStatsService
     // Threshold in mm to differentiate sitting vs standing
     private const SIT_THRESHOLD_MM = 1000;
     
-    // Ergonomic heights (in mm) - These are DEFAULT values
-    // TODO: Personalize based on user height when available
+    // Ergonomic heights (in mm) - These are DEFAULT values, could be personalized per user
     private const DEFAULT_IDEAL_SIT_HEIGHT_MM = 720;
     private const DEFAULT_IDEAL_STAND_HEIGHT_MM = 1100;
     private const ERGONOMIC_TOLERANCE_MM = 40; // ±40mm tolerance band
@@ -373,6 +372,7 @@ class HealthStatsService
             'avg_sit_height_cm' => $avgSitHeight,
             'avg_stand_height_cm' => $avgStandHeight,
             'position_changes' => $transitions,
+            'breaks_per_day' => $transitions, // Same as position_changes
             'calories_per_day' => $calories,
             'posture_score' => $postureScore,
             'data_quality' => $dataQuality, // NEW: Include data quality info
@@ -483,6 +483,7 @@ class HealthStatsService
             'avg_sit_height_cm' => 72,
             'avg_stand_height_cm' => 110,
             'position_changes' => 0,
+            'breaks_per_day' => 0,
             'calories_per_day' => 0,
             'posture_score' => null, // NEW: null instead of 50 when insufficient data
             'data_quality' => $dataQuality,
@@ -1108,6 +1109,7 @@ class HealthStatsService
             'avg_sit_height_cm' => 72,
             'avg_stand_height_cm' => 110,
             'position_changes' => 0,
+            'breaks_per_day' => 0,
             'calories_per_day' => 0,
         ];
     }

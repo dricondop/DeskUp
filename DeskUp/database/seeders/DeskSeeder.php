@@ -22,7 +22,6 @@ class DeskSeeder extends Seeder
                 'api_desk_id' => null,
                 'position_x' => 100.0,
                 'position_y' => 100.0,
-                'user_id' => $adminId,
                 'is_active' => true,
             ],
             [
@@ -32,7 +31,6 @@ class DeskSeeder extends Seeder
                 'api_desk_id' => null,
                 'position_x' => 300.0,
                 'position_y' => 100.0,
-                'user_id' => $userId,
                 'is_active' => true,
             ],
         ];

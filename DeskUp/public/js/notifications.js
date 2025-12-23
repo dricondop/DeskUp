@@ -39,7 +39,8 @@ class NotificationManager {
 
             if (!response.ok) return;
 
-            const notifications = await response.json();
+            const data = await response.json();
+            const notifications = data.notifications || data;
             
             // Show only unread notifications
             const unreadNotifications = notifications.filter(n => !n.is_read);
@@ -112,6 +113,7 @@ class NotificationManager {
     }
 
     closeNotification(element, notificationId) {
+        console.log('Closing notification ID:', notificationId);
         element.classList.remove('show');
         element.classList.add('hide');
 
@@ -125,14 +127,32 @@ class NotificationManager {
 
     async markAsRead(notificationIds) {
         try {
-            await fetch('/api/notifications/mark-read', {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            console.log('CSRF Token:', csrfToken ? 'Found' : 'Missing');
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found in page');
+                return;
+            }
+            
+            const response = await fetch('/api/notifications/mark-read', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
                 },
                 body: JSON.stringify({ notification_ids: notificationIds }),
             });
+            
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Failed to mark as read. Status:', response.status, 'Response:', text);
+                return;
+            }
+            
+            const result = await response.json();
+            console.log('Mark as read response:', result);
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
@@ -162,6 +182,79 @@ class NotificationManager {
     }
 }
 
+/**
+ * Notification History Functions
+ * For displaying notification history in the Health page
+ */
+
+// Load notification history into a container
+async function loadNotificationHistory() {
+    const listEl = document.getElementById('notificationHistoryList');
+    if (!listEl) return;
+
+    try {
+        const response = await fetch('/api/notifications/history');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        if (!data.notifications || data.notifications.length === 0) {
+            listEl.innerHTML = '<p class="empty-text">No notifications yet</p>';
+            return;
+        }
+
+        listEl.innerHTML = data.notifications.map(notification => {
+            const date = new Date(notification.sent_at || notification.created_at);
+            const timeAgo = getTimeAgoLong(date);
+            const unreadClass = notification.is_read ? '' : ' unread';
+            
+            return `
+                <div class="notification-item${unreadClass}">
+                    <div class="notification-item-header">
+                        <h4 class="notification-item-title">${escapeHtml(notification.title)}</h4>
+                        <span class="notification-item-badge ${notification.type}">${notification.type}</span>
+                    </div>
+                    <p class="notification-item-message">${escapeHtml(notification.message)}</p>
+                    <span class="notification-item-time">${timeAgo}</span>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading notification history:', error);
+        listEl.innerHTML = '<p class="empty-text">Failed to load notifications</p>';
+    }
+}
+
+// Get time ago with more verbose format for history
+function getTimeAgoLong(date) {
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
+    return date.toLocaleDateString();
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Export functions for use in other scripts - do this immediately
+window.NotificationHistory = {
+    loadNotificationHistory,
+    getTimeAgoLong,
+    escapeHtml
+};
+
 // Initialize notification manager when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
@@ -170,3 +263,6 @@ if (document.readyState === 'loading') {
 } else {
     window.notificationManager = new NotificationManager();
 }
+
+// Also make functions globally available for backward compatibility
+window.loadNotificationHistory = loadNotificationHistory;

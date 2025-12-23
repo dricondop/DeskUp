@@ -35,6 +35,7 @@ Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth'
 
 Route::middleware('auth')->group(function () {
     Route::get('/api/desks', [DeskController::class, 'index']);
+    Route::get('/api/desks/{id}/current-state', [DeskController::class, 'getCurrentState']);
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/addEvent', [EventController::class, 'addEvent']);
@@ -69,6 +70,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/health/export/preview', [PDFExportController::class, 'previewHealthPDF'])->name('health.export.preview');
     // Combined endpoint for instant page load
     Route::get('/api/health-data', [HealthController::class, 'getAllData'])->name('api.health.all');
+    
+    // Notification API routes
+    Route::get('/api/notifications/history', [NotificationController::class, 'getUserNotifications'])->name('api.notifications.history');
+    Route::get('/api/notifications/pending', [NotificationController::class, 'getPending'])->name('api.notifications.pending');
+    Route::post('/api/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('api.notifications.mark-read');
+    
+    // Notification management (admin)
+    Route::post('/api/notifications/settings', [NotificationController::class, 'updateSettings'])->name('api.notifications.settings');
+    Route::post('/api/notifications/send-manual', [NotificationController::class, 'sendManual'])->name('api.notifications.send-manual');
 });
 
 Route::get('/signin', function () {
@@ -79,39 +89,14 @@ Route::get('/signin', function () {
 Route::get('/admin-statistics', [AdminStatisticsController::class, 'index'])
     ->name('admin-statistics')
     ->middleware('auth');
-    $totalDesks = Desk::count();
-    $occupiedDesks = UserStatsHistory::distinct('desk_id')->count('desk_id');
-    $avgSession = UserStatsHistory::selectRaw(
-    'COUNT(*) * 60.0 / NULLIF(COUNT(DISTINCT user_id), 0) as avg_minutes'
-    )->value('avg_minutes') ?? 0;
-    $topUsers = UserStatsHistory::select('user_id')
-    ->selectRaw('COUNT(*) as count')
-    ->groupBy('user_id')
-    ->orderByDesc('count')
-    ->with('user:id,name')
-    ->limit(5)
-    ->get()
-    ->map(fn ($row) => [
-        'name' => $row->user->name ?? 'Unknown',
-        'count' => (int) $row->count,
-    ]);
-    $heatmapRaw = UserStatsHistory::selectRaw('
-        EXTRACT(DOW FROM recorded_at) as day,
-        EXTRACT(HOUR FROM recorded_at) as hour,
-        COUNT(*) as count
-    ')
-    ->groupBy('day', 'hour')
-    ->get();
 
-    $heatmapGrid = [];
-    foreach ($heatmapRaw as $row) {
-    $heatmapGrid[(int)$row->day][(int)$row->hour] = (int)$row->count;
-    }
-    $users = User::all();
-    $desks = Desk::all();
+// Admin Statistics API for live updates
+Route::get('/api/admin-statistics/live', [AdminStatisticsController::class, 'getLiveData'])
+    ->name('api.admin-statistics.live')
+    ->middleware('auth');
 
-    // Admin Statistics PDF Export routes
-    Route::get('/admin/statistics/export/pdf', [PDFExportController::class, 'exportAdminStatsPDF'])->name('admin.statistics.export.pdf');
+// Admin Statistics PDF Export routes
+Route::get('/admin/statistics/export/pdf', [PDFExportController::class, 'exportAdminStatsPDF'])->name('admin.statistics.export.pdf');
     Route::get('/admin/statistics/export/preview', [PDFExportController::class, 'previewAdminStatsPDF'])->name('admin.statistics.export.preview');
 
 Route::get('/events', [EventController::class, 'index'])
@@ -130,18 +115,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/{id}/remove-user', [AdminController::class, 'removeUser']);
     Route::post('/event/{id}/approve', [AdminController::class, 'approveEvent']);
     Route::post('/event/{id}/reject', [AdminController::class, 'rejectEvent']);
-    
-    // Notification Management (Admin)
-    Route::get('/admin/notifications', [NotificationController::class, 'adminIndex'])->name('admin.notifications');
-    Route::post('/api/notifications/send-manual', [NotificationController::class, 'sendManual']);
-    Route::post('/api/notifications/settings', [NotificationController::class, 'updateSettings']);
-});
-
-// Notification routes for all authenticated users
-Route::middleware('auth')->group(function () {
-    Route::get('/api/notifications/history', [NotificationController::class, 'getUserNotifications']);
-    Route::get('/api/notifications/pending', [NotificationController::class, 'getPending']);
-    Route::post('/api/notifications/mark-read', [NotificationController::class, 'markAsRead']);
 });
 
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile')->middleware('auth');
@@ -163,6 +136,7 @@ Route::get('/height-detection/result/{id}', [HeightDetectionController::class, '
 Route::get('/height-detection/history', [HeightDetectionController::class, 'history'])->name('height.detection.history')->middleware('auth');
 Route::get('/height-detection/health', [HeightDetectionController::class, 'healthCheck'])->name('height.detection.health')->middleware('auth');
 
+Route::get('/api/current-desk-height', [HeightDetectionController::class, 'getCurrentHeight'])->name('api.current.desk.height')->middleware('auth');
 
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {

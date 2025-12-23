@@ -26,11 +26,6 @@ function animateCharts() {
 }
 
 function setupEventListeners() {
-    const notificationBtn = document.querySelector('.notification-btn');
-    if (notificationBtn) {
-        notificationBtn.addEventListener('click', handleNotificationClick);
-    }
-    
     const settingsBtn = document.querySelector('.settings-btn');
     if (settingsBtn) {
         settingsBtn.addEventListener('click', handleSettingsClick);
@@ -45,11 +40,6 @@ function setupEventListeners() {
     if (heightButton) {
         heightButton.addEventListener('click', handleHeightClick);
     }
-}
-
-function handleNotificationClick(event) {
-    console.log('Notifications clicked');
-    showNotification('No new notifications');
 }
 
 function handleSettingsClick(event) {
