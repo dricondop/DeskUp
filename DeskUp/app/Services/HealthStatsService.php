@@ -12,8 +12,7 @@ class HealthStatsService
     // Threshold in mm to differentiate sitting vs standing
     private const SIT_THRESHOLD_MM = 1000;
     
-    // Ergonomic heights (in mm) - These are DEFAULT values
-    // TODO: Personalize based on user height when available
+    // Ergonomic heights (in mm) - These are DEFAULT values, could be personalized per user
     private const DEFAULT_IDEAL_SIT_HEIGHT_MM = 720;
     private const DEFAULT_IDEAL_STAND_HEIGHT_MM = 1100;
     private const ERGONOMIC_TOLERANCE_MM = 40; // ±40mm tolerance band
@@ -25,11 +24,11 @@ class HealthStatsService
     private const WEIGHT_ERGONOMICS = 0.20;
 
     // MINIMUM DATA REQUIREMENTS
-    private const MIN_RECORDS_FOR_HOURLY_SCORE = 1; // Need 1+ records per hour (relaxed for testing)
-    private const MIN_HOURS_FOR_DAILY_SCORE = 1;    // Need 1+ hours of data for daily score (relaxed for testing)
-    private const MIN_DAYS_FOR_WEEKLY_SCORE = 1;    // Need 1+ days for weekly score (relaxed for testing)
-    private const MIN_WEEKS_FOR_MONTHLY_SCORE = 1;  // Need 1+ weeks for monthly score (relaxed for testing)
-    private const MIN_MONTHS_FOR_YEARLY_SCORE = 1;  // Need 1+ months for yearly score (relaxed for testing)
+    private const MIN_RECORDS_FOR_HOURLY_SCORE = 3; // Need 3+ records per hour
+    private const MIN_HOURS_FOR_DAILY_SCORE = 4;    // Need 4+ hours of data for daily score
+    private const MIN_DAYS_FOR_WEEKLY_SCORE = 3;    // Need 3+ days for weekly score
+    private const MIN_WEEKS_FOR_MONTHLY_SCORE = 2;  // Need 2+ weeks for monthly score
+    private const MIN_MONTHS_FOR_YEARLY_SCORE = 6;  // Need 6+ months for yearly score
 
     /**
      * Fetch user health stats with optional date filtering.

@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HeightDetectionController; 
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\PDFExportController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -69,6 +70,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/health/export/preview', [PDFExportController::class, 'previewHealthPDF'])->name('health.export.preview');
     // Combined endpoint for instant page load
     Route::get('/api/health-data', [HealthController::class, 'getAllData'])->name('api.health.all');
+    
+    // Notification API routes
+    Route::get('/api/notifications/history', [NotificationController::class, 'getUserNotifications'])->name('api.notifications.history');
+    Route::get('/api/notifications/pending', [NotificationController::class, 'getPending'])->name('api.notifications.pending');
+    Route::post('/api/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('api.notifications.mark-read');
+    
+    // Notification management (admin)
+    Route::post('/api/notifications/settings', [NotificationController::class, 'updateSettings'])->name('api.notifications.settings');
+    Route::post('/api/notifications/send-manual', [NotificationController::class, 'sendManual'])->name('api.notifications.send-manual');
 });
 
 Route::get('/signin', function () {
