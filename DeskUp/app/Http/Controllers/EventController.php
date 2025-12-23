@@ -42,7 +42,7 @@ class EventController extends Controller
         $recurringCleaningDays = Event::where('event_type', 'cleaning')
             ->where('status', Event::STATUS_APPROVED)
             ->value('cleaning_days');
-
+        
         
         $meetings   = $allEvents->where('event_type', 'meeting');
         $events     = $allEvents->where('event_type', 'event');
