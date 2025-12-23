@@ -98,13 +98,12 @@ class EventSeeder extends Seeder
   
         foreach ($events as $eventData) {  
             $event = Event::create($eventData);  
-  
+
             // Attach random desks (1-3 desks per event)  
-            $deskCount = rand(1, 3);  
-            $deskIds = Desk::inRandomOrder()->limit($deskCount)->pluck('id');  
-            $event->desks()->attach($deskIds);  
+            $deskIds = Desk::inRandomOrder()->limit(rand(1,3))->pluck('id')->all();
+            $event->desks()->syncWithoutDetaching($deskIds); 
   
-            // Attach users based on event type  
+            //Attach users based on event type  
             if (in_array($event->event_type, ['meeting', 'event'])) {  
                 // Meetings and events include both users  
                 $event->users()->attach([$adminUser->id, $regularUser->id]);  
