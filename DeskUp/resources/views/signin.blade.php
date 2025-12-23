@@ -7,7 +7,7 @@
     </head>
     <body class="signin-body">
         <div class="sign-in-container">
-            <a href="" class="back"> <img src="{{ asset ('assets/back.png') }}"> </a>
+            <a href="/" class="back"> <img src="{{ asset ('assets/back.png') }}"> </a>
             <img class="sign-in-logo" src="{{ asset ('assets/logo.png') }}">
             <div class="form-container">
                 @if ($errors->has('auth'))

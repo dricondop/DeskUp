@@ -76,6 +76,8 @@ holdButton(dec, () => changeHeight(-1));
 const presetButtons = document.querySelectorAll('.height-preset-btns button');
 presetButtons.forEach(button => {
     button.addEventListener('click', () => {
+        markUserAction(); // Mark that user is adjusting
+        
         const targetHeight = Number(button.dataset.height);
 
         // Update height
@@ -96,6 +98,8 @@ presetButtons.forEach(button => {
 function changeHeight(number) 
 {   
     if (!allDesks.length) return;
+    
+    markUserAction(); // Mark that user is adjusting
     
     const previousHeight = currentHeight;
     currentHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, currentHeight + number));
@@ -173,3 +177,83 @@ window.updateDeskHeight = function(height) {
         updateDesk();
     }
 };
+
+// Poll desk state from API to sync "real-time" height
+let pollingInterval = null;
+let isUserAdjusting = false;
+let lastUserAction = 0;
+
+async function pollDeskState() {
+    // Don't poll if user is actively adjusting (wait 3 seconds after last action)
+    const timeSinceLastAction = Date.now() - lastUserAction;
+    if (isUserAdjusting || timeSinceLastAction < 3000) {
+        return;
+    }
+    
+    //If there is no assingned desk, return
+    if (!allDesks.length) return;
+    
+    try {
+        for (const deskId of allDesks) {
+            const response = await fetch(`/api/desks/${deskId}/current-state`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.height) {
+                // Only update if height is different (avoid unnecessary updates)
+                if (currentHeight !== data.height) {
+                    console.log(`Syncing height from API: ${data.height}cm (was ${currentHeight}cm)`);
+                    currentHeight = data.height;
+                    display.textContent = currentHeight + " cm";
+                    
+                    // Update 3D viewer
+                    if (window.desk3DViewer) {
+                        window.desk3DViewer.setHeight(currentHeight, true);
+                    }
+                }
+                
+                // Update status if element exists
+                const statusEl = document.getElementById('deskStatus');
+                if (statusEl && data.status) {
+                    statusEl.textContent = data.status;
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error polling desk state:', error);
+    }
+}
+
+// Start polling when page loads
+function startPolling(intervalMs = 5000) {
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+    
+    // Initial poll
+    pollDeskState();
+    
+    // Then poll every X seconds
+    pollingInterval = setInterval(pollDeskState, intervalMs);
+    console.log(`Started polling desk state every ${intervalMs/1000}s`);
+}
+
+// Stop polling
+function stopPolling() {
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+        console.log('Stopped polling desk state');
+    }
+}
+
+// Mark when user is adjusting to pause polling temporarily
+function markUserAction() {
+    lastUserAction = Date.now();
+}

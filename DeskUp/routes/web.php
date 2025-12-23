@@ -34,6 +34,7 @@ Route::get('/layout/load', [LayoutController::class, 'load'])->middleware('auth'
 
 Route::middleware('auth')->group(function () {
     Route::get('/api/desks', [DeskController::class, 'index']);
+    Route::get('/api/desks/{id}/current-state', [DeskController::class, 'getCurrentState']);
     Route::post('/api/desks/{id}/height', [DeskController::class, 'updateHeight']);
     Route::post('/api/desks/{id}/status', [DeskController::class, 'updateStatus']);
     Route::post('/api/addEvent', [EventController::class, 'addEvent']);
