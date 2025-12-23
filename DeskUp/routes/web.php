@@ -75,6 +75,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/notifications/history', [NotificationController::class, 'getUserNotifications'])->name('api.notifications.history');
     Route::get('/api/notifications/pending', [NotificationController::class, 'getPending'])->name('api.notifications.pending');
     Route::post('/api/notifications/mark-read', [NotificationController::class, 'markAsRead'])->name('api.notifications.mark-read');
+    
+    // Notification management (admin)
+    Route::post('/api/notifications/settings', [NotificationController::class, 'updateSettings'])->name('api.notifications.settings');
+    Route::post('/api/notifications/send-manual', [NotificationController::class, 'sendManual'])->name('api.notifications.send-manual');
 });
 
 Route::get('/signin', function () {

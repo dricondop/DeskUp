@@ -333,6 +333,7 @@
 
     </div>
 
+    <script src='{{ asset('js/notification-management.js') }}'></script>
     <script src='{{ asset('js/users-management.js') }}'></script>
 </body>
 </html>
