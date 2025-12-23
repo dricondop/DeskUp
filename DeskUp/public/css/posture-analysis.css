@@ -5,24 +5,27 @@ html, body {
 .posture-analysis-container {
     min-height: 100vh;
     background: #f8fafc;
-    margin-left: 80px; /* Reducido significativamente */
+    margin-left: 15%;
+    padding: 0 1rem;
 }
 
-/* Header Centrado */
 .analysis-header {
     background: white;
     border-bottom: 1px solid #e2e8f0;
-    padding: 1.5rem 1rem; /* Reducido padding lateral */
+    padding: 1.5rem 0;
     display: flex;
     justify-content: center;
+    margin-left: -15%;
+    padding-left: 15%;
 }
 
 .header-content {
     display: flex;
     align-items: center;
     gap: 1rem;
-    max-width: 1400px; /* Aumentado para más espacio */
+    max-width: 1400px;
     width: 100%;
+    padding: 0 1rem;
 }
 
 .header-text {
@@ -31,7 +34,7 @@ html, body {
 }
 
 .header-text h1 {
-    font-size: 1.8rem; /* Ligeramente más pequeño */
+    font-size: 1.8rem;
     font-weight: 700;
     color: #1a202c;
     margin: 0 0 0.5rem 0;
@@ -48,33 +51,33 @@ html, body {
     height: 24px;
 }
 
-/* Layout Principal de 3 Columnas - OPTIMIZADO */
 .analysis-main-layout {
     display: grid;
-    grid-template-columns: 60px 1fr 280px; /* Sidebar izquierda muy reducida */
+    grid-template-columns: 60px 1fr 280px;
     min-height: calc(100vh - 100px);
-    max-width: 1600px; /* Más ancho */
+    max-width: 1600px;
     margin: 0 auto;
-    gap: 1rem; /* Menor gap */
+    gap: 1rem;
+    padding-left: 15%;
+    margin-left: -15%;
 }
 
-/* Sección Central - Cámara MÁS GRANDE */
 .camera-main-section {
-    padding: 1rem; /* Reducido padding */
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    min-width: 0; /* Permite que se expanda */
+    min-width: 0;
 }
 
 .camera-container {
     background: white;
     border-radius: 12px;
-    padding: 1.5rem; /* Reducido */
+    padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: none; /* Sin límite máximo */
+    max-width: none;
     text-align: center;
 }
 
@@ -84,9 +87,9 @@ html, body {
 
 .camera-feed {
     width: 100%;
-    height: 65vh; /* Usa porcentaje de viewport height */
-    min-height: 500px; /* Mínimo para buena visibilidad */
-    max-height: 700px; /* Máximo razonable */
+    height: 65vh;
+    min-height: 500px;
+    max-height: 700px;
     border-radius: 10px;
     background: #f7fafc;
     border: 3px dashed #cbd5e0;
@@ -178,7 +181,6 @@ html, body {
 .status-success { color: #48bb78; }
 .status-error { color: #f56565; }
 
-/* Loading State */
 .loading-state {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -203,7 +205,6 @@ html, body {
     100% { transform: rotate(360deg); }
 }
 
-/* Results Section */
 .results-section {
     animation: fadeIn 0.5s ease-in;
     width: 100%;
@@ -287,7 +288,6 @@ html, body {
     justify-content: center;
 }
 
-/* Sidebar Derecha - Instrucciones COMPACTAS */
 .instructions-sidebar {
     padding: 1rem 0.5rem;
     display: flex;
@@ -322,7 +322,6 @@ html, body {
     margin-bottom: 0.5rem;
 }
 
-/* Responsive Design MEJORADO para laptops */
 @media (max-width: 1440px) {
     .analysis-main-layout {
         grid-template-columns: 60px 1fr 250px;
@@ -341,10 +340,6 @@ html, body {
         gap: 0.5rem;
     }
     
-    .posture-analysis-container {
-        margin-left: 60px;
-    }
-    
     .camera-feed {
         height: 55vh;
         min-height: 400px;
@@ -354,10 +349,6 @@ html, body {
 @media (max-width: 1024px) {
     .analysis-main-layout {
         grid-template-columns: 40px 1fr 200px;
-    }
-    
-    .posture-analysis-container {
-        margin-left: 50px;
     }
     
     .camera-main-section {
@@ -377,21 +368,27 @@ html, body {
 @media (max-width: 768px) {
     .posture-analysis-container {
         margin-left: 0;
+        padding: 0 0.5rem;
+    }
+    
+    .analysis-header {
+        margin-left: 0;
+        padding-left: 0;
+        padding: 1rem 0.5rem;
     }
     
     .analysis-main-layout {
         grid-template-columns: 1fr;
         padding: 0.5rem;
         gap: 1rem;
-    }
-    
-    .analysis-header {
-        padding: 1rem 0.5rem;
+        margin-left: 0;
+        padding-left: 0;
     }
     
     .header-content {
         flex-direction: column;
         gap: 0.75rem;
+        padding: 0 0.5rem;
     }
     
     .header-text h1 {
@@ -400,7 +397,7 @@ html, body {
     
     .camera-main-section {
         padding: 0;
-        order: 1; /* Cámara primero en móviles */
+        order: 1;
     }
     
     .camera-container {
@@ -419,7 +416,7 @@ html, body {
     
     .instructions-sidebar {
         padding: 0.5rem;
-        order: 2; /* Instrucciones después en móviles */
+        order: 2;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 1rem;
@@ -430,6 +427,50 @@ html, body {
         min-width: 250px;
         padding: 1rem;
     }
+}
+
+.camera-feed {
+    width: 100%;
+    height: 65vh;
+    min-height: 500px;
+    max-height: 700px;
+    border-radius: 10px;
+    background: #f7fafc;
+    border: 3px dashed #cbd5e0;
+    object-fit: cover;
+    transform: scaleX(-1); /* Añade esta línea */
+}
+
+.camera-feed.camera-active {
+    border-color: #48bb78;
+    border-style: solid;
+    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
+}
+
+.current-height-display {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid #4299e1;
+}
+
+.current-height-display .value {
+    font-weight: 700;
+    color: #1a202c;
+    font-size: 1.2rem;
+}
+
+.current-height-display .label {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.current-height-display .description {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.9rem;
+    color: #718096;
 }
 
 @media (max-width: 480px) {
@@ -461,7 +502,6 @@ html, body {
     }
 }
 
-/* Optimización específica para laptops pequeñas (13-14") */
 @media (max-width: 1366px) and (min-width: 1024px) {
     .analysis-main-layout {
         grid-template-columns: 50px 1fr 240px;

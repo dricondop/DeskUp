@@ -126,6 +126,7 @@ Route::get('/height-detection/result/{id}', [HeightDetectionController::class, '
 Route::get('/height-detection/history', [HeightDetectionController::class, 'history'])->name('height.detection.history')->middleware('auth');
 Route::get('/height-detection/health', [HeightDetectionController::class, 'healthCheck'])->name('height.detection.health')->middleware('auth');
 
+Route::get('/api/current-desk-height', [HeightDetectionController::class, 'getCurrentHeight'])->name('api.current.desk.height')->middleware('auth');
 
 Route::get('desk-control', [DeskController::class, 'showAssignedDesk']);
 Route::get('/desk-control', function () {
