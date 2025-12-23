@@ -6,144 +6,25 @@ const qq = s => Array.from(document.querySelectorAll(s));
 let chartInstances = {};
 const palette = { primary: '#3A506B', accent: '#00A8A8', alt:'#9FB3C8' };
 
-// Fetch all data at once for instant page load
-async function fetchAllData(range = 'today') {
-    try {
-        const response = await fetch(`/api/health-data?range=${range}`);
-        const data = await response.json();
-        
-        if (data.error) {
-            console.error('Error fetching data:', data.error);
-            return null;
-        }
-        
-        // Update live status
-        updateLiveStatus(data.liveStatus);
-        
-        // Update stats
-        updateStats(data.stats);
-        
-        // Update charts
-        updateCharts(data.chartData, data.stats);
-        
-        return data;
-    } catch (error) {
-        console.error('Error fetching all data:', error);
-        return null;
-    }
-}
-
-// Update live status display
-function updateLiveStatus(data) {
-    const modeEl = q('#live-mode');
-    const heightEl = q('#live-height');
-    const lastEl = q('#live-last');
-    
-    if (modeEl) modeEl.textContent = data.mode;
-    if (heightEl) heightEl.textContent = `${data.height_cm} cm`;
-    if (lastEl) lastEl.textContent = `Last adjusted: ${data.last_adjusted}`;
-}
-
-// Update stats display
-function updateStats(data) {
-    // Update metric cards
-    const activeEl = q('[data-key="periodActiveHours"]');
-    if (activeEl) activeEl.textContent = data.active_hours || 0;
-    
-    const standEl = q('[data-key="periodStanding"]');
-    if (standEl) standEl.textContent = `${data.standing_pct || 0}%`;
-    
-    const breaksEl = q('[data-key="periodBreaks"]');
-    if (breaksEl) breaksEl.textContent = data.breaks_per_day || 0;
-    
-    const calEl = q('[data-key="periodCalories"]');
-    if (calEl) calEl.textContent = `${data.calories_per_day || 0} kcal`;
-    
-    // Update posture score
-    const score = Math.max(0, Math.min(100, data.standing_pct || 0));
-    const scoreEl = q('#posture-score-value');
-    const bar = q('#posture-score-bar');
-    if (scoreEl) scoreEl.textContent = `${score} / 100`;
-    if (bar) bar.style.width = `${score}%`;
-    
-    // Generate insights
-    generateInsights(data);
-}
-
-// Update all charts
-function updateCharts(chartData, stats) {
-    // Update doughnut chart (time percentage)
-    if (chartInstances.timePercentage) {
-        chartInstances.timePercentage.data.datasets[0].data = [
-            stats.sitting_pct || 50,
-            stats.standing_pct || 50
-        ];
-        chartInstances.timePercentage.update();
-    }
-    
-    // Update bar chart (absolute time)
-    if (chartInstances.timeAbsolute && chartData.labels && chartData.labels.length > 0) {
-        chartInstances.timeAbsolute.data.datasets[0].data = [
-            chartData.sitting_hours.reduce((a, b) => a + b, 0).toFixed(2),
-            chartData.standing_hours.reduce((a, b) => a + b, 0).toFixed(2)
-        ];
-        chartInstances.timeAbsolute.data.labels = ['Sitting', 'Standing'];
-        chartInstances.timeAbsolute.update();
-    }
-    
-    // Update posture score line chart
-    if (chartInstances.postureScore && chartData.posture_scores && chartData.posture_scores.length > 0) {
-        chartInstances.postureScore.data.labels = chartData.labels;
-        chartInstances.postureScore.data.datasets[0].data = chartData.posture_scores;
-        setYAxisRange(chartInstances.postureScore, chartData.posture_scores, { minClamp: null, maxClamp: 100 });
-        chartInstances.postureScore.update();
-    }
-    
-    // Update height average chart
-    if (chartInstances.heightAverage && chartData.avg_sit_heights && chartData.avg_sit_heights.length > 0) {
-        chartInstances.heightAverage.data.labels = chartData.labels;
-        chartInstances.heightAverage.data.datasets[0].data = chartData.avg_sit_heights;
-        chartInstances.heightAverage.data.datasets[1].data = chartData.avg_stand_heights;
-        setYAxisRange(
-            chartInstances.heightAverage,
-            chartData.avg_sit_heights.concat(chartData.avg_stand_heights),
-            { minClamp: null, maxClamp: null }
-        );
-        chartInstances.heightAverage.update();
-    }
-    
-    // Update height overview chart
-    if (chartInstances.heightOverview && chartData.height_overview && chartData.height_overview.length > 0) {
-        chartInstances.heightOverview.data.labels = chartData.labels;
-        
-        const heights = chartData.height_overview.map(h => h.height);
-        const modes = chartData.height_overview.map(h => h.mode);
-        
-        chartInstances.heightOverview.data.datasets[0].data = heights;
-        chartInstances.heightOverview.data.datasets[0].modes = modes;
-        
-        const validHeights = heights.filter(h => h !== null);
-        if (validHeights.length > 0) {
-            setYAxisRange(chartInstances.heightOverview, validHeights, { minClamp: null, maxClamp: null });
-        }
-        
-        chartInstances.heightOverview.update();
-    }
-}
-
 // Fetch live status
 async function fetchLiveStatus() {
     try {
         const response = await fetch('/api/health-live-status');
         const data = await response.json();
         
-        updateLiveStatus(data);
+        const modeEl = q('#live-mode');
+        const heightEl = q('#live-height');
+        const lastEl = q('#live-last');
+        
+        if (modeEl) modeEl.textContent = data.mode;
+        if (heightEl) heightEl.textContent = `${data.height_cm} cm`;
+        if (lastEl) lastEl.textContent = `Last adjusted: ${data.last_adjusted}`;
     } catch (error) {
         console.error('Error fetching live status:', error);
     }
 }
 
-// Fetch aggregated stats (kept for backward compatibility or refresh)
+// Fetch aggregated stats
 async function fetchStats(range = 'today') {
     try {
         const response = await fetch(`/api/health-stats?range=${range}`);
@@ -216,7 +97,7 @@ async function fetchStats(range = 'today') {
     }
 }
 
-// Fetch chart data (kept for backward compatibility or refresh)
+// Fetch chart data
 async function fetchChartData(range = 'today') {
     try {
         const response = await fetch(`/api/health-chart-data?range=${range}`);
@@ -242,20 +123,6 @@ async function fetchChartData(range = 'today') {
         }
         
         // Update height average chart
-        if (chartInstances.heightAverage && data.avg_sit_heights && data.avg_sit_heights.length > 0) {
-            chartInstances.heightAverage.data.labels = data.labels;
-            chartInstances.heightAverage.data.datasets[0].data = data.avg_sit_heights;
-            chartInstances.heightAverage.data.datasets[1].data = data.avg_stand_heights;
-            
-            // Only set range if we have valid data
-            const validHeights = [...data.avg_sit_heights, ...data.avg_stand_heights].filter(h => h !== null);
-            if (validHeights.length > 0) {
-                setYAxisRange(chartInstances.heightAverage, validHeights, { minClamp: null, maxClamp: null });
-            }
-            chartInstances.heightAverage.update();
-        }
-        
-        // Height overview chart
         if (chartInstances.heightOverview && data.height_overview && data.height_overview.length > 0) {
             chartInstances.heightOverview.data.labels = data.labels;
             
@@ -306,13 +173,13 @@ function createCharts() {
             chartInstances.timePercentage = new Chart(pctCtx, {
                 type: 'doughnut',
                 data: { 
-                    labels: ['Sitting', 'Standing'],  // Fixed: Match data order
+                    labels: ['Standing', 'Sitting'], 
                     datasets: [{
                         data: [50, 50],
-                        backgroundColor: [palette.primary, palette.accent]  // Fixed: Sitting=primary, Standing=accent
+                        backgroundColor: [palette.accent, palette.primary]
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom'} } }  // Removed reverse
+                options: { responsive: true, plugins: { legend: { position: 'bottom', reverse: true} } }
             });
         }
 
@@ -550,7 +417,6 @@ function setupPDFExport() {
             console.error('Export error:', error);
             alert('Failed to generate PDF. Please try again.');
         } finally {
-            // Restaurar botón
             exportBtn.innerHTML = originalText;
             exportBtn.disabled = false;
         }
@@ -633,18 +499,19 @@ function showTip(message, title = 'Suggestion', type = 'default') {
     container.appendChild(article);
 }
 
+async function updateRange(range) {
+    await fetchStats(range);
+    await fetchChartData(range);
+}
+
 async function init() {
     createCharts();
     await fetchLiveStatus();
     await fetchStats('today');
     await fetchChartData('today');
     
-    
-    // Load all data in parallel for faster page load
-    await Promise.all([
-        fetchAllData('today'),
-        loadNotificationHistory()
-    ]);
+    // Load notification history
+    await loadNotificationHistory();
 
     qq('.range-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -655,18 +522,9 @@ async function init() {
     });
     
     setupPDFExport();
-    
-    // Refresh live status every 30 seconds
-    setInterval(fetchLiveStatus, 30000);
-    
-    // Refresh notifications every 2 minutes
-    setInterval(loadNotificationHistory, 120000);
-}
 
-async function updateRange(range) {
-    // Use combined endpoint for faster updates
-    // Maybe will remain unused
-    await fetchAllData(range);
+    setInterval(fetchLiveStatus, 30000);
+    setInterval(loadNotificationHistory, 120000);
 }
 
 if (document.readyState === 'loading') {
