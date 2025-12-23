@@ -145,9 +145,21 @@
                 isEvent = false;
             }
             
+            // Start polling for real-time updates (every 5 seconds)
+            if (typeof startPolling === 'function') {
+                startPolling(5000);
+            }
+            
             // Update clock
             updateClock();
             setInterval(updateClock, 1000);
+        });
+        
+        // Stop polling when leaving the page
+        window.addEventListener('beforeunload', function() {
+            if (typeof stopPolling === 'function') {
+                stopPolling();
+            }
         });
         
         function updateClock() {
