@@ -641,10 +641,16 @@ async function init() {
     
     
     // Load all data in parallel for faster page load
-    await Promise.all([
-        fetchAllData('today'),
-        loadNotificationHistory()
-    ]);
+    const promises = [fetchAllData('today')];
+    
+    // Load notification history using the function from notifications.js
+    if (typeof loadNotificationHistory === 'function') {
+        promises.push(loadNotificationHistory());
+    } else if (window.NotificationHistory?.loadNotificationHistory) {
+        promises.push(window.NotificationHistory.loadNotificationHistory());
+    }
+    
+    await Promise.all(promises);
 
     qq('.range-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -659,8 +665,14 @@ async function init() {
     // Refresh live status every 30 seconds
     setInterval(fetchLiveStatus, 30000);
     
-    // Refresh notifications every 2 minutes
-    setInterval(loadNotificationHistory, 120000);
+    // Refresh notifications every 2 minutes using the function from notifications.js
+    setInterval(() => {
+        if (typeof loadNotificationHistory === 'function') {
+            loadNotificationHistory();
+        } else if (window.NotificationHistory?.loadNotificationHistory) {
+            window.NotificationHistory.loadNotificationHistory();
+        }
+    }, 120000);
 }
 
 async function updateRange(range) {
@@ -673,62 +685,4 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
-}
-
-// Load notification history
-async function loadNotificationHistory() {
-    const listEl = document.getElementById('notificationHistoryList');
-    if (!listEl) return;
-
-    try {
-        const response = await fetch('/api/notifications/history');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-
-        if (!data.notifications || data.notifications.length === 0) {
-            listEl.innerHTML = '<p class="empty-text">No notifications yet</p>';
-            return;
-        }
-
-        listEl.innerHTML = data.notifications.map(notification => {
-            const date = new Date(notification.sent_at || notification.created_at);
-            const timeAgo = getTimeAgo(date);
-            const unreadClass = notification.is_read ? '' : ' unread';
-            
-            return `
-                <div class="notification-item${unreadClass}">
-                    <div class="notification-item-header">
-                        <h4 class="notification-item-title">${escapeHtml(notification.title)}</h4>
-                        <span class="notification-item-badge ${notification.type}">${notification.type}</span>
-                    </div>
-                    <p class="notification-item-message">${escapeHtml(notification.message)}</p>
-                    <span class="notification-item-time">${timeAgo}</span>
-                </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading notification history:', error);
-        listEl.innerHTML = '<p class="empty-text">Failed to load notifications</p>';
-    }
-}
-
-function getTimeAgo(date) {
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-    
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)} days ago`;
-    return date.toLocaleDateString();
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }

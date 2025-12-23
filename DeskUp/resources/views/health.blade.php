@@ -10,9 +10,9 @@
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/health.css') }}">
     <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
-    <script src="{{ asset('js/health.js') }}" defer></script>
-    <script src="{{ asset('js/notifications.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
+    <script src="{{ asset('js/health.js') }}" defer></script>
 </head>
 <body>
     @include('components.sidebar')
