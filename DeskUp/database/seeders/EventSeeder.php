@@ -7,106 +7,111 @@ use Illuminate\Database\Seeder;
 use App\Models\Event;
 use App\Models\Desk;
 use App\Models\User;
+use Carbon\Carbon;
 
 class EventSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        $createEvents = [
-        [
-            'event_type'   => 'meeting',
-            'description'  => 'Weekly team 12 meeting',
-            'scheduled_at' => '2025-12-01 09:00:00',
-            'scheduled_to' => '2025-12-01 10:00:00',
-            'status'       => 'approved',
-            'created_by'   => 2,
-        ],
-        [
-            'event_type'   => 'cleaning',
-            'description'  => 'Weekly deep cleaning of the office area',
-            'scheduled_at' => '2025-12-02 17:00:00',
-            'scheduled_to' => '2025-12-02 19:00:00',
-            'status'       => 'approved',
-            'created_by'   => 1,
-        ],
-        [
-            'event_type'   => 'maintenance',
-            'description'  => 'Height calibration and cable check for adjustable desks',
-            'scheduled_at' => '2025-12-03 13:00:00',
-            'scheduled_to' => '2025-12-03 15:00:00',
-            'status'       => 'approved',
-            'created_by'   => 1,
-        ],
-        [
-            'event_type'   => 'event',
-            'description'  => 'DeskUp launch presentation',
-            'scheduled_at' => '2025-12-05 14:00:00',
-            'scheduled_to' => '2025-12-05 16:00:00',
-            'status'       => 'pending',
-            'created_by'   => 2,
-        ],
-        [
-            'event_type'   => 'meeting',
-            'description'  => 'Monthly team 2 meeting',
-            'scheduled_at' => '2025-12-06 10:00:00',
-            'scheduled_to' => '2025-12-06 12:00:00',
-            'status'       => 'pending',
-            'created_by'   => 2,
-        ],
-        [
-            'event_type'   => 'meeting',
-            'description'  => 'Monthly team 4 meeting',
-            'scheduled_at' => '2025-12-08 09:00:00',
-            'scheduled_to' => '2025-12-08 11:00:00',
-            'status'       => 'pending',
-            'created_by'   => 2,
-        ],
-        [
-            'event_type'   => 'cleaning',
-            'description'  => 'Weekly deep cleaning of the office area',
-            'scheduled_at' => '2025-12-09 17:00:00',
-            'scheduled_to' => '2025-12-09 19:00:00',
-            'status'       => 'approved',
-            'created_by'   => 1,
-        ],
-    ];
-
-
-
-
-    foreach ($createEvents as $eventData) {
-        $event = Event::create($eventData);
-
-        // Attach 1-3 random desks to each event
-        $deskIds = Desk::inRandomOrder()->limit(rand(1,3))->pluck('id');
-
-        $event->desks()->attach($deskIds);
-    }
-    
-
-    $adminUser = User::where('is_admin', true)->firstOrFail();
-    $regularUser = User::where('is_admin', false)->firstOrFail();
-
-    $events = Event::all();
-
-        foreach ($events as $event) {
-
-            // meetings + generic events -> both users
-            if (in_array($event->event_type, ['meeting', 'event'], true)) {
-                $event->users()->syncWithoutDetaching([
-                    $adminUser->id,
-                    $regularUser->id,
-                ]);
-            }
-            // all other event types -> only admin
-            else {
-                $event->users()->syncWithoutDetaching([
-                    $adminUser->id,
-                ]);
-            }
-        }
+    public function run(): void  
+    {  
+        // Get users for event creation  
+        $adminUser = User::where('is_admin', true)->first();  
+        $regularUser = User::where('is_admin', false)->first();  
+  
+        if (!$adminUser || !$regularUser) {  
+            $this->command->warn('Users not found. Please run UserSeeder first.');  
+            return;  
+        }  
+  
+        // Define events to create  
+        $events = [  
+            [  
+                'event_type' => 'meeting',  
+                'description' => 'Weekly team standup meeting',  
+                'scheduled_at' => Carbon::now()->addDays(7)->setTime(9, 0),  
+                'scheduled_to' => Carbon::now()->addDays(7)->setTime(10, 0),  
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $adminUser->id,  
+            ],  
+            [  
+                'event_type' => 'meeting',  
+                'description' => 'Monthly planning session',  
+                'scheduled_at' => Carbon::now()->addDays(9)->setTime(14, 0),  
+                'scheduled_to' => Carbon::now()->addDays(9)->setTime(16, 0),  
+                'status' => Event::STATUS_PENDING,  
+                'created_by' => $regularUser->id,  
+            ],  
+            [  
+                'event_type' => 'meeting',  
+                'description' => 'Weekly scrum meeting',  
+                'scheduled_at' => Carbon::now()->addDays(8)->setTime(14, 0),  
+                'scheduled_to' => Carbon::now()->addDays(8)->setTime(16, 0),  
+                'status' => Event::STATUS_PENDING,  
+                'created_by' => $regularUser->id,  
+            ],  
+            [  
+                'event_type' => 'meeting',  
+                'description' => 'Bi-weekly planning session',  
+                'scheduled_at' => Carbon::now()->addDays(10)->setTime(14, 0),  
+                'scheduled_to' => Carbon::now()->addDays(10)->setTime(16, 0),  
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $regularUser->id,  
+            ],  
+            [  
+                'event_type' => 'event',  
+                'description' => 'Company all-hands presentation',  
+                'scheduled_at' => Carbon::now()->addDays(11)->setTime(10, 0),  
+                'scheduled_to' => Carbon::now()->addDays(11)->setTime(13, 0),  
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $adminUser->id,  
+            ],  
+            [  
+                'event_type' => 'event',  
+                'description' => 'Company product showcase',  
+                'scheduled_at' => Carbon::now()->addDays(23)->setTime(9, 0),  
+                'scheduled_to' => Carbon::now()->addDays(23)->setTime(12, 0),  
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $adminUser->id,  
+            ],  
+            [  
+                'event_type' => 'maintenance',  
+                'description' => 'Desk height calibration and inspection',  
+                'scheduled_at' => Carbon::now()->addDays(5)->setTime(17, 0),  
+                'scheduled_to' => Carbon::now()->addDays(5)->setTime(19, 0),  
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $adminUser->id,  
+            ],  
+            [  
+                'event_type' => 'cleaning',  
+                'description' => 'Weekly office deep cleaning',  
+                'scheduled_at' => null, 
+                'scheduled_to' => null, 
+                'status' => Event::STATUS_APPROVED,  
+                'created_by' => $adminUser->id,  
+                'cleaning_time' => '18:00',  
+                'cleaning_days' => ['MON', 'WED', 'FRI'],  
+                'is_recurring' => true,  
+            ],  
+        ];  
+  
+        foreach ($events as $eventData) {  
+            $event = Event::create($eventData);  
+  
+            // Attach random desks (1-3 desks per event)  
+            $deskCount = rand(1, 3);  
+            $deskIds = Desk::inRandomOrder()->limit($deskCount)->pluck('id');  
+            $event->desks()->attach($deskIds);  
+  
+            // Attach users based on event type  
+            if (in_array($event->event_type, ['meeting', 'event'])) {  
+                // Meetings and events include both users  
+                $event->users()->attach([$adminUser->id, $regularUser->id]);  
+            } else {  
+                // Maintenance and cleaning only include admin  
+                $event->users()->attach([$adminUser->id]);  
+            }  
+        }  
     }
 }

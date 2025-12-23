@@ -111,9 +111,9 @@
                         </div>
 
                         <div class="height-preset-btns">
-                            <button data-height="60">Sit</button>
-                            <button data-height="75">75</button>
-                            <button data-height="90">Stand</button>
+                            <button data-height="70">Sit</button>
+                            <button data-height="90">90</button>
+                            <button data-height="110">Stand</button>
                         </div>
 
                         <div class="meeting-attendees">
