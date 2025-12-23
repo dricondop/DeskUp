@@ -92,7 +92,7 @@ class HealthStatsServiceTest extends TestCase
         UserStatsHistory::create([
             'user_id' => $this->user->id,
             'desk_id' => $this->desk->id,
-            'desk_height_mm' => 600,
+            'desk_height_mm' => 700,
             'recorded_at' => now(),
         ]);
 

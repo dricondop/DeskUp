@@ -30,7 +30,25 @@ return new class extends Migration
         });
         
         // Add check constraint for desk height (680-1320mm inclusive)
-        DB::statement('ALTER TABLE user_stats_history ADD CONSTRAINT chk_desk_height CHECK (desk_height_mm >= 680 AND desk_height_mm <= 1320)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE user_stats_history ADD CONSTRAINT chk_desk_height CHECK (desk_height_mm >= 680 AND desk_height_mm <= 1320)');
+        } 
+        
+        // SQLite for testing, PGSQL does not support RAM databases
+        elseif (DB::getDriverName() === 'sqlite') {
+            DB::statement('CREATE TRIGGER chk_desk_height_insert BEFORE INSERT ON user_stats_history
+                BEGIN
+                    SELECT CASE WHEN NEW.desk_height_mm < 680 OR NEW.desk_height_mm > 1320
+                    THEN RAISE(ABORT, "desk_height_mm must be between 680 and 1320")
+                    END;
+                END');
+            DB::statement('CREATE TRIGGER chk_desk_height_update BEFORE UPDATE ON user_stats_history
+                BEGIN
+                    SELECT CASE WHEN NEW.desk_height_mm < 680 OR NEW.desk_height_mm > 1320
+                    THEN RAISE(ABORT, "desk_height_mm must be between 680 and 1320")
+                    END;
+                END');
+        }
     }
 
     public function down(): void
